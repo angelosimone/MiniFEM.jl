@@ -51,3 +51,18 @@ build/
 .gradle/
 .terraform/
 # --- end OS + editor junk ---
+
+# Quarto cache and rendered output
+book/.quarto/
+book/_book/
+
+# Generated numerical output
+output/
+results/
+tmp/
+
+# Julia coverage output
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
