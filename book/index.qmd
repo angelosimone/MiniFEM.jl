@@ -7,12 +7,13 @@ verified.
 The presentation begins with simple mechanical systems and the direct stiffness
 method. Starting from problems that can be solved and verified by hand, the core
 ingredients of a finite element formulation are introduced gradually. As the
-course progresses, these same principles are extended to continuum problems.
+presentation progresses, these same principles are extended to continuum
+problems.
 
 Theory and computation are developed together. Julia is used because its syntax
 stays close to mathematical notation while still delivering high performance.
 The exposition is tightly coordinated with successive versions of the
-accompanying pedagogical code MiniFEM.jl.
+accompanying pedagogical code, MiniFEM.
 
 The primary target audience is students with an engineering background and a
 basic knowledge of solid or structural mechanics and of numerical analysis,
@@ -28,29 +29,30 @@ This book is built with [Quarto](https://quarto.org/docs/books).
 
 OpenAI's ChatGPT was used to support language editing, structural revision, and
 the review of selected explanations and code examples. The author remains fully
-responsible for the technical content and final editorial decisions
+responsible for the technical content and final editorial decisions.
 
 --------------------------------------------------------------------------------
 
-# About MiniFEM.jl {.unnumbered}
+# About MiniFEM {.unnumbered}
 
-[MiniFEM.jl](https://github.com/angelosimone/MiniFEM.jl) is a pedagogical finite
-element code written in Julia and developed alongside the material presented in
-this book.
+MiniFEM is a pedagogical finite element code written in Julia and developed
+alongside the material presented in this book. Its source code and successive
+development snapshots are hosted in the
+[`MiniFEM.jl`](https://github.com/angelosimone/MiniFEM.jl) repository.
 
 Its development begins with self-contained scripts that closely mirror hand
 calculations and proceeds toward increasingly structured and modular
-implementations. The purpose of MiniFEM.jl is to make the essential components
-of a finite element implementation explicit and directly inspectable.
+implementations. The purpose of MiniFEM is to make the essential components of a
+finite element implementation explicit and directly inspectable.
 
-At a later stage, the course transitions to established Julia finite element
-libraries such as
-[Ferrite.jl](https://ferrite-fem.github.io/Ferrite.jl/stable/). The concepts
-developed through MiniFEM.jl provide the basis for understanding the more
-general abstractions and workflows introduced by these libraries.
+At a later stage, the presentation transitions to established Julia finite
+element libraries such as
+[`Ferrite.jl`](https://ferrite-fem.github.io/Ferrite.jl/stable/). The concepts
+developed through MiniFEM provide the basis for understanding the more general
+abstractions and workflows introduced by these libraries.
 
 The chapters of the book are coordinated with successive snapshots of the
-MiniFEM.jl repository. Early snapshots document the progressive development of
-MiniFEM.jl, while later ones include examples and applications based on
-Ferrite.jl. Each snapshot captures a particular stage in the development of the
-course material.
+`MiniFEM.jl` repository. Early snapshots document the progressive development of
+MiniFEM, while later ones include examples and applications based on
+`Ferrite.jl`. Each snapshot captures a particular stage in the development of
+the course material.
