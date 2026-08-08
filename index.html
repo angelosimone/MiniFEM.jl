@@ -157,7 +157,7 @@ window.MathJax = {
    
   <ul>
   <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a></li>
-  <li><a href="#about-minifem.jl" id="toc-about-minifem.jl" class="nav-link" data-scroll-target="#about-minifem.jl">About MiniFEM.jl</a></li>
+  <li><a href="#about-minifem" id="toc-about-minifem" class="nav-link" data-scroll-target="#about-minifem">About MiniFEM</a></li>
   </ul>
 </nav>
     </div>
@@ -193,20 +193,20 @@ window.MathJax = {
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
 <p>This book provides a progressive introduction to the finite element method, with an emphasis on understanding how the method is formulated, implemented, and verified.</p>
-<p>The presentation begins with simple mechanical systems and the direct stiffness method. Starting from problems that can be solved and verified by hand, the core ingredients of a finite element formulation are introduced gradually. As the course progresses, these same principles are extended to continuum problems.</p>
-<p>Theory and computation are developed together. Julia is used because its syntax stays close to mathematical notation while still delivering high performance. The exposition is tightly coordinated with successive versions of the accompanying pedagogical code MiniFEM.jl.</p>
+<p>The presentation begins with simple mechanical systems and the direct stiffness method. Starting from problems that can be solved and verified by hand, the core ingredients of a finite element formulation are introduced gradually. As the presentation progresses, these same principles are extended to continuum problems.</p>
+<p>Theory and computation are developed together. Julia is used because its syntax stays close to mathematical notation while still delivering high performance. The exposition is tightly coordinated with successive versions of the accompanying pedagogical code, MiniFEM.</p>
 <p>The primary target audience is students with an engineering background and a basic knowledge of solid or structural mechanics and of numerical analysis, although the material may also be useful to students from related disciplines.</p>
 <p>Finite element concepts are developed through computational examples of increasing generality, with the aim of connecting mathematical formulations, numerical algorithms, and their software implementation. Throughout the book, particular attention is given to verification and to the interpretation of numerical results.</p>
 <p>This book is built with <a href="https://quarto.org/docs/books">Quarto</a>.</p>
-<p>OpenAI’s ChatGPT was used to support language editing, structural revision, and the review of selected explanations and code examples. The author remains fully responsible for the technical content and final editorial decisions</p>
+<p>OpenAI’s ChatGPT was used to support language editing, structural revision, and the review of selected explanations and code examples. The author remains fully responsible for the technical content and final editorial decisions.</p>
 <hr>
 </section>
-<section id="about-minifem.jl" class="level1 unnumbered">
-<h1 class="unnumbered">About MiniFEM.jl</h1>
-<p><a href="https://github.com/angelosimone/MiniFEM.jl">MiniFEM.jl</a> is a pedagogical finite element code written in Julia and developed alongside the material presented in this book.</p>
-<p>Its development begins with self-contained scripts that closely mirror hand calculations and proceeds toward increasingly structured and modular implementations. The purpose of MiniFEM.jl is to make the essential components of a finite element implementation explicit and directly inspectable.</p>
-<p>At a later stage, the course transitions to established Julia finite element libraries such as <a href="https://ferrite-fem.github.io/Ferrite.jl/stable/">Ferrite.jl</a>. The concepts developed through MiniFEM.jl provide the basis for understanding the more general abstractions and workflows introduced by these libraries.</p>
-<p>The chapters of the book are coordinated with successive snapshots of the MiniFEM.jl repository. Early snapshots document the progressive development of MiniFEM.jl, while later ones include examples and applications based on Ferrite.jl. Each snapshot captures a particular stage in the development of the course material.</p>
+<section id="about-minifem" class="level1 unnumbered">
+<h1 class="unnumbered">About MiniFEM</h1>
+<p>MiniFEM is a pedagogical finite element code written in Julia and developed alongside the material presented in this book. Its source code and successive development snapshots are hosted in the <a href="https://github.com/angelosimone/MiniFEM.jl"><code>MiniFEM.jl</code></a> repository.</p>
+<p>Its development begins with self-contained scripts that closely mirror hand calculations and proceeds toward increasingly structured and modular implementations. The purpose of MiniFEM is to make the essential components of a finite element implementation explicit and directly inspectable.</p>
+<p>At a later stage, the presentation transitions to established Julia finite element libraries such as <a href="https://ferrite-fem.github.io/Ferrite.jl/stable/"><code>Ferrite.jl</code></a>. The concepts developed through MiniFEM provide the basis for understanding the more general abstractions and workflows introduced by these libraries.</p>
+<p>The chapters of the book are coordinated with successive snapshots of the <code>MiniFEM.jl</code> repository. Early snapshots document the progressive development of MiniFEM, while later ones include examples and applications based on <code>Ferrite.jl</code>. Each snapshot captures a particular stage in the development of the course material.</p>
 
 
 </section>
