@@ -52,10 +52,6 @@ build/
 .terraform/
 # --- end OS + editor junk ---
 
-# Quarto cache and rendered output
-book/.quarto/
-book/_book/
-
 # Generated numerical output
 output/
 results/
