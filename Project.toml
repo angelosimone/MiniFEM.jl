@@ -1,7 +1,0 @@
-name = "MiniFEM"
-uuid = "50f5fcb2-890f-49c9-8106-67f5429324be"
-authors = ["Angelo Simone <angelo.simone@unipd.it>"]
-version = "0.1.0"
-
-[compat]
-julia = "1.10"

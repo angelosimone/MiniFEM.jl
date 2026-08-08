@@ -1,3 +1,0 @@
-module MiniFEM
-
-end
