@@ -7,6 +7,9 @@ book:
   author: "Angelo Simone"
   chapters:
     - index.qmd
+    - part: "Getting started"
+      chapters:
+        - chapters/julia-essentials.qmd
 
 format:
   html:

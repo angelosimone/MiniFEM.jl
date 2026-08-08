@@ -1,0 +1,1475 @@
+# The bare minimum: Julia essentials for MiniFEM {#sec-julia-essentials}
+
+This chapter introduces the Julia concepts needed to read, run, and modify the
+first MiniFEM examples. It is not intended to provide a complete introduction to
+programming or to the Julia language. Instead, it focuses on the programming
+ideas that appear directly in the MiniFEM code and introduces additional Julia
+features only when they become useful.
+
+No previous programming experience is assumed. The most effective way to use
+this chapter is interactively: execute each example in the Julia REPL, inspect
+the result, and then modify one part of the example to observe how the behaviour
+changes.
+
+::: {.callout-important title="Bare-minimum learning path"}
+Part I contains the Julia knowledge required to understand the first
+`two_springs.jl` implementation.
+
+The essential path is:
+
+`REPL` → `values and variables` → `vectors and matrices` → `indexing` → `loops`
+→ `tuples` → `index mapping` → `copy` → `linear solve` → `transpose` → `output`
+
+When you reach the Bare-minimum checkpoint, you have the programming background
+needed to move to the two-spring implementation.
+
+Part II is a reference section for Julia concepts used in later MiniFEM
+snapshots. It is not required for the first `two_springs.jl` implementation and
+can be revisited when those features first appear.
+:::
+
+## Part I --- The bare minimum for `two_springs.jl`
+
+### Core programming constructs
+
+Computer programs are built from a small set of recurring programming
+constructs. A *construct* is a language feature or syntax pattern used to
+represent data, perform computations, control program execution, or organize
+code.
+
+MiniFEM relies on several broad categories of these constructs. The overview
+below serves as a map of the chapter. Some concepts are needed immediately for
+the first script; others become relevant only in later MiniFEM snapshots and are
+collected in the reference section.
+
+#### Data representation constructs
+
+These constructs define *what information* is stored and manipulated.
+
+- Literals are fixed values written directly in the code, such as `1`, `3.14`,
+  `"hello"`, `true`, and `false`.
+- Variables associate names with values, as in `count = 3`.
+- Collections group several values. MiniFEM uses vectors, matrices, tuples, and,
+  later, nested collections such as arrays of arrays.
+
+#### Operators and expressions
+
+Operators combine values into expressions. Examples include arithmetic operators
+such as `+`, `-`, `*`, and `/`, comparison operators such as `==` and `<`, and
+the assignment operator `=`.
+
+#### Control-flow constructs
+
+Control flow determines *when* and *how often* statements are executed.
+
+- Loops use `for` or `while` to repeat a block of code.
+- Conditional statements use `if`, `elseif`, and `else` to select between
+  alternatives.
+- Branching statements, such as `break`, `continue`, and `return`, alter the
+  normal sequence of execution.
+
+#### Functional abstraction constructs
+
+Functions collect statements into reusable computational units. A function can
+accept input arguments and return one or more results. The first
+`two_springs.jl` script calls built-in functions but is deliberately written at
+the top level. User-defined functions are introduced later, when MiniFEM begins
+to separate recurring operations from problem-specific data.
+
+#### Error checking and verification
+
+A numerical program should detect invalid input and verify important results.
+The first script exposes numerical differences for inspection. Later sections
+introduce conditional checks, explicit errors, assertions, and comparisons based
+on numerical tolerances.
+
+#### Input and output
+
+The first MiniFEM scripts use printed output to expose the individual stages of
+the computation. Comments document the source code, while `print`, `println`,
+and `display` present information when the program runs.
+
+### Learning objectives
+
+After completing this essential section, you should be able to:
+
+- read and modify the basic Julia constructs used in the first MiniFEM script;
+- work with variables, vectors, matrices, indexing, loops, and tuples;
+- follow the mapping and assembly operations used to build larger arrays from
+  smaller ones;
+- distinguish assignment from copying when working with mutable arrays;
+- solve a linear system and interpret the basic numerical output produced by the
+  script.
+
+### Working in the Julia REPL
+
+As introduced in the installation chapter, the Julia REPL provides an
+interactive environment for evaluating Julia expressions. Here we use it to
+explore the programming constructs needed by the first MiniFEM examples.
+
+For example, enter:
+
+```julia
+2 + 3
+```
+
+Julia evaluates the expression and displays:
+
+```text
+5
+```
+
+Assignments are expressions as well. Therefore,
+
+```julia
+count = 3
+```
+
+normally displays:
+
+```text
+3
+```
+
+Entering the variable name again displays its current value:
+
+```julia
+count
+```
+
+A trailing semicolon suppresses the displayed result:
+
+```julia
+count = 3;
+```
+
+This makes the REPL useful for short experiments and for checking how individual
+Julia expressions behave.
+
+### Values, variables, and assignment
+
+#### Literals
+
+A *literal* is a value written directly in the program:
+
+```julia
+3
+1.0
+"example"
+true
+```
+
+These examples represent an integer, a floating-point number, a string, and a
+Boolean value.
+
+#### Variables
+
+A *variable* is a name associated with a value. The assignment operator `=`
+binds a name to the value on its right-hand side:
+
+```julia
+count = 3
+scale = 1.0
+title = "example"
+```
+
+The value associated with a variable can later be replaced:
+
+```julia
+count = 3
+count = 4
+```
+
+After the second assignment, `count` has the value `4`.
+
+Assignment and equality comparison are different operations:
+
+```julia
+x = 5       # assign the value 5 to x
+x == 5      # ask whether x is equal to 5
+```
+
+The expression `x == 5` evaluates to the Boolean value `true`.
+
+#### Basic scalar types
+
+The numerical examples in this chapter mainly use integers and floating-point
+numbers:
+
+```julia
+count = 2        # Int64 on a typical 64-bit system
+scale = 1.0      # Float64
+```
+
+Strings are used for text:
+
+```julia
+message = "Calculation complete"
+```
+
+and Boolean values represent `true` or `false` conditions:
+
+```julia
+check_passed = true
+```
+
+The type of a value can be inspected with `typeof`:
+
+```julia
+typeof(count)
+typeof(scale)
+```
+
+A *floating-point number* is a number represented using a finite-precision
+numerical format. For example, the literal `3.14` is represented as a `Float64`
+by default. Because only a finite number of binary digits are available, most
+real numbers cannot be represented exactly. The consequences of this
+approximation become important when numerical results are compared;
+tolerance-based comparisons are introduced later in this chapter.
+
+### Expressions and operators used by the first script
+
+The following operators appear directly in the first MiniFEM implementation.
+
+  | Operation           | Julia expression |
+  | ------------------- | ---------------- |
+  | Addition            | `a + b`          |
+  | Subtraction         | `a - b`          |
+  | Multiplication      | `a * b`          |
+  | Division            | `a / b`          |
+  | Power               | `a ^ b`          |
+  | Assignment          | `a = b`          |
+  | Equality comparison | `a == b`         |
+
+Julia evaluates combinations of values, variables, function calls, and operators
+as *expressions*. For example:
+
+```julia
+total = count * 2
+```
+
+computes the product on the right-hand side and assigns the result to `total`.
+
+#### Accumulated assignment
+
+An accumulated assignment combines an operation with assignment:
+
+```julia
+value = 10.0
+value += 2.0
+```
+
+The second statement is equivalent to:
+
+```julia
+value = value + 2.0
+```
+
+This pattern is useful whenever a result is built up gradually. For example:
+
+```julia
+total = 0.0
+total += 2.5
+total += 1.5
+```
+
+After these statements, `total` is `4.0`.
+
+The first MiniFEM script uses the same `+=` pattern to accumulate several
+contributions into a single array entry. For example,
+
+```julia
+K[I, J] += K_e[i, j]
+```
+
+adds the value `K_e[i, j]` to the value already stored in `K[I, J]`.
+
+In the finite element code, this operation is used during assembly because more
+than one element can contribute to the same entry of the global matrix. At this
+stage, however, you only need to recognize the programming pattern: read the
+current value, add a contribution, and store the updated value.
+
+### Calling functions
+
+The first script calls several Julia functions, including `zeros`, `size`,
+`copy`, `transpose`, `abs`, `println`, and `display`.
+
+A function call has the general form:
+
+```text
+function_name(arguments)
+```
+
+For example:
+
+```julia
+zeros(3)
+abs(-2.0)
+```
+
+You do not need to know how to define your own functions before reading the
+first `two_springs.jl` script. User-defined functions are introduced later, when
+they become useful in the evolving MiniFEM code.
+
+### Vectors
+
+A Julia vector is a one-dimensional array:
+
+```julia
+values = [10.0, 20.0, 30.0]
+```
+
+A vector of floating-point zeros can be created with:
+
+```julia
+x = zeros(3)
+```
+
+Here `x` contains three `Float64` zeros.
+
+Useful inspection functions include:
+
+```julia
+length(x)
+eltype(x)
+typeof(x)
+```
+
+For this vector:
+
+- `length(x)` is `3`;
+- `eltype(x)` is `Float64`;
+- `typeof(x)` is a concrete vector type such as `Vector{Float64}`.
+
+#### One-based indexing
+
+Julia uses one-based indexing. The first entry of a vector has index `1`:
+
+```julia
+values = [10.0, 20.0, 30.0]
+
+values[1]      # 10.0
+values[2]      # 20.0
+values[3]      # 30.0
+```
+
+An entry can be changed by assigning a new value to the indexed location:
+
+```julia
+values[2] = 99.0
+```
+
+An index can itself be stored in a variable:
+
+```julia
+i = 2
+values[i]      # 99.0
+```
+
+### Matrices
+
+A Julia matrix is a two-dimensional array. Spaces separate columns, while
+semicolons or line breaks separate rows:
+
+```julia
+A = [
+    1.0  2.0
+    3.0  4.0
+]
+```
+
+The same matrix could be written on one line:
+
+```julia
+A = [1.0 2.0; 3.0 4.0]
+```
+
+The expression
+
+```julia
+A[i, j]
+```
+
+selects the entry in row `i` and column `j`. For example:
+
+```julia
+A[1, 1]    # 1.0
+A[1, 2]    # 2.0
+A[2, 1]    # 3.0
+A[2, 2]    # 4.0
+```
+
+The dimensions of a matrix can be inspected with `size`:
+
+```julia
+size(A)       # (2, 2)
+size(A, 1)    # number of rows
+size(A, 2)    # number of columns
+```
+
+#### Creating zero arrays
+
+A zero matrix and a zero vector can be created with:
+
+```julia
+A = zeros(3, 3)
+x = zeros(3)
+```
+
+The first statement creates a `3 × 3` matrix and the second creates a vector of
+length `3`.
+
+#### Arrays are mutable
+
+A Julia array is mutable: its entries can be changed after the array has been
+created.
+
+```julia
+A = zeros(3, 3)
+A[1, 1] = 1.0
+
+x = zeros(3)
+x[1] = 10.0
+```
+
+The variables `A` and `x` continue to refer to the same arrays, but the contents
+of those arrays have changed.
+
+### Ranges and `for` loops
+
+A *range* represents a sequence of values. For example:
+
+```julia
+1:3
+```
+
+represents the integers `1`, `2`, and `3`.
+
+Ranges are commonly used in `for` loops:
+
+```julia
+for i = 1:3
+    println(i)
+end
+```
+
+The block between `for` and `end` is executed once for each value in the range.
+
+#### Iterables
+
+A range is an example of an *iterable*: an object whose values can be visited
+one at a time. Vectors, matrices, tuples, and many other Julia objects are also
+iterable. This means that a loop can visit their values directly.
+
+For example:
+
+```julia
+for value in [10.0, 20.0, 30.0]
+    println(value)
+end
+```
+
+Not every iterable stores all of its values in a conventional array. A range,
+for example, stores a compact description of a sequence and produces the
+individual values as they are visited.
+
+Julia accepts both `=` and `in` in a `for` loop header:
+
+```julia
+for i = 1:3
+    println(i)
+end
+```
+
+and
+
+```julia
+for i in 1:3
+    println(i)
+end
+```
+
+The first `two_springs.jl` script uses both forms.
+
+#### Looping directly over stored values
+
+A vector can be traversed directly:
+
+```julia
+values = [10.0, 20.0, 30.0]
+
+for value in values
+    println(value)
+end
+```
+
+Here `value` takes each entry of `values` in turn.
+
+#### Nested loops
+
+A loop can contain another loop:
+
+```julia
+for i = 1:2
+    for j = 1:2
+        println("i = ", i, ", j = ", j)
+    end
+end
+```
+
+The inner loop runs completely for each iteration of the outer loop. Nested
+loops are commonly used when working with matrices because two indices are
+needed to visit rows and columns.
+
+### Tuples and destructuring
+
+A tuple is an ordered collection of values:
+
+```julia
+pair = (2, 10.0)
+```
+
+Unlike an array, a tuple is immutable: its entries cannot be replaced after it
+has been created.
+
+Tuple entries use one-based indexing:
+
+```julia
+pair[1]       # 2
+pair[2]       # 10.0
+```
+
+#### A vector of tuples
+
+A vector can contain tuples:
+
+```julia
+entries = [
+    (1, 10.0),
+    (3, -2.0),
+]
+```
+
+The outer brackets `[...]` create the vector. Each pair of parentheses creates
+one tuple containing an index and an associated value.
+
+#### Tuple destructuring
+
+Tuple destructuring assigns tuple entries to separate variable names:
+
+```julia
+index, value = (1, 10.0)
+```
+
+After this statement, `index` is `1` and `value` is `10.0`.
+
+The same pattern can be used directly in a loop:
+
+```julia
+for (index, value) in entries
+    println("index = ", index, ", value = ", value)
+end
+```
+
+For each tuple, `index` receives the first entry and `value` receives the
+second.
+
+### Mapping indices between arrays
+
+Sometimes the indices of a small array need to be mapped to positions in a
+larger array. The following example uses a two-entry map:
+
+```julia
+index_map = [2, 3]
+```
+
+Suppose a small matrix is
+
+```julia
+B = [
+     1.0  -1.0
+    -1.0   1.0
+]
+```
+
+and a larger matrix is initialized as
+
+```julia
+A = zeros(3, 3)
+```
+
+The map can be used inside nested loops:
+
+```julia
+for i = 1:2
+    I = index_map[i]
+
+    for j = 1:2
+        J = index_map[j]
+        A[I, J] += B[i, j]
+    end
+end
+```
+
+Focus on the indexing logic:
+
+- `i` and `j` select an entry of the small matrix `B`;
+- `index_map` gives the corresponding positions in the larger matrix `A`;
+- `I` and `J` store those larger-array indices;
+- `+=` adds the selected value to the value already stored in `A`.
+
+For example, if
+
+```julia
+index_map = [2, 3]
+i = 1
+j = 2
+```
+
+then
+
+```julia
+I = 2
+J = 3
+```
+
+and
+
+```julia
+A[I, J] += B[i, j]
+```
+
+adds `B[1, 2]` to `A[2, 3]`.
+
+### Assignment, aliasing, and `copy`
+
+Arrays are mutable, so assigning an array to another variable does not create an
+independent copy.
+
+Consider:
+
+```julia
+A = [1.0 2.0; 3.0 4.0]
+B = A
+```
+
+Both variable names refer to the same matrix. Therefore:
+
+```julia
+A[1, 1] = 99.0
+println(B)
+```
+
+shows that `B[1, 1]` has also become `99.0`.
+
+This situation is called *aliasing*: two variable names refer to the same
+mutable object.
+
+An independent numerical matrix can be created with:
+
+```julia
+A = [1.0 2.0; 3.0 4.0]
+B = copy(A)
+```
+
+Now changing `A` does not change `B`:
+
+```julia
+A[1, 1] = 99.0
+println(B)
+```
+
+For an ordinary numerical matrix such as `Matrix{Float64}`, `copy` is sufficient
+to preserve the original entries.
+
+The distinction can be summarized as:
+
+```text
+B = A        same matrix, two names
+B = copy(A)  independent numerical matrix
+```
+
+### Modifying a selected matrix row and column
+
+The following example shows how nested loops and indexed assignment can modify a
+selected row and column of a matrix:
+
+```julia
+A = [
+    1.0  2.0  3.0
+    4.0  5.0  6.0
+    7.0  8.0  9.0
+]
+
+selected = 2
+
+for i = 1:size(A, 1)
+    A[i, selected] = 0.0
+    A[selected, i] = 0.0
+end
+
+A[selected, selected] = 1.0
+```
+
+### Solving a linear system with `\`
+
+Consider the linear system
+
+$$
+  A x = b.
+$$
+
+Julia solves it using the backslash operator:
+
+```julia
+x = A \ b
+```
+
+Read this as: solve `A * x = b` for `x`.
+
+At this stage, the important point is simply that `\` is Julia's standard
+linear-system solve operator. A later section explains why this is preferable to
+forming an inverse explicitly.
+
+### Transpose and quadratic forms
+
+A vector can be transposed with:
+
+```julia
+transpose(x)
+```
+
+A scalar expression of the form
+
+$$
+  q = x^{\mathsf T} A x
+$$
+
+can therefore be written as:
+
+```julia
+q = transpose(x) * A * x
+```
+
+This type of expression is called a *quadratic form*. For real-valued vectors,
+the adjoint notation `x'` has the same numerical entries as `transpose(x)`.
+
+The power operator `^` is used for powers:
+
+```julia
+value^2
+```
+
+which means the square of `value`.
+
+### `abs` and comparing computed values
+
+The function `abs` returns the absolute value:
+
+```julia
+abs(-3.0)    # 3.0
+```
+
+It is also useful when inspecting the difference between two computed values:
+
+```julia
+abs(result_a - result_b)
+```
+
+At this stage, simply recognize that this gives the magnitude of the difference.
+A systematic test of whether two floating-point results are sufficiently close
+requires numerical tolerances, which are introduced later in this chapter.
+
+### Printing and displaying results
+
+Julia provides several ways to show output while a program runs.
+
+#### `print` and `println`
+
+The function `print` writes output without automatically starting a new line:
+
+```julia
+print("Calculation")
+print(" complete")
+```
+
+which produces:
+
+```text
+Calculation complete
+```
+
+The function `println` behaves similarly but starts a new line after the output:
+
+```julia
+println("Calculation complete")
+```
+
+Several values can be supplied as separate arguments:
+
+```julia
+index = 2
+value = 10.0
+println("index = ", index, ", value = ", value)
+```
+
+A newline character can be inserted inside a string using `\n`:
+
+```julia
+println("\nResults:")
+```
+
+Here the leading `\n` inserts a blank line before the heading.
+
+#### `display`
+
+For vectors and matrices, `display` gives a convenient structured
+representation:
+
+```julia
+display(A)
+display(x)
+```
+
+`display` uses Julia's display system to show an object in a form appropriate to
+its type. This is particularly useful for numerical arrays because their rows
+and columns remain visually clear.
+
+### Comments and code organization
+
+A single-line comment begins with `#`:
+
+```julia
+# Number of values to process
+count = 3
+```
+
+Comments are ignored when the program runs. They explain the role or purpose of
+the code to the reader.
+
+Longer scripts can also use comment blocks to make their structure visible:
+
+```julia
+# -------------------------------
+# 1. Input data
+# -------------------------------
+```
+
+A simple numerical script might be organized as:
+
+1. input data;
+2. computation;
+3. output and checks.
+
+Comments and printed output serve different purposes. Comments should explain
+*why* a step is performed, what a quantity represents, or how a statement
+relates to the algorithm; they are part of the source code and are ignored
+during execution. Printed messages explain *what the program is currently doing*
+or show values produced while it runs.
+
+### Bare-minimum checkpoint
+
+::: {.callout-tip title="Getting ready for `two_springs.jl`"}
+Before moving on, make sure that you can explain the programming ideas in the
+following examples.
+
+Vectors, matrices, and indexing:
+
+```julia
+values = [1.0, 2.0]
+A = zeros(3, 3)
+A[2, 3] = 1.0
+```
+
+Index mapping and accumulated assignment:
+
+```julia
+index_map = [2, 3]
+B = [1.0 -1.0; -1.0 1.0]
+
+for i = 1:2
+    I = index_map[i]
+
+    for j = 1:2
+        J = index_map[j]
+        A[I, J] += B[i, j]
+    end
+end
+```
+
+Copying an array:
+
+```julia
+A_original = copy(A)
+```
+
+Solving a linear system:
+
+```julia
+A = [
+     2.0 -1.0
+    -1.0  2.0
+]
+
+b = [1.0, 0.0]
+x = A \ b
+```
+
+Transpose and a quadratic form:
+
+```julia
+q = transpose(x) * A * x
+```
+
+You should be able to identify the variables, vectors, matrices, indices, loops,
+assignments, function calls, copy operation, linear solve, and transpose. The
+first MiniFEM example uses these same Julia patterns with application-specific
+names and meanings.
+:::
+
+::: {.callout-note title="You may stop here"}
+You now have all the Julia knowledge required for the first `two_springs.jl`
+example. You can continue to the direct stiffness chapters and return to the
+reference section that follows when later MiniFEM examples introduce additional
+programming concepts.
+:::
+
+## Part II --- Reference: Julia concepts used later in MiniFEM
+
+### Learning objectives
+
+This reference section will help you to:
+
+- read basic control flow and simple Julia functions used in later MiniFEM code;
+- apply appropriate checks for floating-point results and invalid program
+  states;
+- understand at a high level how Julia solves linear systems;
+- work with more general indexing, iteration, and nested data structures;
+- recognize programming choices that become relevant as numerical problems grow
+  in size and complexity.
+
+### Conditional statements
+
+A conditional statement executes different code depending on a Boolean
+condition:
+
+```julia
+x = 5
+
+if x > 3
+    println("x is greater than 3")
+else
+    println("x is not greater than 3")
+end
+```
+
+Additional alternatives can be introduced with `elseif`:
+
+```julia
+if x < 0
+    println("negative")
+elseif x == 0
+    println("zero")
+else
+    println("positive")
+end
+```
+
+Useful comparison operators include:
+
+  | Operation                | Julia expression |
+  | ------------------------ | ---------------- |
+  | Equality                 | `a == b`         |
+  | Inequality               | `a != b`         |
+  | Less than                | `a < b`          |
+  | Less than or equal to    | `a <= b`         |
+  | Greater than             | `a > b`          |
+  | Greater than or equal to | `a >= b`         |
+
+Boolean expressions can be combined using:
+
+- logical AND: `a && b`;
+- logical OR: `a || b`;
+- logical NOT: `!a`.
+
+For example:
+
+```julia
+index = 2
+values = [10.0, 20.0, 30.0]
+
+if index >= 1 && index <= length(values)
+    println("Valid index")
+end
+```
+
+### Additional control flow: `while`, `break`, and `continue`
+
+A `while` loop repeats a block for as long as a Boolean condition remains true:
+
+```julia
+i = 1
+while i <= 3
+    println(i)
+    i += 1
+end
+```
+
+Two branching statements can alter the normal progression of a loop:
+
+- `break` exits the nearest enclosing loop immediately;
+- `continue` skips the remainder of the current iteration and proceeds to the
+  next one.
+
+For example:
+
+```julia
+for i in 1:5
+    if i == 2
+        continue
+    elseif i == 4
+        break
+    end
+    println(i)
+end
+```
+
+These constructs are not needed by the first `two_springs.jl` script, but they
+become useful when later algorithms require convergence loops, searches, or
+conditional iteration. The related branching statement `return`, which leaves a
+function and optionally supplies its result, is introduced with functions below.
+
+### Floating-point arithmetic and tolerance checks
+
+Floating-point calculations are affected by rounding. Two expressions that are
+mathematically equal may therefore produce values that differ by a very small
+amount.
+
+For example, a quantity that is mathematically zero may be computed as something
+like:
+
+```text
+1.0e-15
+```
+
+This motivates the distinction between exact zero and numerical zero. The
+floating-point value
+
+```julia
+0.0
+```
+
+is exactly zero, but a computed value does not generally need to equal `0.0`
+exactly to be accepted as zero for a numerical calculation.
+
+For reference, the spacing of `Float64` numbers near `1.0` is given by:
+
+```julia
+eps(Float64)
+```
+
+which is approximately:
+
+```text
+2.220446049250313e-16
+```
+
+This quantity is commonly called machine epsilon for `Float64`. It characterizes
+the spacing of representable floating-point numbers around `1.0` and gives an
+indication of finite precision. It should not be used as a universal definition
+of numerical zero or as a universal comparison tolerance. The acceptable
+numerical error depends on the scale of the quantities being compared and on the
+calculation being performed.
+
+For this reason, an exact comparison such as
+
+```julia
+result_a == result_b
+```
+
+may be too strict when both values have been obtained through floating-point
+calculations. Two results can be equivalent for the purpose of a numerical
+calculation while differing by a very small rounding error.
+
+::: {.callout-note title="MiniFEM example"}
+A later verification may compare quantities such as
+
+```julia
+energy_local == energy_global
+```
+
+The programming issue is the same: exact equality can be too strict for
+independently computed floating-point results.
+:::
+
+#### Absolute and relative tolerances
+
+For scalar values, a useful approximate-comparison rule is:
+
+$$
+  |a-b|
+  \leq
+  \max\left(
+  \mathrm{atol},
+  \mathrm{rtol}\max(|a|,|b|)
+  \right).
+$$
+
+Here:
+
+- `atol` is the absolute tolerance;
+- `rtol` is the relative tolerance.
+
+An explicit Julia implementation is:
+
+```julia
+difference = abs(a - b)
+scale = max(abs(a), abs(b))
+threshold = max(atol, rtol * scale)
+
+if difference <= threshold
+    println("Check passed")
+else
+    error("Check failed")
+end
+```
+
+The two tolerances have different roles:
+
+- `atol` is an absolute tolerance. It limits the acceptable difference in
+  absolute terms and is particularly important near zero. It answers the
+  practical question: *How close to zero is close enough?*
+- `rtol` is a relative tolerance. It allows the acceptable difference to scale
+  with the magnitude of the values being compared. It answers: *How large a
+  difference is acceptable relative to the magnitude of the values?*
+
+The special case of comparing a computed value $a$ with zero is worth examining.
+Setting $b=0$ gives
+
+$$
+  |a|
+  \leq
+  \max\left(
+  \mathrm{atol},
+  \mathrm{rtol}|a|
+  \right).
+$$
+
+The relative term does not vanish: it becomes $\mathrm{rtol}|a|$. However, for
+the usual choice $0 \leq \mathrm{rtol} < 1$, a nonzero value of $a$ cannot
+satisfy the comparison through the relative term alone, because
+$|a| \leq \mathrm{rtol}|a|$ would require $1 \leq \mathrm{rtol}$. Consequently,
+a small nonzero result is accepted as zero only when
+
+$$
+  |a| \leq \mathrm{atol}.
+$$
+
+In this sense, `atol` provides a practical definition of numerical zero for the
+calculation.
+
+Julia also provides `isapprox`:
+
+```julia
+isapprox(a, b; atol=atol, rtol=rtol)
+```
+
+### Basic errors and assertions
+
+The function `error` stops execution and displays a message:
+
+```julia
+if count <= 0
+    error("The count must be positive.")
+end
+```
+
+Assertions express conditions that are expected to be true:
+
+```julia
+@assert length(values) == count
+```
+
+An assertion failure stops execution and reports the failed condition.
+
+A useful distinction is:
+
+- use `error(...)` when you want to report an invalid input or failed operation
+  explicitly;
+- use `@assert` for internal assumptions or consistency conditions that should
+  always hold if the program is correct.
+
+When Julia reports an error, first read the main error message and then use the
+stack trace to identify where the problem occurred.
+
+### Defining functions
+
+The first `two_springs.jl` implementation is intentionally written as a
+top-level script. As MiniFEM grows, recurring operations become easier to reuse
+and test when they are placed in functions.
+
+A function is a reusable block of code with a defined interface. It can receive
+input arguments and return a result:
+
+```julia
+function scale_value(value, factor)
+    result = factor * value
+    return result
+end
+```
+
+The function is called with:
+
+```julia
+y = scale_value(4.0, 2.5)
+```
+
+Julia also permits compact one-line definitions:
+
+```julia
+scale_value(value, factor) = factor * value
+```
+
+If no explicit `return` is written, Julia returns the value of the final
+expression. In teaching code, an explicit `return` can nevertheless make the
+function interface easier to identify.
+
+Functions will become more important when MiniFEM starts separating recurring
+reusable operations from problem-specific input data.
+
+### What the backslash operator does internally
+
+Earlier in this chapter, the expression
+
+```julia
+x = A \ b
+```
+
+was introduced as the standard way to solve the linear system $A x = b$. At a
+higher level, Julia selects a suitable linear algebra algorithm based on the
+matrix and then solves the resulting system. For a general dense square matrix,
+this is commonly based on an LU factorization,
+
+$$
+  A = LU,
+$$
+
+followed by forward and backward substitution.
+
+This is preferable to explicitly forming the inverse,
+
+```julia
+x = inv(A) * b
+```
+
+because computing the complete inverse requires more work than is needed to
+solve a single linear system. The entries of the inverse must also be
+represented in floating-point arithmetic before the approximate inverse is
+multiplied by `b`, creating an unnecessary intermediate numerical calculation.
+
+By solving the factorized system directly, `\` avoids forming this intermediate
+inverse. It is therefore the clearer and generally more efficient and
+numerically preferable expression for solving a linear system.
+
+### Whole-row and whole-column indexing with `:`
+
+Julia uses `:` in an array index to mean all valid indices along that dimension.
+For a matrix `A`,
+
+```julia
+A[2, :]       # second row
+A[:, 2]       # second column
+```
+
+selects the complete second row or complete second column, respectively. This is
+useful for concise matrix operations.
+
+### Arrays of arrays
+
+A matrix and an array of arrays are different data structures.
+
+The expression:
+
+```julia
+matrix = [1 2; 3 4]
+```
+
+creates a true two-dimensional array. By contrast:
+
+```julia
+rows = [
+    [1, 2],
+    [3, 4],
+]
+```
+
+creates a one-dimensional array whose entries are themselves vectors.
+
+The two structures are indexed differently:
+
+```julia
+matrix[1, 2]      # two-dimensional indexing
+rows[1][2]        # first select a vector, then an entry in that vector
+```
+
+Arrays of arrays are useful when the inner collections may have different
+lengths:
+
+```julia
+ragged = [
+    [1, 2],
+    [3, 4, 5],
+    [6],
+]
+```
+
+### Shallow and deep copies of nested mutable data
+
+For the ordinary numerical matrices used in the first MiniFEM example, `copy` is
+sufficient. A deeper distinction appears when an array stores other mutable
+arrays.
+
+Consider:
+
+```julia
+A = [[1, 2], [3, 4]]
+B = copy(A)
+```
+
+`A` and `B` are different outer arrays, but corresponding entries still refer to
+the same inner vectors. Therefore:
+
+```julia
+B[1][1] = 99
+println(A)
+```
+
+also changes the first inner vector visible through `A`.
+
+A *deep copy* recursively copies nested mutable data:
+
+```julia
+A = [[1, 2], [3, 4]]
+B = deepcopy(A)
+
+B[1][1] = 99
+println(A)
+```
+
+Now the inner vectors are independent as well.
+
+The distinction is:
+
+- `B = A` creates another reference to the same object;
+- `B = copy(A)` copies the outer object;
+- `B = deepcopy(A)` recursively copies nested mutable objects.
+
+For ordinary numerical matrices such as those used in the first MiniFEM example,
+`deepcopy` is unnecessary.
+
+### More general iteration with `axes`
+
+The first examples use explicit ranges such as:
+
+```julia
+for i = 1:2
+```
+
+because the dimensions of these small matrices are deliberately visible. For
+more general code, Julia can obtain valid index ranges from the array itself:
+
+```julia
+axes(A, 1)    # valid row indices
+axes(A, 2)    # valid column indices
+```
+
+For example:
+
+```julia
+for i in axes(A, 1)
+    println(i)
+end
+```
+
+This avoids hard-coding the number of rows and becomes more useful when element
+or system sizes are no longer fixed in advance.
+
+### A note on column-major storage
+
+Julia stores dense multidimensional arrays in column-major order: entries in the
+first column are stored consecutively in memory, followed by entries in the
+second column, and so on.
+
+For example:
+
+```julia
+A = [
+    1 2;
+    3 4
+]
+```
+
+is stored in the order:
+
+```text
+1, 3, 2, 4
+```
+
+Consequently, the loop order
+
+```julia
+for j in axes(A, 2)
+    for i in axes(A, 1)
+        value = A[i, j]
+    end
+end
+```
+
+traverses consecutive entries in storage order: the first index `i` changes
+inside the innermost loop.
+
+::: {.callout-note title="Performance note"}
+The matrices in the first MiniFEM examples are tiny, so this loop-order choice
+has no practical effect on runtime. Column-major storage becomes relevant for
+larger problems and performance-sensitive numerical kernels. It is included here
+because it is useful Julia knowledge, not because it is needed to understand the
+first two-spring script.
+:::
+
+::: {.callout-tip title="Exercise — storage order"}
+For the matrix
+
+```julia
+A = [
+    1 2 3;
+    4 5 6
+]
+```
+
+write down the order in which its six entries are stored in column-major order.
+Then compare that order with the values visited by:
+
+```julia
+for j in axes(A, 2)
+    for i in axes(A, 1)
+        println(A[i, j])
+    end
+end
+```
+:::
+
+### Further reading
+
+The Julia manual provides more extensive treatments of the topics introduced in
+this chapter:
+
+- [Getting started](https://docs.julialang.org/en/v1/manual/getting-started/)
+- [Variables](https://docs.julialang.org/en/v1/manual/variables/)
+- [Integers and floating-point
+  numbers](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/)
+- [Mathematical
+  operations](https://docs.julialang.org/en/v1/manual/mathematical-operations/)
+- [Control flow](https://docs.julialang.org/en/v1/manual/control-flow/)
+- [Functions](https://docs.julialang.org/en/v1/manual/functions/)
+- [Arrays](https://docs.julialang.org/en/v1/manual/arrays/)
+- [Performance tips](https://docs.julialang.org/en/v1/manual/performance-tips/)
