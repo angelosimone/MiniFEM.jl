@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>1&nbsp; Installing Julia and setting up VS Code – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/julia-essentials.html" rel="next">
+<link href="../index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/julia-installation.html">Getting started</a></li><li class="breadcrumb-item"><a href="../chapters/julia-installation.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#install-julia" id="toc-install-julia" class="nav-link active" data-scroll-target="#install-julia"><span class="header-section-number">1.1</span> Install Julia</a>
+  <ul class="collapse">
+  <li><a href="#windows" id="toc-windows" class="nav-link" data-scroll-target="#windows"><span class="header-section-number">1.1.1</span> Windows</a></li>
+  <li><a href="#macos" id="toc-macos" class="nav-link" data-scroll-target="#macos"><span class="header-section-number">1.1.2</span> macOS</a></li>
+  <li><a href="#linux" id="toc-linux" class="nav-link" data-scroll-target="#linux"><span class="header-section-number">1.1.3</span> Linux</a></li>
+  <li><a href="#check-the-installation" id="toc-check-the-installation" class="nav-link" data-scroll-target="#check-the-installation"><span class="header-section-number">1.1.4</span> Check the installation</a></li>
+  </ul></li>
+  <li><a href="#install-vs-code" id="toc-install-vs-code" class="nav-link" data-scroll-target="#install-vs-code"><span class="header-section-number">1.2</span> Install VS Code</a></li>
+  <li><a href="#install-the-vs-code-extension" id="toc-install-the-vs-code-extension" class="nav-link" data-scroll-target="#install-the-vs-code-extension"><span class="header-section-number">1.3</span> Install the VS Code extension</a>
+  <ul class="collapse">
+  <li><a href="#extension-used-in-this-project" id="toc-extension-used-in-this-project" class="nav-link" data-scroll-target="#extension-used-in-this-project"><span class="header-section-number">1.3.1</span> Extension used in this project</a></li>
+  </ul></li>
+  <li><a href="#configure-vs-code" id="toc-configure-vs-code" class="nav-link" data-scroll-target="#configure-vs-code"><span class="header-section-number">1.4</span> Configure VS Code</a></li>
+  <li><a href="#terminal-shell-and-repl" id="toc-terminal-shell-and-repl" class="nav-link" data-scroll-target="#terminal-shell-and-repl"><span class="header-section-number">1.5</span> Terminal, shell, and REPL</a></li>
+  <li><a href="#open-the-project-from-the-command-line" id="toc-open-the-project-from-the-command-line" class="nav-link" data-scroll-target="#open-the-project-from-the-command-line"><span class="header-section-number">1.6</span> Open the project from the command line</a></li>
+  <li><a href="#starting-julia-inside-vs-code" id="toc-starting-julia-inside-vs-code" class="nav-link" data-scroll-target="#starting-julia-inside-vs-code"><span class="header-section-number">1.7</span> Starting Julia inside VS Code</a>
+  <ul class="collapse">
+  <li><a href="#a-normal-julia-repl-from-the-terminal" id="toc-a-normal-julia-repl-from-the-terminal" class="nav-link" data-scroll-target="#a-normal-julia-repl-from-the-terminal"><span class="header-section-number">1.7.1</span> A normal Julia REPL from the terminal</a></li>
+  <li><a href="#the-julia-extension-repl" id="toc-the-julia-extension-repl" class="nav-link" data-scroll-target="#the-julia-extension-repl"><span class="header-section-number">1.7.2</span> The Julia extension REPL</a></li>
+  </ul></li>
+  <li><a href="#run-julia-code" id="toc-run-julia-code" class="nav-link" data-scroll-target="#run-julia-code"><span class="header-section-number">1.8</span> Run Julia code</a>
+  <ul class="collapse">
+  <li><a href="#from-the-vs-code-editor" id="toc-from-the-vs-code-editor" class="nav-link" data-scroll-target="#from-the-vs-code-editor"><span class="header-section-number">1.8.1</span> From the VS Code editor</a></li>
+  <li><a href="#from-a-julia-repl" id="toc-from-a-julia-repl" class="nav-link" data-scroll-target="#from-a-julia-repl"><span class="header-section-number">1.8.2</span> From a Julia REPL</a></li>
+  <li><a href="#directly-from-the-command-line" id="toc-directly-from-the-command-line" class="nav-link" data-scroll-target="#directly-from-the-command-line"><span class="header-section-number">1.8.3</span> Directly from the command line</a></li>
+  <li><a href="#does-it-work" id="toc-does-it-work" class="nav-link" data-scroll-target="#does-it-work"><span class="header-section-number">1.8.4</span> Does it work?</a></li>
+  </ul></li>
+  <li><a href="#if-vs-code-cannot-find-julia" id="toc-if-vs-code-cannot-find-julia" class="nav-link" data-scroll-target="#if-vs-code-cannot-find-julia"><span class="header-section-number">1.9</span> If VS Code cannot find Julia</a></li>
+  <li><a href="#further-information" id="toc-further-information" class="nav-link" data-scroll-target="#further-information"><span class="header-section-number">1.10</span> Further information</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/julia-installation.html">Getting started</a></li><li class="breadcrumb-item"><a href="../chapters/julia-installation.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-installation" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>MiniFEM is written in <a href="https://julialang.org/">Julia</a>. In this book we use <a href="https://code.visualstudio.com/">Visual Studio Code (VS Code)</a> as the editor and development environment.</p>
+<p>The installation is operating-system specific only for the first few steps. Once Julia and VS Code are installed, we will work mainly from the VS Code integrated terminal and the Julia REPL, so the workflow is essentially the same on Windows, macOS, and Linux.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>VSCodium
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Readers who do not want to use VS Code can use <a href="https://vscodium.com/">VSCodium</a> instead. VSCodium is built from the open-source VS Code codebase without Microsoft’s branding and telemetry.</p>
+<p>VSCodium uses the <a href="https://open-vsx.org/">Open VSX</a> extension registry rather than the Microsoft Visual Studio Marketplace. For the extension used in this chapter, the workflow is the same as in VS Code. In the remainder of the chapter, <strong>VS Code</strong> refers to either VS Code or VSCodium unless stated otherwise.</p>
+</div>
+</div>
+<section id="install-julia" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="install-julia"><span class="header-section-number">1.1</span> Install Julia</h2>
+<p>The recommended Julia installation method uses <a href="https://github.com/JuliaLang/juliaup">Juliaup</a>, Julia’s installer and version manager. Juliaup also takes care of making the <code>julia</code> command available from the command line.</p>
+<section id="windows" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="windows"><span class="header-section-number">1.1.1</span> Windows</h3>
+<p>Open <strong>Windows Terminal</strong>, <strong>PowerShell</strong>, or <strong>Command Prompt</strong>.</p>
+<p>For example, press the Windows key, type <code>Terminal</code>, and open <strong>Windows Terminal</strong>.</p>
+<p>Then run:</p>
+<pre class="console"><code>winget install julia -s msstore</code></pre>
+<p>Follow the instructions shown by the installer.</p>
+<p>If access to the Microsoft Store is disabled on your computer, use one of the alternative installation methods described in the <a href="https://docs.julialang.org/en/v1/manual/installation/">official Julia installation instructions</a>.</p>
+</section>
+<section id="macos" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="macos"><span class="header-section-number">1.1.2</span> macOS</h3>
+<p>Open <strong>Terminal</strong>. One quick way is to press <code>Cmd+Space</code>, type <code>Terminal</code>, and press Enter.</p>
+<p>Then run:</p>
+<pre class="console"><code>curl -fsSL https://install.julialang.org | sh</code></pre>
+<p>Follow the instructions printed by the installer. When installation is complete, close and reopen the terminal.</p>
+</section>
+<section id="linux" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="linux"><span class="header-section-number">1.1.3</span> Linux</h3>
+<p>Open a terminal from your desktop environment. On many Linux desktops, <code>Ctrl+Alt+T</code> opens one directly.</p>
+<p>Then run:</p>
+<pre class="console"><code>curl -fsSL https://install.julialang.org | sh</code></pre>
+<p>Follow the instructions printed by the installer. When installation is complete, close and reopen the terminal.</p>
+</section>
+<section id="check-the-installation" class="level3" data-number="1.1.4">
+<h3 data-number="1.1.4" class="anchored" data-anchor-id="check-the-installation"><span class="header-section-number">1.1.4</span> Check the installation</h3>
+<p>On any operating system, type:</p>
+<pre class="console"><code>julia --version</code></pre>
+<p>A successful installation prints the installed Julia version.</p>
+<p>Now start Julia:</p>
+<pre class="console"><code>julia</code></pre>
+<p>You should see the Julia prompt:</p>
+<pre class="text"><code>julia&gt;</code></pre>
+<p>To leave Julia, type:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>or press <code>Ctrl+D</code>.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The Julia extension is not Julia
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Installing the <strong>Julia extension for VS Code does not install Julia itself</strong>. Julia must first be installed on the computer using the procedure above.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="install-vs-code" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="install-vs-code"><span class="header-section-number">1.2</span> Install VS Code</h2>
+<p>Download and install VS Code from:</p>
+<p><a href="https://code.visualstudio.com/" class="uri">https://code.visualstudio.com/</a></p>
+<p>Choose the installer for your operating system and use the standard installation options.</p>
+<p>If you prefer VSCodium, install it from:</p>
+<p><a href="https://vscodium.com/" class="uri">https://vscodium.com/</a></p>
+<p>After installation, start the editor.</p>
+</section>
+<section id="install-the-vs-code-extension" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="install-the-vs-code-extension"><span class="header-section-number">1.3</span> Install the VS Code extension</h2>
+<p>Open the <strong>Extensions</strong> view by clicking the Extensions icon in the Activity Bar on the left side of the VS Code window.</p>
+<p>Alternatively, open the Command Palette with:</p>
+<ul>
+<li><code>Ctrl+Shift+P</code> on Windows and Linux;</li>
+<li><code>Cmd+Shift+P</code> on macOS;</li>
+</ul>
+<p>and run:</p>
+<pre class="text"><code>View: Show Extensions</code></pre>
+<section id="extension-used-in-this-project" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="extension-used-in-this-project"><span class="header-section-number">1.3.1</span> Extension used in this project</h3>
+<p>Install the following extension:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 15%">
+<col style="width: 78%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Extension</th>
+<th>Identifier</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Julia</strong></td>
+<td><code>julialang.language-julia</code></td>
+<td>Julia language support, integrated REPL, code execution, formatting, navigation, debugging, plots, and other Julia-specific tools.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="configure-vs-code" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="configure-vs-code"><span class="header-section-number">1.4</span> Configure VS Code</h2>
+<p>VS Code stores user-level configuration in a JSON file called <code>settings.json</code>.</p>
+<p>Open the Command Palette:</p>
+<ul>
+<li><code>Ctrl+Shift+P</code> on Windows and Linux;</li>
+<li><code>Cmd+Shift+P</code> on macOS.</li>
+</ul>
+<p>Then type:</p>
+<pre class="text"><code>Preferences: Open User Settings (JSON)</code></pre>
+<p>and select that command.</p>
+<p>For the Julia workflow used here, the relevant settings are:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"telemetry.telemetryLevel"</span><span class="fu">:</span> <span class="st">"off"</span><span class="fu">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"files.trimTrailingWhitespace"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"julia.enableTelemetry"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"[julia]"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.defaultFormatter"</span><span class="fu">:</span> <span class="st">"julialang.language-julia"</span><span class="fu">,</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.formatOnSave"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If your <code>settings.json</code> already contains other settings, <strong>do not replace the whole file</strong>. Add the settings above inside the existing outer braces <code>{ ... }</code> and separate adjacent entries with commas.</p>
+<p>The Julia extension uses <a href="https://github.com/domluna/JuliaFormatter.jl">JuliaFormatter.jl</a> for source-code formatting. Therefore, no separate extension or script is needed merely to format <code>.jl</code> files when they are saved.</p>
+<p>The MiniFEM project includes its own JuliaFormatter configuration, which is applied automatically when Julia files are formatted.</p>
+</section>
+<section id="terminal-shell-and-repl" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="terminal-shell-and-repl"><span class="header-section-number">1.5</span> Terminal, shell, and REPL</h2>
+<p>Three terms are worth distinguishing. A <strong>terminal</strong> is the window or panel through which we interact with command-line programs. A <strong>shell</strong> is the program running inside the terminal and interpreting commands. The <strong>Julia REPL</strong>—short for <em>read-eval-print loop</em>—is Julia’s interactive environment.</p>
+<p>For example, this is a shell command:</p>
+<pre class="console"><code>julia hello.jl</code></pre>
+<p>whereas this is Julia code typed at the Julia REPL:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fl">2</span> <span class="op">+</span> <span class="fl">3</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fl">5</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="open-the-project-from-the-command-line" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="open-the-project-from-the-command-line"><span class="header-section-number">1.6</span> Open the project from the command line</h2>
+<p>A convenient workflow is to open VS Code <strong>from the project folder</strong>. This has an important advantage: VS Code treats that folder as the workspace root, and terminals and Julia processes started from the workspace naturally begin in the right location.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="MiniFEM course files">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>MiniFEM course files
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Julia and VS Code installation steps above can be completed without the MiniFEM files.</p>
+<p>At the end of the first class, you will be asked to download the initial course snapshot, <code>2026-27/S01-two-springs</code>, as an archive. After extracting the archive, you will have a folder named <code>MiniFEM.jl</code> containing the project files used in the following chapters.</p>
+<p>From this point onward, commands that refer to the MiniFEM project assume that you are working with this extracted <code>MiniFEM.jl</code> folder.</p>
+</div>
+</div>
+<p>Open a terminal and move to the MiniFEM project folder. For example:</p>
+<pre class="console"><code>cd path/to/MiniFEM.jl</code></pre>
+<p>Check where you are with:</p>
+<pre class="console"><code>pwd</code></pre>
+<p>and list the files in the folder with:</p>
+<pre class="console"><code>ls</code></pre>
+<p>These commands work directly on macOS and Linux. They also work in PowerShell on Windows. If you use the older Windows Command Prompt instead, <code>cd</code> displays the current directory and <code>dir</code> lists its contents.</p>
+<p>Once you are in the project folder, start VS Code with:</p>
+<pre class="console"><code>code .</code></pre>
+<p>The dot <code>.</code> means <strong>the current directory</strong>, so the command opens the current project folder as the VS Code workspace.</p>
+<p>If you use VSCodium, the corresponding command is normally:</p>
+<pre class="console"><code>codium .</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>If <code>code</code> is not available on macOS
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>On macOS, the <code>code</code> command may need to be added to the shell path after VS Code is installed. Open the Command Palette with <code>Cmd+Shift+P</code> and run:</p>
+<pre class="text"><code>Shell Command: Install 'code' command in PATH</code></pre>
+<p>Then close and reopen the terminal. VSCodium provides the corresponding <code>codium</code> command.</p>
+</div>
+</div>
+<p>The command <code>code .</code> opens VS Code in the correct folder; it does <strong>not</strong> guarantee that the integrated terminal panel will already be visible. If you need a shell inside VS Code, open:</p>
+<pre class="text"><code>Terminal &gt; New Terminal</code></pre>
+<p>The integrated terminal starts at the root of the opened workspace, so <code>pwd</code> and <code>ls</code> should show the MiniFEM project folder and its files.</p>
+</section>
+<section id="starting-julia-inside-vs-code" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="starting-julia-inside-vs-code"><span class="header-section-number">1.7</span> Starting Julia inside VS Code</h2>
+<p>There are two related ways to start Julia in VS Code, and they should not be confused.</p>
+<section id="a-normal-julia-repl-from-the-terminal" class="level3" data-number="1.7.1">
+<h3 data-number="1.7.1" class="anchored" data-anchor-id="a-normal-julia-repl-from-the-terminal"><span class="header-section-number">1.7.1</span> A normal Julia REPL from the terminal</h3>
+<p>In the VS Code integrated terminal, type:</p>
+<pre class="console"><code>julia</code></pre>
+<p>This starts an ordinary Julia REPL in the current folder. Because the terminal is already in the project folder, relative paths refer naturally to files in that project.</p>
+<p>Create a temporary file named <code>hello.jl</code> in the <code>MiniFEM.jl</code> project folder containing:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Hello, MiniFEM!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The instruction</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"hello.jl"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>runs <code>hello.jl</code> from the current project folder.</p>
+</section>
+<section id="the-julia-extension-repl" class="level3" data-number="1.7.2">
+<h3 data-number="1.7.2" class="anchored" data-anchor-id="the-julia-extension-repl"><span class="header-section-number">1.7.2</span> The Julia extension REPL</h3>
+<p>The Julia extension also manages a Julia REPL that is connected directly to the editor. This is the REPL used by commands such as <strong>Julia: Execute active File in REPL</strong> and <strong>Julia: Execute Code in REPL</strong>.</p>
+<p>You normally <strong>do not need to start this REPL manually</strong> with:</p>
+<pre class="text"><code>Julia: Start REPL</code></pre>
+<p>If a Julia file is open in the editor, click the triangular <strong>Run</strong> button at the upper-right of the editor and choose or use:</p>
+<pre class="text"><code>Julia: Execute active File in REPL</code></pre>
+<p>The Julia extension starts its REPL if necessary and executes the active file there.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The two REPLs are not the same session
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Typing <code>julia</code> manually in an integrated terminal starts a normal Julia process. The Julia extension’s <strong>Execute … in REPL</strong> commands use the REPL managed by the extension. Unless an external REPL is explicitly connected to the extension, these are separate Julia sessions.</p>
+<p>For ordinary MiniFEM work, the simplest editor-based workflow is therefore to open the project with <code>code .</code>, open a <code>.jl</code> file, and use the triangular <strong>Julia: Execute active File in REPL</strong> button. There is usually no need to run <strong>Julia: Start REPL</strong> first.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="run-julia-code" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="run-julia-code"><span class="header-section-number">1.8</span> Run Julia code</h2>
+<section id="from-the-vs-code-editor" class="level3" data-number="1.8.1">
+<h3 data-number="1.8.1" class="anchored" data-anchor-id="from-the-vs-code-editor"><span class="header-section-number">1.8.1</span> From the VS Code editor</h3>
+<p>Open the <code>hello.jl</code> file. With <code>hello.jl</code> active, click the triangular button at the upper-right of the editor:</p>
+<pre class="text"><code>Julia: Execute active File in REPL</code></pre>
+<p>This is the most convenient way to run a complete Julia file while developing interactively.</p>
+<p>To execute only the current expression or a selected block of code, use:</p>
+<pre class="text"><code>Julia: Execute Code in REPL</code></pre>
+<p>The default shortcut is <code>Ctrl+Enter</code>.</p>
+</section>
+<section id="from-a-julia-repl" class="level3" data-number="1.8.2">
+<h3 data-number="1.8.2" class="anchored" data-anchor-id="from-a-julia-repl"><span class="header-section-number">1.8.2</span> From a Julia REPL</h3>
+<p>If you started Julia yourself by typing <code>julia</code>, run the file with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"hello.jl"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="directly-from-the-command-line" class="level3" data-number="1.8.3">
+<h3 data-number="1.8.3" class="anchored" data-anchor-id="directly-from-the-command-line"><span class="header-section-number">1.8.3</span> Directly from the command line</h3>
+<p>You can also run the file without entering an interactive REPL:</p>
+<pre class="console"><code>julia hello.jl</code></pre>
+<p>Julia starts, executes the file, and exits. This gives the program a fresh Julia process.</p>
+</section>
+<section id="does-it-work" class="level3" data-number="1.8.4">
+<h3 data-number="1.8.4" class="anchored" data-anchor-id="does-it-work"><span class="header-section-number">1.8.4</span> Does it work?</h3>
+<p>You should see:</p>
+<pre class="text"><code>Hello, MiniFEM!</code></pre>
+<p>If this output appears, the Julia installation and VS Code setup are ready for the examples in the following chapters.</p>
+<p>You can now delete <code>hello.jl</code>. This file is used only to verify the development environment.</p>
+</section>
+</section>
+<section id="if-vs-code-cannot-find-julia" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="if-vs-code-cannot-find-julia"><span class="header-section-number">1.9</span> If VS Code cannot find Julia</h2>
+<p>With a standard Juliaup installation, the Julia extension should normally find Julia automatically. Manual configuration should therefore be treated as a troubleshooting step rather than part of the normal installation.</p>
+<p>First open a VS Code terminal and check:</p>
+<pre class="console"><code>julia --version</code></pre>
+<p>If this works, restart VS Code, open a <code>.jl</code> file, and try the triangular <strong>Julia: Execute active File in REPL</strong> button again.</p>
+<p>If the Julia extension still cannot locate Julia, determine the location of the executable.</p>
+<p>On Windows:</p>
+<pre class="console"><code>where julia</code></pre>
+<p>On macOS and Linux:</p>
+<pre class="console"><code>which julia</code></pre>
+<p>Then open:</p>
+<pre class="text"><code>Preferences: Open User Settings (JSON)</code></pre>
+<p>and add the full executable path:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="st">"julia.executablePath"</span><span class="er">:</span> <span class="st">"/full/path/to/julia"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>On Windows, backslashes must be escaped in JSON. For example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="st">"julia.executablePath"</span><span class="er">:</span> <span class="st">"C:</span><span class="ch">\\</span><span class="st">path</span><span class="ch">\\</span><span class="st">to</span><span class="ch">\\</span><span class="st">julia.exe"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This setting is normally unnecessary and should only be added if automatic detection fails.</p>
+</section>
+<section id="further-information" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="further-information"><span class="header-section-number">1.10</span> Further information</h2>
+<p>For installation and editor details, consult the current official documentation:</p>
+<ul>
+<li><a href="https://docs.julialang.org/en/v1/manual/installation/">Installing Julia</a></li>
+<li><a href="https://www.julia-vscode.org/docs/latest/setup/">Julia in VS Code: Setup</a></li>
+<li><a href="https://www.julia-vscode.org/docs/latest/userguide/runningcode/">Julia in VS Code: Running Code</a></li>
+<li><a href="https://www.julia-vscode.org/docs/latest/userguide/formatter/">Julia in VS Code: Formatting Code</a></li>
+<li><a href="https://github.com/VSCodium/vscodium/tree/master/docs">VSCodium documentation</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/julia-essentials.html" class="pagination-link" aria-label="The bare minimum: Julia essentials for MiniFEM">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
