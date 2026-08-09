@@ -1,1 +1,6 @@
+style = "blue"
+
+format_docstrings = true
+join_lines_based_on_source = true
+whitespace_typedefs = true
 remove_extra_newlines = true
