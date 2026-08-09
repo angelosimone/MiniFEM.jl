@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Angelo Simone">
 
-<title>An Introduction to the Finite Element Method</title>
+<title>3&nbsp; From continuous systems to discrete models – An Introduction to the Finite Element Method</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -30,24 +29,25 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./chapters/julia-installation.html" rel="next">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../references.html" rel="next">
+<link href="../chapters/julia-essentials.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -86,6 +86,35 @@ window.MathJax = {
 };
 </script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -98,7 +127,7 @@ window.MathJax = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Preface</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">The direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -113,7 +142,7 @@ window.MathJax = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">An Introduction to the Finite Element Method</a> 
+      <a href="../">An Introduction to the Finite Element Method</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -125,7 +154,7 @@ window.MathJax = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
@@ -140,13 +169,13 @@ window.MathJax = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
   </div>
 </li>
@@ -163,7 +192,7 @@ window.MathJax = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
   </div>
 </li>
@@ -171,7 +200,7 @@ window.MathJax = {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
 </li>
@@ -185,30 +214,24 @@ window.MathJax = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a></li>
-  <li><a href="#about-minifem" id="toc-about-minifem" class="nav-link" data-scroll-target="#about-minifem">About MiniFEM</a></li>
+  <li><a href="#a-continuous-system-a-one-dimensional-bar" id="toc-a-continuous-system-a-one-dimensional-bar" class="nav-link active" data-scroll-target="#a-continuous-system-a-one-dimensional-bar"><span class="header-section-number">3.1</span> A continuous system: a one-dimensional bar</a></li>
+  <li><a href="#a-discrete-system-a-one-dimensional-spring" id="toc-a-discrete-system-a-one-dimensional-spring" class="nav-link" data-scroll-target="#a-discrete-system-a-one-dimensional-spring"><span class="header-section-number">3.2</span> A discrete system: a one-dimensional spring</a></li>
+  <li><a href="#continuous-and-discrete-descriptions" id="toc-continuous-and-discrete-descriptions" class="nav-link" data-scroll-target="#continuous-and-discrete-descriptions"><span class="header-section-number">3.3</span> Continuous and discrete descriptions</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">The direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">An Introduction to the Finite Element Method</h1>
-<p class="subtitle lead">A Step-by-Step Approach Using Julia</p>
+<h1 class="title"><span id="sec-discrete-continuous" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Angelo Simone </p>
-          </div>
-  </div>
     
   
     
@@ -219,23 +242,119 @@ window.MathJax = {
 </header>
 
 
-<section id="preface" class="level1 unnumbered">
-<h1 class="unnumbered">Preface</h1>
-<p>This book provides a progressive introduction to the finite element method, with an emphasis on understanding how the method is formulated, implemented, and verified.</p>
-<p>The presentation begins with simple mechanical systems and the direct stiffness method. Starting from problems that can be solved and verified by hand, the core ingredients of a finite element formulation are introduced gradually. As the presentation progresses, these same principles are extended to continuum problems.</p>
-<p>Theory and computation are developed together. Julia is used because its syntax stays close to mathematical notation while still delivering high performance. The exposition is tightly coordinated with successive versions of the accompanying pedagogical code, MiniFEM.</p>
-<p>The primary target audience is students with an engineering background and a basic knowledge of solid or structural mechanics and of numerical analysis, although the material may also be useful to students from related disciplines.</p>
-<p>Finite element concepts are developed through computational examples of increasing generality, with the aim of connecting mathematical formulations, numerical algorithms, and their software implementation. Throughout the book, particular attention is given to verification and to the interpretation of numerical results.</p>
-<p>This book is built with <a href="https://quarto.org/docs/books">Quarto</a>.</p>
-<p>OpenAI’s ChatGPT was used to support language editing, structural revision, and the review of selected explanations and code examples. The author remains fully responsible for the technical content and final editorial decisions.</p>
-<hr>
+<p>A finite element model is a discrete mathematical representation of a continuous system.</p>
+<p>In a discrete system, the state is described by a finite set of variables. In a continuous system, the state is described by one or more fields defined over the entire domain.</p>
+<section id="a-continuous-system-a-one-dimensional-bar" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="a-continuous-system-a-one-dimensional-bar"><span class="header-section-number">3.1</span> A continuous system: a one-dimensional bar</h2>
+<div id="fig-bar-1d" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/bar_in_tension-1d.png" class="img-fluid figure-img" style="width:30.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: One-dimensional bar fixed at the left end, with distributed axial load <span class="math inline">\(q\)</span>, end force <span class="math inline">\(F\)</span>, coordinate <span class="math inline">\(x\)</span>, cross-sectional area <span class="math inline">\(A\)</span>, Young’s modulus <span class="math inline">\(E\)</span>, and axial displacement field <span class="math inline">\(u(x)\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>A one-dimensional bar is a continuous body. Its axial displacement can be evaluated at every point of the bar and is therefore represented by a function,</p>
+<p><span class="math display">\[
+  u=u(x).
+\]</span></p>
+<p>The displacement field is the primary variable of the problem. For a linearly elastic bar,</p>
+<p><span class="math display">\[
+  \varepsilon(x)=\frac{du}{dx}=u'(x)
+\]</span></p>
+<p>is the axial strain and</p>
+<p><span class="math display">\[
+  \sigma(x)=E\varepsilon(x)
+\]</span></p>
+<p>is the axial stress. The corresponding internal axial force is</p>
+<p><span class="math display">\[
+  N(x)=\int_A \sigma\,dA.
+\]</span></p>
+<p>For a homogeneous bar with constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>,</p>
+<p><span class="math display">\[
+  N=EA\frac{du}{dx}.
+\]</span></p>
+<p>Equilibrium under the distributed axial load <span class="math inline">\(q\)</span> gives</p>
+<p><span class="math display">\[
+  \frac{dN}{dx}+q=0,
+\]</span></p>
+<p>and hence</p>
+<p><span class="math display">\[
+  EA\frac{d^2u}{dx^2}=-q.
+\]</span></p>
+<div id="fig-bar-cross-section" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-cross-section-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/bar-cross-section.png" class="img-fluid figure-img" style="width:30.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-cross-section-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: Cross-section <span class="math inline">\(A\)</span> with axial stress <span class="math inline">\(\sigma_x\)</span>, represented equivalently by the internal axial force <span class="math inline">\(N\)</span>. A positive internal force corresponds to tension.
+</figcaption>
+</figure>
+</div>
+<p>The state of the bar is therefore described by the complete displacement field <span class="math inline">\(u(x)\)</span>, which contains information at an infinite number of points.</p>
 </section>
-<section id="about-minifem" class="level1 unnumbered">
-<h1 class="unnumbered">About MiniFEM</h1>
-<p>MiniFEM is a pedagogical finite element code written in Julia and developed alongside the material presented in this book. Its source code and successive development snapshots are hosted in the <a href="https://github.com/angelosimone/MiniFEM.jl"><code>MiniFEM.jl</code></a> repository.</p>
-<p>Its development begins with self-contained scripts that closely mirror hand calculations and proceeds toward increasingly structured and modular implementations. The purpose of MiniFEM is to make the essential components of a finite element implementation explicit and directly inspectable.</p>
-<p>At a later stage, the presentation transitions to established Julia finite element libraries such as <a href="https://ferrite-fem.github.io/Ferrite.jl/stable/"><code>Ferrite.jl</code></a>. The concepts developed through MiniFEM provide the basis for understanding the more general abstractions and workflows introduced by these libraries.</p>
-<p>The chapters of the book are coordinated with successive snapshots of the <code>MiniFEM.jl</code> repository. Early snapshots document the progressive development of MiniFEM, while later ones include examples and applications based on <code>Ferrite.jl</code>. Each snapshot captures a particular stage in the development of the course material.</p>
+<section id="a-discrete-system-a-one-dimensional-spring" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="a-discrete-system-a-one-dimensional-spring"><span class="header-section-number">3.2</span> A discrete system: a one-dimensional spring</h2>
+<p>A spring is already a discrete mechanical system. Its state can be described by quantities defined only at its end points.</p>
+<div id="fig-spring-1d" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spring-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/spring-1d.png" class="img-fluid figure-img" style="width:30.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: One-dimensional spring of stiffness <span class="math inline">\(k_s\)</span> between end points 1 and 2. The end displacements <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span> and the nodal forces are referred to the positive <span class="math inline">\(x\)</span> direction.
+</figcaption>
+</figure>
+</div>
+<p>The spring elongation or spring stretch is a measure of the spring deformation and is defined as</p>
+<p><span class="math display">\[
+  \delta=u_2-u_1.
+\]</span></p>
+<p>A positive elongation corresponds to a stretched spring. The internal spring force is related to the elongation by</p>
+<p><span class="math display">\[
+  F_s=k_s\delta,
+\]</span></p>
+<p>where <span class="math inline">\(k_s\)</span> is the spring stiffness.</p>
+<div id="fig-spring-1d-convention" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spring-1d-convention-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/spring-1d-convention.png" class="img-fluid figure-img" style="width:30.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-1d-convention-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.4: Positive sign convention for the internal spring force <span class="math inline">\(F_s\)</span>: outward forces at the two sides of a cut spring indicate tension.
+</figcaption>
+</figure>
+</div>
+<p>The relation</p>
+<p><span class="math display">\[
+  F_s=k_s\delta
+\]</span></p>
+<p>plays the same role for the spring that the constitutive relation <span class="math inline">\(\sigma=E\varepsilon\)</span> plays for the bar. The deformation measure is now the single scalar <span class="math inline">\(\delta\)</span>, rather than the strain field <span class="math inline">\(\varepsilon(x)\)</span>.</p>
+</section>
+<section id="continuous-and-discrete-descriptions" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="continuous-and-discrete-descriptions"><span class="header-section-number">3.3</span> Continuous and discrete descriptions</h2>
+<p>The state of the spring is determined by the two discrete quantities <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span>. The state of the bar is described by the function <span class="math inline">\(u(x)\)</span>.</p>
+<p>The continuous description is richer: it provides the displacement at every point, whereas the discrete description contains only a finite number of values. A finite element model replaces the continuous field by a finite set of unknowns while retaining enough information to approximate the mechanical response.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why begin with springs?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A spring is already discrete, so no approximation of a continuous field is needed. It can therefore be used to introduce equilibrium, element matrices, assembly, boundary conditions, and the global system of equations before those same ideas are applied to continuous bodies.</p>
+</div>
+</div>
+<p>The next chapter uses two springs in series to derive the direct stiffness method and the algebraic system</p>
+<p><span class="math display">\[
+  \mathbf{K}\mathbf{u}=\mathbf{f}.
+\]</span></p>
 
 
 </section>
@@ -643,10 +762,13 @@ window.MathJax = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../chapters/julia-essentials.html" class="pagination-link" aria-label="The bare minimum: Julia essentials for MiniFEM">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./chapters/julia-installation.html" class="pagination-link" aria-label="Installing Julia and setting up VS Code">
-        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
