@@ -12,6 +12,7 @@ book:
     - index.qmd
     - part: "Getting started"
       chapters:
+        - chapters/julia-installation.qmd
         - chapters/julia-essentials.qmd
     - references.qmd
 

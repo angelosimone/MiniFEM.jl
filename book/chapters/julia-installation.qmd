@@ -1,0 +1,488 @@
+# Installing Julia and setting up VS Code {#sec-installation}
+
+MiniFEM is written in [Julia](https://julialang.org/). In this book we use
+[Visual Studio Code (VS Code)](https://code.visualstudio.com/) as the editor and
+development environment.
+
+The installation is operating-system specific only for the first few steps. Once
+Julia and VS Code are installed, we will work mainly from the VS Code integrated
+terminal and the Julia REPL, so the workflow is essentially the same on Windows,
+macOS, and Linux.
+
+::: {.callout-note}
+## VSCodium
+
+Readers who do not want to use VS Code can use [VSCodium](https://vscodium.com/)
+instead. VSCodium is built from the open-source VS Code codebase without
+Microsoft's branding and telemetry.
+
+VSCodium uses the [Open VSX](https://open-vsx.org/) extension registry rather
+than the Microsoft Visual Studio Marketplace. For the extension used in this
+chapter, the workflow is the same as in VS Code. In the remainder of the
+chapter, **VS Code** refers to either VS Code or VSCodium unless stated
+otherwise.
+:::
+
+## Install Julia
+
+The recommended Julia installation method uses
+[Juliaup](https://github.com/JuliaLang/juliaup), Julia's installer and version
+manager. Juliaup also takes care of making the `julia` command available from
+the command line.
+
+### Windows
+
+Open **Windows Terminal**, **PowerShell**, or **Command Prompt**.
+
+For example, press the Windows key, type `Terminal`, and open **Windows
+Terminal**.
+
+Then run:
+
+```console
+winget install julia -s msstore
+```
+
+Follow the instructions shown by the installer.
+
+If access to the Microsoft Store is disabled on your computer, use one of the
+alternative installation methods described in the [official Julia installation
+instructions](https://docs.julialang.org/en/v1/manual/installation/).
+
+### macOS
+
+Open **Terminal**. One quick way is to press `Cmd+Space`, type `Terminal`, and
+press Enter.
+
+Then run:
+
+```console
+curl -fsSL https://install.julialang.org | sh
+```
+
+Follow the instructions printed by the installer. When installation is complete,
+close and reopen the terminal.
+
+### Linux
+
+Open a terminal from your desktop environment. On many Linux desktops,
+`Ctrl+Alt+T` opens one directly.
+
+Then run:
+
+```console
+curl -fsSL https://install.julialang.org | sh
+```
+
+Follow the instructions printed by the installer. When installation is complete,
+close and reopen the terminal.
+
+### Check the installation
+
+On any operating system, type:
+
+```console
+julia --version
+```
+
+A successful installation prints the installed Julia version.
+
+Now start Julia:
+
+```console
+julia
+```
+
+You should see the Julia prompt:
+
+```text
+julia>
+```
+
+To leave Julia, type:
+
+```julia
+exit()
+```
+
+or press `Ctrl+D`.
+
+::: {.callout-important}
+## The Julia extension is not Julia
+
+Installing the **Julia extension for VS Code does not install Julia itself**.
+Julia must first be installed on the computer using the procedure above.
+:::
+
+## Install VS Code
+
+Download and install VS Code from:
+
+<https://code.visualstudio.com/>
+
+Choose the installer for your operating system and use the standard installation
+options.
+
+If you prefer VSCodium, install it from:
+
+<https://vscodium.com/>
+
+After installation, start the editor.
+
+## Install the VS Code extension
+
+Open the **Extensions** view by clicking the Extensions icon in the Activity Bar
+on the left side of the VS Code window.
+
+Alternatively, open the Command Palette with:
+
+- `Ctrl+Shift+P` on Windows and Linux;
+- `Cmd+Shift+P` on macOS;
+
+and run:
+
+```text
+View: Show Extensions
+```
+
+### Extension used in this project
+
+Install the following extension:
+
+  | Extension | Identifier                 | Purpose                                                                                                                            |
+  | --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+  | **Julia** | `julialang.language-julia` | Julia language support, integrated REPL, code execution, formatting, navigation, debugging, plots, and other Julia-specific tools. |
+
+## Configure VS Code
+
+VS Code stores user-level configuration in a JSON file called `settings.json`.
+
+Open the Command Palette:
+
+- `Ctrl+Shift+P` on Windows and Linux;
+- `Cmd+Shift+P` on macOS.
+
+Then type:
+
+```text
+Preferences: Open User Settings (JSON)
+```
+
+and select that command.
+
+For the Julia workflow used here, the relevant settings are:
+
+```json
+{
+  "telemetry.telemetryLevel": "off",
+  "files.trimTrailingWhitespace": true,
+  "julia.enableTelemetry": false,
+
+  "[julia]": {
+    "editor.defaultFormatter": "julialang.language-julia",
+    "editor.formatOnSave": true
+  },
+
+}
+```
+
+If your `settings.json` already contains other settings, **do not replace the
+whole file**. Add the settings above inside the existing outer braces `{ ... }`
+and separate adjacent entries with commas.
+
+The Julia extension uses
+[JuliaFormatter.jl](https://github.com/domluna/JuliaFormatter.jl) for
+source-code formatting. Therefore, no separate extension or script is needed
+merely to format `.jl` files when they are saved.
+
+The MiniFEM project includes its own JuliaFormatter configuration, which is
+applied automatically when Julia files are formatted.
+
+## Terminal, shell, and REPL
+
+Three terms are worth distinguishing. A **terminal** is the window or panel
+through which we interact with command-line programs. A **shell** is the program
+running inside the terminal and interpreting commands. The **Julia
+REPL**---short for *read-eval-print loop*---is Julia's interactive environment.
+
+For example, this is a shell command:
+
+```console
+julia hello.jl
+```
+
+whereas this is Julia code typed at the Julia REPL:
+
+```julia
+julia> 2 + 3
+5
+```
+
+## Open the project from the command line
+
+A convenient workflow is to open VS Code **from the project folder**. This has
+an important advantage: VS Code treats that folder as the workspace root, and
+terminals and Julia processes started from the workspace naturally begin in the
+right location.
+
+::: {.callout-note title="MiniFEM course files"}
+The Julia and VS Code installation steps above can be completed without the
+MiniFEM files.
+
+At the end of the first class, you will be asked to download the initial course
+snapshot, `2026-27/S01-two-springs`, as an archive. After extracting the
+archive, you will have a folder named `MiniFEM.jl` containing the project files
+used in the following chapters.
+
+From this point onward, commands that refer to the MiniFEM project assume that
+you are working with this extracted `MiniFEM.jl` folder.
+:::
+
+Open a terminal and move to the MiniFEM project folder. For example:
+
+```console
+cd path/to/MiniFEM.jl
+```
+
+Check where you are with:
+
+```console
+pwd
+```
+
+and list the files in the folder with:
+
+```console
+ls
+```
+
+These commands work directly on macOS and Linux. They also work in PowerShell on
+Windows. If you use the older Windows Command Prompt instead, `cd` displays the
+current directory and `dir` lists its contents.
+
+Once you are in the project folder, start VS Code with:
+
+```console
+code .
+```
+
+The dot `.` means **the current directory**, so the command opens the current
+project folder as the VS Code workspace.
+
+If you use VSCodium, the corresponding command is normally:
+
+```console
+codium .
+```
+
+::: {.callout-note}
+## If `code` is not available on macOS
+
+On macOS, the `code` command may need to be added to the shell path after VS
+Code is installed. Open the Command Palette with `Cmd+Shift+P` and run:
+
+```text
+Shell Command: Install 'code' command in PATH
+```
+
+Then close and reopen the terminal. VSCodium provides the corresponding `codium`
+command.
+:::
+
+The command `code .` opens VS Code in the correct folder; it does **not**
+guarantee that the integrated terminal panel will already be visible. If you
+need a shell inside VS Code, open:
+
+```text
+Terminal > New Terminal
+```
+
+The integrated terminal starts at the root of the opened workspace, so `pwd` and
+`ls` should show the MiniFEM project folder and its files.
+
+## Starting Julia inside VS Code
+
+There are two related ways to start Julia in VS Code, and they should not be
+confused.
+
+### A normal Julia REPL from the terminal
+
+In the VS Code integrated terminal, type:
+
+```console
+julia
+```
+
+This starts an ordinary Julia REPL in the current folder. Because the terminal
+is already in the project folder, relative paths refer naturally to files in
+that project.
+
+Create a temporary file named `hello.jl` in the `MiniFEM.jl` project folder
+containing:
+
+```julia
+println("Hello, MiniFEM!")
+```
+
+The instruction
+
+```julia
+include("hello.jl")
+```
+
+runs `hello.jl` from the current project folder.
+
+### The Julia extension REPL
+
+The Julia extension also manages a Julia REPL that is connected directly to the
+editor. This is the REPL used by commands such as **Julia: Execute active File
+in REPL** and **Julia: Execute Code in REPL**.
+
+You normally **do not need to start this REPL manually** with:
+
+```text
+Julia: Start REPL
+```
+
+If a Julia file is open in the editor, click the triangular **Run** button at
+the upper-right of the editor and choose or use:
+
+```text
+Julia: Execute active File in REPL
+```
+
+The Julia extension starts its REPL if necessary and executes the active file
+there.
+
+::: {.callout-important}
+## The two REPLs are not the same session
+
+Typing `julia` manually in an integrated terminal starts a normal Julia process.
+The Julia extension's **Execute ... in REPL** commands use the REPL managed by
+the extension. Unless an external REPL is explicitly connected to the extension,
+these are separate Julia sessions.
+
+For ordinary MiniFEM work, the simplest editor-based workflow is therefore to
+open the project with `code .`, open a `.jl` file, and use the triangular
+**Julia: Execute active File in REPL** button. There is usually no need to run
+**Julia: Start REPL** first.
+:::
+
+## Run Julia code
+
+### From the VS Code editor
+
+Open the `hello.jl` file. With `hello.jl` active, click the triangular button at
+the upper-right of the editor:
+
+```text
+Julia: Execute active File in REPL
+```
+
+This is the most convenient way to run a complete Julia file while developing
+interactively.
+
+To execute only the current expression or a selected block of code, use:
+
+```text
+Julia: Execute Code in REPL
+```
+
+The default shortcut is `Ctrl+Enter`.
+
+### From a Julia REPL
+
+If you started Julia yourself by typing `julia`, run the file with:
+
+```julia
+include("hello.jl")
+```
+
+### Directly from the command line
+
+You can also run the file without entering an interactive REPL:
+
+```console
+julia hello.jl
+```
+
+Julia starts, executes the file, and exits. This gives the program a fresh Julia
+process.
+
+### Does it work?
+
+You should see:
+
+```text
+Hello, MiniFEM!
+```
+
+If this output appears, the Julia installation and VS Code setup are ready for
+the examples in the following chapters.
+
+You can now delete `hello.jl`. This file is used only to verify the development
+environment.
+
+## If VS Code cannot find Julia
+
+With a standard Juliaup installation, the Julia extension should normally find
+Julia automatically. Manual configuration should therefore be treated as a
+troubleshooting step rather than part of the normal installation.
+
+First open a VS Code terminal and check:
+
+```console
+julia --version
+```
+
+If this works, restart VS Code, open a `.jl` file, and try the triangular
+**Julia: Execute active File in REPL** button again.
+
+If the Julia extension still cannot locate Julia, determine the location of the
+executable.
+
+On Windows:
+
+```console
+where julia
+```
+
+On macOS and Linux:
+
+```console
+which julia
+```
+
+Then open:
+
+```text
+Preferences: Open User Settings (JSON)
+```
+
+and add the full executable path:
+
+```json
+"julia.executablePath": "/full/path/to/julia"
+```
+
+On Windows, backslashes must be escaped in JSON. For example:
+
+```json
+"julia.executablePath": "C:\\path\\to\\julia.exe"
+```
+
+This setting is normally unnecessary and should only be added if automatic
+detection fails.
+
+## Further information
+
+For installation and editor details, consult the current official documentation:
+
+- [Installing Julia](https://docs.julialang.org/en/v1/manual/installation/)
+- [Julia in VS Code: Setup](https://www.julia-vscode.org/docs/latest/setup/)
+- [Julia in VS Code: Running
+  Code](https://www.julia-vscode.org/docs/latest/userguide/runningcode/)
+- [Julia in VS Code: Formatting
+  Code](https://www.julia-vscode.org/docs/latest/userguide/formatter/)
+- [VSCodium
+  documentation](https://github.com/VSCodium/vscodium/tree/master/docs)
