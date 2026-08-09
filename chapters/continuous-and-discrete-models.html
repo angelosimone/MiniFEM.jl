@@ -242,7 +242,6 @@ window.Quarto = {
 </header>
 
 
-<p>A finite element model is a discrete mathematical representation of a continuous system.</p>
 <p>In a discrete system, the state is described by a finite set of variables. In a continuous system, the state is described by one or more fields defined over the entire domain.</p>
 <section id="a-continuous-system-a-one-dimensional-bar" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="a-continuous-system-a-one-dimensional-bar"><span class="header-section-number">3.1</span> A continuous system: a one-dimensional bar</h2>
@@ -256,33 +255,26 @@ Figure&nbsp;3.1: One-dimensional bar fixed at the left end, with distributed axi
 </figcaption>
 </figure>
 </div>
-<p>A one-dimensional bar is a continuous body. Its axial displacement can be evaluated at every point of the bar and is therefore represented by a function,</p>
+<p>A one-dimensional bar is a continuous body. Its axial displacement <span class="math inline">\(u\)</span> can be evaluated at every point of the bar and is represented by a function,</p>
 <p><span class="math display">\[
   u=u(x).
 \]</span></p>
-<p>The displacement field is the primary variable of the problem. For a linearly elastic bar,</p>
+<p>The state of the bar is therefore described by the continuous displacement field <span class="math inline">\(u(x)\)</span>, which assigns a displacement value to every point along the bar.</p>
+<p>The displacement field is the primary variable of the problem. Its variation along the bar determines the axial strain. Under the small-strain assumption, the axial strain is defined by</p>
 <p><span class="math display">\[
-  \varepsilon(x)=\frac{du}{dx}=u'(x)
+  \varepsilon(x)=\frac{du}{dx}=u'(x).
 \]</span></p>
-<p>is the axial strain and</p>
+<p>For a linearly elastic material, the axial stress is related to the strain by</p>
 <p><span class="math display">\[
-  \sigma(x)=E\varepsilon(x)
+  \sigma(x)=E\varepsilon(x).
 \]</span></p>
-<p>is the axial stress. The corresponding internal axial force is</p>
+<p>The corresponding internal axial force is</p>
 <p><span class="math display">\[
   N(x)=\int_A \sigma\,dA.
 \]</span></p>
 <p>For a homogeneous bar with constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>,</p>
 <p><span class="math display">\[
   N=EA\frac{du}{dx}.
-\]</span></p>
-<p>Equilibrium under the distributed axial load <span class="math inline">\(q\)</span> gives</p>
-<p><span class="math display">\[
-  \frac{dN}{dx}+q=0,
-\]</span></p>
-<p>and hence</p>
-<p><span class="math display">\[
-  EA\frac{d^2u}{dx^2}=-q.
 \]</span></p>
 <div id="fig-bar-cross-section" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -294,7 +286,6 @@ Figure&nbsp;3.2: Cross-section <span class="math inline">\(A\)</span> with axial
 </figcaption>
 </figure>
 </div>
-<p>The state of the bar is therefore described by the complete displacement field <span class="math inline">\(u(x)\)</span>, which contains information at an infinite number of points.</p>
 </section>
 <section id="a-discrete-system-a-one-dimensional-spring" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="a-discrete-system-a-one-dimensional-spring"><span class="header-section-number">3.2</span> A discrete system: a one-dimensional spring</h2>
@@ -315,7 +306,7 @@ Figure&nbsp;3.3: One-dimensional spring of stiffness <span class="math inline">\
 \]</span></p>
 <p>A positive elongation corresponds to a stretched spring. The internal spring force is related to the elongation by</p>
 <p><span class="math display">\[
-  F_s=k_s\delta,
+  F_s=k_s\delta=k_s(u_2-u_1),
 \]</span></p>
 <p>where <span class="math inline">\(k_s\)</span> is the spring stiffness.</p>
 <div id="fig-spring-1d-convention" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -328,30 +319,21 @@ Figure&nbsp;3.4: Positive sign convention for the internal spring force <span cl
 </figcaption>
 </figure>
 </div>
-<p>The relation</p>
-<p><span class="math display">\[
-  F_s=k_s\delta
-\]</span></p>
-<p>plays the same role for the spring that the constitutive relation <span class="math inline">\(\sigma=E\varepsilon\)</span> plays for the bar. The deformation measure is now the single scalar <span class="math inline">\(\delta\)</span>, rather than the strain field <span class="math inline">\(\varepsilon(x)\)</span>.</p>
 </section>
 <section id="continuous-and-discrete-descriptions" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="continuous-and-discrete-descriptions"><span class="header-section-number">3.3</span> Continuous and discrete descriptions</h2>
-<p>The state of the spring is determined by the two discrete quantities <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span>. The state of the bar is described by the function <span class="math inline">\(u(x)\)</span>.</p>
-<p>The continuous description is richer: it provides the displacement at every point, whereas the discrete description contains only a finite number of values. A finite element model replaces the continuous field by a finite set of unknowns while retaining enough information to approximate the mechanical response.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Why begin with springs?
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>A spring is already discrete, so no approximation of a continuous field is needed. It can therefore be used to introduce equilibrium, element matrices, assembly, boundary conditions, and the global system of equations before those same ideas are applied to continuous bodies.</p>
-</div>
-</div>
-<p>The next chapter uses two springs in series to derive the direct stiffness method and the algebraic system</p>
+<p>The bar is described by the continuous displacement field <span class="math inline">\(u(x)\)</span>, defined at every point along its length, whereas the spring is described by the two discrete displacement values <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span>. The continuous description is therefore richer: it provides the displacement at every point, whereas the discrete description contains only a finite number of displacement values.</p>
+<p>This distinction is also reflected in the internal-force relations. For the homogeneous bar,</p>
+<p><span class="math display">\[
+  N=EA\frac{du}{dx},
+\]</span></p>
+<p>so the internal axial force depends on the spatial variation of the continuous displacement field. For the spring,</p>
+<p><span class="math display">\[
+  F_s=k_s(u_2-u_1),
+\]</span></p>
+<p>so the internal spring force depends on the difference between two discrete displacement values.</p>
+<p>The finite element method will later approximate a continuous field using a finite set of unknowns. Before introducing that approximation, we begin with springs, which are already discrete, and use them to develop the fundamental algebraic ingredients of the method: equilibrium, element stiffness matrices, assembly, boundary conditions, and the global system of equations.</p>
+<p>The next chapter applies these ideas to two springs in series and derives the direct stiffness system</p>
 <p><span class="math display">\[
   \mathbf{K}\mathbf{u}=\mathbf{f}.
 \]</span></p>
