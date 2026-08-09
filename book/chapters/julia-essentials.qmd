@@ -20,17 +20,15 @@ The essential path is:
 `REPL` → `values and variables` → `vectors and matrices` → `indexing` → `loops`
 → `tuples` → `index mapping` → `copy` → `linear solve` → `transpose` → `output`
 
-When you reach the Bare-minimum checkpoint, you have the programming background
-needed to move to the two-spring implementation.
+When you reach the Bare-minimum checkpoint, you have the Julia background needed
+for the direct stiffness chapters and the first MiniFEM implementation.
 
 Part II is a reference section for Julia concepts used in later MiniFEM
 snapshots. It is not required for the first `two_springs.jl` implementation and
 can be revisited when those features first appear.
 :::
 
-## Part I --- The bare minimum for `two_springs.jl`
-
-### Core programming constructs
+## Core programming constructs
 
 Computer programs are built from a small set of recurring programming
 constructs. A *construct* is a language feature or syntax pattern used to
@@ -42,7 +40,7 @@ below serves as a map of the chapter. Some concepts are needed immediately for
 the first script; others become relevant only in later MiniFEM snapshots and are
 collected in the reference section.
 
-#### Data representation constructs
+### Data representation constructs
 
 These constructs define *what information* is stored and manipulated.
 
@@ -52,13 +50,13 @@ These constructs define *what information* is stored and manipulated.
 - Collections group several values. MiniFEM uses vectors, matrices, tuples, and,
   later, nested collections such as arrays of arrays.
 
-#### Operators and expressions
+### Operators and expressions
 
 Operators combine values into expressions. Examples include arithmetic operators
 such as `+`, `-`, `*`, and `/`, comparison operators such as `==` and `<`, and
 the assignment operator `=`.
 
-#### Control-flow constructs
+### Control-flow constructs
 
 Control flow determines *when* and *how often* statements are executed.
 
@@ -68,7 +66,7 @@ Control flow determines *when* and *how often* statements are executed.
 - Branching statements, such as `break`, `continue`, and `return`, alter the
   normal sequence of execution.
 
-#### Functional abstraction constructs
+### Functional abstraction constructs
 
 Functions collect statements into reusable computational units. A function can
 accept input arguments and return one or more results. The first
@@ -76,18 +74,20 @@ accept input arguments and return one or more results. The first
 the top level. User-defined functions are introduced later, when MiniFEM begins
 to separate recurring operations from problem-specific data.
 
-#### Error checking and verification
+### Error checking and verification
 
 A numerical program should detect invalid input and verify important results.
 The first script exposes numerical differences for inspection. Later sections
 introduce conditional checks, explicit errors, assertions, and comparisons based
 on numerical tolerances.
 
-#### Input and output
+### Input and output
 
 The first MiniFEM scripts use printed output to expose the individual stages of
 the computation. Comments document the source code, while `print`, `println`,
 and `display` present information when the program runs.
+
+## Part I --- Essential Julia
 
 ### Learning objectives
 
@@ -95,8 +95,7 @@ After completing this essential section, you should be able to:
 
 - read and modify the basic Julia constructs used in the first MiniFEM script;
 - work with variables, vectors, matrices, indexing, loops, and tuples;
-- follow the mapping and assembly operations used to build larger arrays from
-  smaller ones;
+- map indices between arrays and accumulate values into selected entries;
 - distinguish assignment from copying when working with mutable arrays;
 - solve a linear system and interpret the basic numerical output produced by the
   script.
@@ -107,19 +106,7 @@ As introduced in the installation chapter, the Julia REPL provides an
 interactive environment for evaluating Julia expressions. Here we use it to
 explore the programming constructs needed by the first MiniFEM examples.
 
-For example, enter:
-
-```julia
-2 + 3
-```
-
-Julia evaluates the expression and displays:
-
-```text
-5
-```
-
-Assignments are expressions as well. Therefore,
+Assignments are expressions. Therefore,
 
 ```julia
 count = 3
@@ -227,9 +214,9 @@ real numbers cannot be represented exactly. The consequences of this
 approximation become important when numerical results are compared;
 tolerance-based comparisons are introduced later in this chapter.
 
-### Expressions and operators used by the first script
+### Expressions and operators
 
-The following operators appear directly in the first MiniFEM implementation.
+The following operators are used throughout the examples in this book.
 
   | Operation           | Julia expression |
   | ------------------- | ---------------- |
@@ -275,20 +262,6 @@ total += 1.5
 
 After these statements, `total` is `4.0`.
 
-The first MiniFEM script uses the same `+=` pattern to accumulate several
-contributions into a single array entry. For example,
-
-```julia
-K[I, J] += K_e[i, j]
-```
-
-adds the value `K_e[i, j]` to the value already stored in `K[I, J]`.
-
-In the finite element code, this operation is used during assembly because more
-than one element can contribute to the same entry of the global matrix. At this
-stage, however, you only need to recognize the programming pattern: read the
-current value, add a contribution, and store the updated value.
-
 ### Calling functions
 
 The first script calls several Julia functions, including `zeros`, `size`,
@@ -307,9 +280,8 @@ zeros(3)
 abs(-2.0)
 ```
 
-You do not need to know how to define your own functions before reading the
-first `two_springs.jl` script. User-defined functions are introduced later, when
-they become useful in the evolving MiniFEM code.
+User-defined functions are introduced later, when they become useful in the
+evolving MiniFEM code.
 
 ### Vectors
 
@@ -488,8 +460,6 @@ for i in 1:3
     println(i)
 end
 ```
-
-The first `two_springs.jl` script uses both forms.
 
 #### Looping directly over stored values
 
@@ -869,7 +839,6 @@ or show values produced while it runs.
 
 ### Bare-minimum checkpoint
 
-::: {.callout-tip title="Getting ready for `two_springs.jl`"}
 Before moving on, make sure that you can explain the programming ideas in the
 following examples.
 
@@ -921,17 +890,23 @@ Transpose and a quadratic form:
 q = transpose(x) * A * x
 ```
 
-You should be able to identify the variables, vectors, matrices, indices, loops,
-assignments, function calls, copy operation, linear solve, and transpose. The
-first MiniFEM example uses these same Julia patterns with application-specific
-names and meanings.
-:::
+Recognise tuples, destructuring, and output:
+
+```julia
+entries = [(1, 10.0), (3, -2.0)]
+
+for (index, value) in entries
+    println("index = ", index, ", value = ", value)
+end
+```
+
+You should be able to identify the constructs above. The first MiniFEM example
+uses the same Julia constructs with application-specific names and meanings.
 
 ::: {.callout-note title="You may stop here"}
-You now have all the Julia knowledge required for the first `two_springs.jl`
-example. You can continue to the direct stiffness chapters and return to the
-reference section that follows when later MiniFEM examples introduce additional
-programming concepts.
+You now have all the Julia background needed to proceed with the
+direct-stiffness chapters. Continue there, and use the reference section below
+as needed when subsequent MiniFEM examples introduce new programming concepts.
 :::
 
 ## Part II --- Reference: Julia concepts used later in MiniFEM
@@ -1034,10 +1009,10 @@ for i in 1:5
 end
 ```
 
-These constructs are not needed by the first `two_springs.jl` script, but they
-become useful when later algorithms require convergence loops, searches, or
-conditional iteration. The related branching statement `return`, which leaves a
-function and optionally supplies its result, is introduced with functions below.
+These constructs become useful when later algorithms require convergence loops,
+searches, or conditional iteration. The related branching statement `return`,
+which leaves a function and optionally supplies its result, is introduced with
+functions below.
 
 ### Floating-point arithmetic and tolerance checks
 
@@ -1090,17 +1065,6 @@ result_a == result_b
 may be too strict when both values have been obtained through floating-point
 calculations. Two results can be equivalent for the purpose of a numerical
 calculation while differing by a very small rounding error.
-
-::: {.callout-note title="MiniFEM example"}
-A later verification may compare quantities such as
-
-```julia
-energy_local == energy_global
-```
-
-The programming issue is the same: exact equality can be too strict for
-independently computed floating-point results.
-:::
 
 #### Absolute and relative tolerances
 
@@ -1204,9 +1168,8 @@ stack trace to identify where the problem occurred.
 
 ### Defining functions
 
-The first `two_springs.jl` implementation is intentionally written as a
-top-level script. As MiniFEM grows, recurring operations become easier to reuse
-and test when they are placed in functions.
+Recurring operations become easier to reuse and test when they are placed in
+functions.
 
 A function is a reusable block of code with a defined interface. It can receive
 input arguments and return a result:
@@ -1234,8 +1197,8 @@ If no explicit `return` is written, Julia returns the value of the final
 expression. In teaching code, an explicit `return` can nevertheless make the
 function interface easier to identify.
 
-Functions will become more important when MiniFEM starts separating recurring
-reusable operations from problem-specific input data.
+Functions become more important as programs begin to separate recurring
+operations from problem-specific input data.
 
 ### What the backslash operator does internally
 
@@ -1325,9 +1288,8 @@ ragged = [
 
 ### Shallow and deep copies of nested mutable data
 
-For the ordinary numerical matrices used in the first MiniFEM example, `copy` is
-sufficient. A deeper distinction appears when an array stores other mutable
-arrays.
+For ordinary numerical matrices such as `Matrix{Float64}`, `copy` is sufficient.
+A deeper distinction appears when an array stores other mutable arrays.
 
 Consider:
 
@@ -1364,8 +1326,8 @@ The distinction is:
 - `B = copy(A)` copies the outer object;
 - `B = deepcopy(A)` recursively copies nested mutable objects.
 
-For ordinary numerical matrices such as those used in the first MiniFEM example,
-`deepcopy` is unnecessary.
+For ordinary numerical matrices such as `Matrix{Float64}`, `deepcopy` is
+unnecessary.
 
 ### More general iteration with `axes`
 
@@ -1391,8 +1353,8 @@ for i in axes(A, 1)
 end
 ```
 
-This avoids hard-coding the number of rows and becomes more useful when element
-or system sizes are no longer fixed in advance.
+This avoids hard-coding the number of rows and becomes more useful when array
+dimensions are no longer fixed in advance.
 
 ### A note on column-major storage
 
@@ -1429,11 +1391,9 @@ traverses consecutive entries in storage order: the first index `i` changes
 inside the innermost loop.
 
 ::: {.callout-note title="Performance note"}
-The matrices in the first MiniFEM examples are tiny, so this loop-order choice
-has no practical effect on runtime. Column-major storage becomes relevant for
-larger problems and performance-sensitive numerical kernels. It is included here
-because it is useful Julia knowledge, not because it is needed to understand the
-first two-spring script.
+The matrices in the small examples in this chapter are tiny, so this loop-order
+choice has no practical effect on runtime. Column-major storage becomes relevant
+for larger problems and performance-sensitive numerical kernels.
 :::
 
 ::: {.callout-tip title="Exercise — storage order"}
