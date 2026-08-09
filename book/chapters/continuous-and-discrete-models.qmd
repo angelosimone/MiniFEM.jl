@@ -1,8 +1,5 @@
 # From continuous systems to discrete models {#sec-discrete-continuous}
 
-A finite element model is a discrete mathematical representation of a continuous
-system.
-
 In a discrete system, the state is described by a finite set of variables. In a
 continuous system, the state is described by one or more fields defined over the
 entire domain.
@@ -17,27 +14,31 @@ $u(x)$.](images/bar_in_tension-1d.png){
   width=30%
 }
 
-A one-dimensional bar is a continuous body. Its axial displacement can be
-evaluated at every point of the bar and is therefore represented by a function,
+A one-dimensional bar is a continuous body. Its axial displacement $u$ can be
+evaluated at every point of the bar and is represented by a function,
 
 $$
   u=u(x).
 $$
 
-The displacement field is the primary variable of the problem. For a linearly
-elastic bar,
+The state of the bar is therefore described by the continuous displacement field
+$u(x)$, which assigns a displacement value to every point along the bar.
+
+The displacement field is the primary variable of the problem. Its variation
+along the bar determines the axial strain. Under the small-strain assumption,
+the axial strain is defined by
 
 $$
-  \varepsilon(x)=\frac{du}{dx}=u'(x)
+  \varepsilon(x)=\frac{du}{dx}=u'(x).
 $$
 
-is the axial strain and
+For a linearly elastic material, the axial stress is related to the strain by
 
 $$
-  \sigma(x)=E\varepsilon(x)
+  \sigma(x)=E\varepsilon(x).
 $$
 
-is the axial stress. The corresponding internal axial force is
+The corresponding internal axial force is
 
 $$
   N(x)=\int_A \sigma\,dA.
@@ -49,27 +50,12 @@ $$
   N=EA\frac{du}{dx}.
 $$
 
-Equilibrium under the distributed axial load $q$ gives
-
-$$
-  \frac{dN}{dx}+q=0,
-$$
-
-and hence
-
-$$
-  EA\frac{d^2u}{dx^2}=-q.
-$$
-
 ![Cross-section $A$ with axial stress $\sigma_x$, represented equivalently by
 the internal axial force $N$. A positive internal force corresponds to
 tension.](images/bar-cross-section.png){
   #fig-bar-cross-section
   width=30%
 }
-
-The state of the bar is therefore described by the complete displacement field
-$u(x)$, which contains information at an infinite number of points.
 
 ## A discrete system: a one-dimensional spring
 
@@ -94,7 +80,7 @@ A positive elongation corresponds to a stretched spring. The internal spring
 force is related to the elongation by
 
 $$
-  F_s=k_s\delta,
+  F_s=k_s\delta=k_s(u_2-u_1),
 $$
 
 where $k_s$ is the spring stiffness.
@@ -106,37 +92,39 @@ tension.](images/spring-1d-convention.png){
   width=30%
 }
 
-The relation
-
-$$
-  F_s=k_s\delta
-$$
-
-plays the same role for the spring that the constitutive relation
-$\sigma=E\varepsilon$ plays for the bar. The deformation measure is now the
-single scalar $\delta$, rather than the strain field $\varepsilon(x)$.
-
 ## Continuous and discrete descriptions
 
-The state of the spring is determined by the two discrete quantities $u_1$ and
-$u_2$. The state of the bar is described by the function $u(x)$.
+The bar is described by the continuous displacement field $u(x)$, defined at
+every point along its length, whereas the spring is described by the two
+discrete displacement values $u_1$ and $u_2$. The continuous description is
+therefore richer: it provides the displacement at every point, whereas the
+discrete description contains only a finite number of displacement values.
 
-The continuous description is richer: it provides the displacement at every
-point, whereas the discrete description contains only a finite number of values.
-A finite element model replaces the continuous field by a finite set of unknowns
-while retaining enough information to approximate the mechanical response.
+This distinction is also reflected in the internal-force relations. For the
+homogeneous bar,
 
-::: {.callout-note}
-## Why begin with springs?
+$$
+  N=EA\frac{du}{dx},
+$$
 
-A spring is already discrete, so no approximation of a continuous field is
-needed. It can therefore be used to introduce equilibrium, element matrices,
-assembly, boundary conditions, and the global system of equations before those
-same ideas are applied to continuous bodies.
-:::
+so the internal axial force depends on the spatial variation of the continuous
+displacement field. For the spring,
 
-The next chapter uses two springs in series to derive the direct stiffness
-method and the algebraic system
+$$
+  F_s=k_s(u_2-u_1),
+$$
+
+so the internal spring force depends on the difference between two discrete
+displacement values.
+
+The finite element method will later approximate a continuous field using a
+finite set of unknowns. Before introducing that approximation, we begin with
+springs, which are already discrete, and use them to develop the fundamental
+algebraic ingredients of the method: equilibrium, element stiffness matrices,
+assembly, boundary conditions, and the global system of equations.
+
+The next chapter applies these ideas to two springs in series and derives the
+direct stiffness system
 
 $$
   \mathbf{K}\mathbf{u}=\mathbf{f}.
