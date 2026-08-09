@@ -1,6 +1,9 @@
 project:
   type: book
 
+bibliography: references.bib
+csl: nature-brackets-accessed.csl
+
 book:
   title: "An Introduction to the Finite Element Method"
   subtitle: "A Step-by-Step Approach Using Julia"
@@ -10,6 +13,7 @@ book:
     - part: "Getting started"
       chapters:
         - chapters/julia-essentials.qmd
+    - references.qmd
 
 format:
   html:
