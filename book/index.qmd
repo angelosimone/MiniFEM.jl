@@ -4,11 +4,11 @@ This book provides a progressive introduction to the finite element method, with
 an emphasis on understanding how the method is formulated, implemented, and
 verified.
 
-The presentation begins with simple mechanical systems and the direct stiffness
-method. Starting from problems that can be solved and verified by hand, the core
-ingredients of a finite element formulation are introduced gradually. As the
-presentation progresses, these same principles are extended to continuum
-problems.
+The mechanical development begins by contrasting continuous and discrete
+systems. We then use simple spring assemblies, which can be solved and verified
+by hand, to introduce the direct stiffness method and its fundamental algebraic
+ingredients. Later, these same principles are extended to finite element
+discretisations of continuum problems.
 
 Theory and computation are developed together. Julia is used because its syntax
 stays close to mathematical notation while still delivering high performance.

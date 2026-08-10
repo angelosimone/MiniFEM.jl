@@ -63,7 +63,7 @@ A spring is already a discrete mechanical system. Its state can be described by
 quantities defined only at its end points.
 
 ![One-dimensional spring of stiffness $k_s$ between end points 1 and 2. The end
-displacements $u_1$ and $u_2$ and the nodal forces are referred to the positive
+displacements $u_1$ and $u_2$ and the end forces are referred to the positive
 $x$ direction.](images/spring-1d.png){
   #fig-spring-1d
   width=30%

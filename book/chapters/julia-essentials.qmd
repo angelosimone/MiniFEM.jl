@@ -21,7 +21,7 @@ The essential path is:
 → `tuples` → `index mapping` → `copy` → `linear solve` → `transpose` → `output`
 
 When you reach the Bare-minimum checkpoint, you have the Julia background needed
-for the direct stiffness chapters and the first MiniFEM implementation.
+for the first MiniFEM implementation.
 
 Part II is a reference section for Julia concepts used in later MiniFEM
 snapshots. It is not required for the first `two_springs.jl` implementation and
@@ -904,9 +904,11 @@ You should be able to identify the constructs above. The first MiniFEM example
 uses the same Julia constructs with application-specific names and meanings.
 
 ::: {.callout-note title="You may stop here"}
-You now have all the Julia background needed to proceed with the
-direct-stiffness chapters. Continue there, and use the reference section below
-as needed when subsequent MiniFEM examples introduce new programming concepts.
+You can now proceed to the direct-stiffness chapters, starting with
+@sec-discrete-continuous. The Julia concepts introduced here will be used when
+the mechanical formulation is translated into code. Return to the reference
+section below as needed when later MiniFEM examples introduce additional
+programming concepts.
 :::
 
 ## Part II --- Reference: Julia concepts used later in MiniFEM
