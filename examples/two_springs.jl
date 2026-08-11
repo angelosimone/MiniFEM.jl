@@ -55,7 +55,7 @@ f = zeros(total_dofs)
 # -------------------------------
 
 println("\n- Assembling local stiffness matrices into global K")
-for e = 1:num_elements
+for e in 1:num_elements
     # Element stiffness matrix: K_e = k_e * [1 -1; -1 1]
     k_e = element_stiffness[e]
     K_e = [
@@ -74,9 +74,9 @@ for e = 1:num_elements
     dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
 
     # Assemble the local stiffness matrix into the global stiffness matrix.
-    for i = 1:2
+    for i in 1:2
         I = dof_map[i]
-        for j = 1:2
+        for j in 1:2
             J = dof_map[j]
             K[I, J] += K_e[i, j]
         end
@@ -103,7 +103,7 @@ display(f)
 
 # Apply homogeneous Dirichlet BCs (prescribed displacements).
 for dof in constrained_dofs
-    for i = 1:total_dofs
+    for i in 1:total_dofs
         K[i, dof] = 0.0
         K[dof, i] = 0.0
     end
@@ -136,7 +136,7 @@ println("\n- Analytical nodal displacements u [mm]:")
 display(u_analytical)
 
 # -------------------------------
-# 3. Post-processing: Strain energy
+# 3. Post-processing: Strain Energy
 # -------------------------------
 
 # Compute the total internal strain energy stored in the springs using
