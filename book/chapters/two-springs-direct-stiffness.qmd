@@ -72,7 +72,9 @@ $F_s^{(e)}$ denotes tension.
 The geometric displacement notation used here is limited to the equilibrium
 solution; a separate global node numbering is introduced later.
 
-![Free-body representation of the idealised one-dimensional model, showing the spring end forces and their relation to the nodal forces, together with the reaction force $R$ and the applied force $F$.](images/cart-spring-model-free-body.png){
+![Free-body representation of the idealised one-dimensional model, showing the
+forces transmitted by the two springs, $F_s^{(1)}$ and $F_s^{(2)}$, together
+with the support reaction $R$ and the applied force $F$.](images/cart-spring-model-free-body.png){
   #fig-cart-spring-model-free-body
   width=93%
 }
@@ -391,8 +393,7 @@ Consider a spring of stiffness $k_s$ connecting nodes $a$ and $b$, as shown in
 @fig-spring-1d-element. The nodal displacements $u_a$ and $u_b$ are measured
 along the $x$ direction, while $F_a$ and $F_b$ denote the corresponding nodal
 force components acting on the spring, taken as positive in the positive $x$
-direction. The end labels $a$ and $b$ correspond to local nodes 1 and 2,
-respectively.
+direction.
 
 ![Spring of stiffness $k_s$ between nodes $a$ and $b$. At each end, the
 nodal displacement and nodal force are referred to the positive global $x$
