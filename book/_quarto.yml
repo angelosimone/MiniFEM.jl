@@ -17,6 +17,7 @@ book:
     - part: "The direct stiffness method"
       chapters:
         - chapters/continuous-and-discrete-models.qmd
+        - chapters/two-springs-direct-stiffness.qmd
     - references.qmd
 
 format:
