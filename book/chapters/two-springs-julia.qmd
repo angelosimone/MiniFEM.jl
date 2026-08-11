@@ -49,7 +49,7 @@ julia two_springs.jl
 ## Mathematical specification used by the script
 
 The code implements the formulation derived in @sec-two-springs-theory. The
-mathematical information required by the script is summarised below.
+mathematical information required by the script is summarized below.
 
 For every spring element,
 
@@ -245,8 +245,8 @@ meaning that `element_stiffness[1]` belongs to element 1 and
 
 The script stores physical quantities as ordinary numerical values; it does not
 attach or check units. The input data must therefore use a consistent unit
-system. In this example, forces are in newtons, lengths in millimetres, spring
-stiffnesses in newtons per millimetre, and strain energy in newton millimetres.
+system. In this example, forces are in newtons, lengths in millimeters, spring
+stiffnesses in newtons per millimeter, and strain energy in newton millimeters.
 :::
 
 The number of elements is obtained from the number of rows in the connectivity

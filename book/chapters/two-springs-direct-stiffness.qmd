@@ -11,7 +11,7 @@ cart.](images/cart-spring-problem.png){
 width=36%
 }
 
-To analyse the system, we first construct an idealised mechanical model. The
+To analyze the system, we first construct an idealized mechanical model. The
 motion is restricted to one dimension, the carts are treated as rigid bodies
 that can translate only in the $x$ direction, and the springs are assumed to be
 massless and linearly elastic. The problem is quasi-static and the carts are
@@ -24,7 +24,7 @@ The displacement of a node in the $x$ direction is a **degree of freedom**. The
 complete mechanical system can therefore be described by its nodes, spring
 elements, nodal displacements, applied forces, and displacement constraints.
 
-![Idealised one-dimensional model of the spring-and-cart system.](images/cart-spring-model.png){
+![Idealized one-dimensional model of the spring-and-cart system.](images/cart-spring-model.png){
 #fig-carts-springs-model
 width=36%
 }
@@ -72,7 +72,7 @@ $F_s^{(e)}$ denotes tension.
 The geometric displacement notation used here is limited to the equilibrium
 solution; a separate global node numbering is introduced later.
 
-![Free-body representation of the idealised one-dimensional model, showing the
+![Free-body representation of the idealized one-dimensional model, showing the
 forces transmitted by the two springs, $F_s^{(1)}$ and $F_s^{(2)}$, together
 with the support reaction $R$ and the applied force $F$.](images/cart-spring-model-free-body.png){
   #fig-cart-spring-model-free-body
@@ -499,7 +499,7 @@ For a two-node spring element, the connectivity therefore consists of the two
 global node numbers corresponding to local nodes 1 and 2.
 
 With reference to @fig-spring-cart-fem-model, the connectivity for this model is
-summarised in the table below:
+summarized in the table below:
 
   | element number | global node corresponding to local node 1 | global node corresponding to local node 2 |
   | -------------: | ----------------------------------------: | ----------------------------------------: |
@@ -530,13 +530,13 @@ values are normally supplied to linear-algebra software, which usually stores
 matrix entries as numbers without interpreting their physical units. The input
 values must therefore already belong to one coherent system of units.
 
-Here, forces are expressed in newtons, displacements in millimetres, spring
-stiffnesses in newtons per millimetre, and strain energy in newton millimetres.
+Here, forces are expressed in newtons, displacements in millimeters, spring
+stiffnesses in newtons per millimeter, and strain energy in newton millimeters.
 With these choices, solving the numerical system returns displacements in
-millimetres. For the same reason, a bar element with axial stiffness $EA/L$
-would require Young's modulus $E$ in newtons per square millimetre, the
-cross-sectional area $A$ in square millimetres, and the bar length $L$ in
-millimetres.
+millimeters. For the same reason, a bar element with axial stiffness $EA/L$
+would require Young's modulus $E$ in newtons per square millimeter, the
+cross-sectional area $A$ in square millimeters, and the bar length $L$ in
+millimeters.
 
 Alternatively, forces may be expressed in newtons and lengths in metres. In that
 case, spring stiffnesses must be expressed in newtons per metre, $E$ in newtons
@@ -557,7 +557,7 @@ degree of freedom. We choose the global degree-of-freedom numbering to coincide
 with the global node numbering. Thus, node 1 carries degree of freedom 1, node 2
 carries degree of freedom 2, and node 3 carries degree of freedom 3.
 
-The global node ordering is summarised below.
+The global node ordering is summarized below.
 
   | global node number | physical location | global degree-of-freedom number | displacement variable |
   | -----------------: | :---------------- | ------------------------------: | :-------------------- |
