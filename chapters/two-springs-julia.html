@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Your first FEM code: two springs in series – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/two-springs-direct-stiffness.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">The direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-julia.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">The direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#purpose-of-the-example" id="toc-purpose-of-the-example" class="nav-link active" data-scroll-target="#purpose-of-the-example"><span class="header-section-number">5.1</span> Purpose of the example</a></li>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link" data-scroll-target="#learning-objectives"><span class="header-section-number">5.2</span> Learning objectives</a></li>
+  <li><a href="#running-the-example" id="toc-running-the-example" class="nav-link" data-scroll-target="#running-the-example"><span class="header-section-number">5.3</span> Running the example</a></li>
+  <li><a href="#mathematical-specification-used-by-the-script" id="toc-mathematical-specification-used-by-the-script" class="nav-link" data-scroll-target="#mathematical-specification-used-by-the-script"><span class="header-section-number">5.4</span> Mathematical specification used by the script</a></li>
+  <li><a href="#from-mathematical-objects-to-julia-data" id="toc-from-mathematical-objects-to-julia-data" class="nav-link" data-scroll-target="#from-mathematical-objects-to-julia-data"><span class="header-section-number">5.5</span> From mathematical objects to Julia data</a></li>
+  <li><a href="#pseudocode-summary-of-the-finite-element-procedure" id="toc-pseudocode-summary-of-the-finite-element-procedure" class="nav-link" data-scroll-target="#pseudocode-summary-of-the-finite-element-procedure"><span class="header-section-number">5.6</span> Pseudocode summary of the finite element procedure</a></li>
+  <li><a href="#walkthrough-of-the-julia-script" id="toc-walkthrough-of-the-julia-script" class="nav-link" data-scroll-target="#walkthrough-of-the-julia-script"><span class="header-section-number">5.7</span> Walkthrough of the Julia script</a>
+  <ul class="collapse">
+  <li><a href="#model-dimensions-and-input-data" id="toc-model-dimensions-and-input-data" class="nav-link" data-scroll-target="#model-dimensions-and-input-data"><span class="header-section-number">5.7.1</span> Model dimensions and input data</a></li>
+  <li><a href="#global-arrays" id="toc-global-arrays" class="nav-link" data-scroll-target="#global-arrays"><span class="header-section-number">5.7.2</span> Global arrays</a></li>
+  <li><a href="#element-loop" id="toc-element-loop" class="nav-link" data-scroll-target="#element-loop"><span class="header-section-number">5.7.3</span> Element loop</a></li>
+  <li><a href="#constructing-the-element-matrix" id="toc-constructing-the-element-matrix" class="nav-link" data-scroll-target="#constructing-the-element-matrix"><span class="header-section-number">5.7.4</span> Constructing the element matrix</a></li>
+  <li><a href="#building-the-local-to-global-map" id="toc-building-the-local-to-global-map" class="nav-link" data-scroll-target="#building-the-local-to-global-map"><span class="header-section-number">5.7.5</span> Building the local-to-global map</a></li>
+  <li><a href="#assembling-the-global-stiffness-matrix" id="toc-assembling-the-global-stiffness-matrix" class="nav-link" data-scroll-target="#assembling-the-global-stiffness-matrix"><span class="header-section-number">5.7.6</span> Assembling the global stiffness matrix</a></li>
+  <li><a href="#preserving-the-assembled-matrix" id="toc-preserving-the-assembled-matrix" class="nav-link" data-scroll-target="#preserving-the-assembled-matrix"><span class="header-section-number">5.7.7</span> Preserving the assembled matrix</a></li>
+  <li><a href="#assembling-the-applied-force" id="toc-assembling-the-applied-force" class="nav-link" data-scroll-target="#assembling-the-applied-force"><span class="header-section-number">5.7.8</span> Assembling the applied force</a></li>
+  <li><a href="#imposing-the-homogeneous-displacement-constraint" id="toc-imposing-the-homogeneous-displacement-constraint" class="nav-link" data-scroll-target="#imposing-the-homogeneous-displacement-constraint"><span class="header-section-number">5.7.9</span> Imposing the homogeneous displacement constraint</a></li>
+  <li><a href="#solving-the-linear-system" id="toc-solving-the-linear-system" class="nav-link" data-scroll-target="#solving-the-linear-system"><span class="header-section-number">5.7.10</span> Solving the linear system</a></li>
+  <li><a href="#comparing-displacement-results" id="toc-comparing-displacement-results" class="nav-link" data-scroll-target="#comparing-displacement-results"><span class="header-section-number">5.7.11</span> Comparing displacement results</a></li>
+  <li><a href="#computing-the-internal-strain-energy" id="toc-computing-the-internal-strain-energy" class="nav-link" data-scroll-target="#computing-the-internal-strain-energy"><span class="header-section-number">5.7.12</span> Computing the internal strain energy</a></li>
+  </ul></li>
+  <li><a href="#verification" id="toc-verification" class="nav-link" data-scroll-target="#verification"><span class="header-section-number">5.8</span> Verification</a>
+  <ul class="collapse">
+  <li><a href="#assembled-stiffness-matrix" id="toc-assembled-stiffness-matrix" class="nav-link" data-scroll-target="#assembled-stiffness-matrix"><span class="header-section-number">5.8.1</span> Assembled stiffness matrix</a></li>
+  <li><a href="#displacements" id="toc-displacements" class="nav-link" data-scroll-target="#displacements"><span class="header-section-number">5.8.2</span> Displacements</a></li>
+  <li><a href="#element-elongations-and-spring-forces" id="toc-element-elongations-and-spring-forces" class="nav-link" data-scroll-target="#element-elongations-and-spring-forces"><span class="header-section-number">5.8.3</span> Element elongations and spring forces</a></li>
+  <li><a href="#internal-strain-energy" id="toc-internal-strain-energy" class="nav-link" data-scroll-target="#internal-strain-energy"><span class="header-section-number">5.8.4</span> Internal strain energy</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5.9</span> Exercises</a></li>
+  <li><a href="#what-comes-next" id="toc-what-comes-next" class="nav-link" data-scroll-target="#what-comes-next"><span class="header-section-number">5.10</span> What comes next</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">The direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-julia.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-two-springs-code" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Repository snapshot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Course edition:</strong> 2026–27<br>
+<strong>Target snapshot:</strong> <code>2026-27/S01-two-springs</code></p>
+<p>This is the initial code snapshot. There is no preceding snapshot.</p>
+</div>
+</div>
+<section id="purpose-of-the-example" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="purpose-of-the-example"><span class="header-section-number">5.1</span> Purpose of the example</h2>
+<p>This chapter accompanies <code>two_springs.jl</code>, the first pure-Julia MiniFEM example, which applies the direct stiffness method to the two-spring system shown in <a href="two-springs-direct-stiffness.html#fig-carts-springs" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>.</p>
+<p>The mechanical formulation, hand assembly, and analytical solution were derived in <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>. In this chapter, the mathematical objects and finite element operations are mapped to their corresponding Julia representations.</p>
+<p>The script is intentionally written as a top-level, dependency-free program. Every finite element operation remains visible, and only the basic Julia constructs introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a> are used. The implementation favours explicit, <a href="../glossary.html#gls-imperative-programming">imperative logic</a> over compact syntax or custom abstractions, so that the program can be read in the same order as the hand calculation.</p>
+</section>
+<section id="learning-objectives" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">5.2</span> Learning objectives</h2>
+<p>After completing this chapter, you should be able to:</p>
+<ul>
+<li>relate the mathematical formulation of the two-spring problem to its Julia implementation;</li>
+<li>explain how element data, connectivity, and degrees of freedom are represented and used in the finite element procedure;</li>
+<li>follow the assembly, application of boundary conditions, and solution of the global system;</li>
+<li>verify the numerical results against independently derived reference values.</li>
+</ul>
+</section>
+<section id="running-the-example" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="running-the-example"><span class="header-section-number">5.3</span> Running the example</h2>
+<p>Run the example from the directory containing the file:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">julia</span> two_springs.jl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="mathematical-specification-used-by-the-script" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="mathematical-specification-used-by-the-script"><span class="header-section-number">5.4</span> Mathematical specification used by the script</h2>
+<p>The code implements the formulation derived in <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>. The mathematical information required by the script is summarized below.</p>
+<p>For every spring element,</p>
+<p><span class="math display">\[
+  \mathbf{K}^{(e)}=k_e
+  \begin{bmatrix}
+  1 &amp; -1\\
+  -1 &amp; 1
+  \end{bmatrix}.
+\]</span></p>
+<p>The mathematical matrix <span class="math inline">\(\mathbf{K}^{(e)}\)</span> is represented in the Julia code by the variable <code>K_e</code>.</p>
+<p>The assembled equilibrium equations can be written as</p>
+<p><span class="math display">\[
+  \mathbf{K}\mathbf{u}
+  =
+  \mathbf{f}_{\mathrm{app}}+\mathbf{r},
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{f}_{\mathrm{app}}\)</span> contains the known applied nodal forces and <span class="math inline">\(\mathbf{r}\)</span> contains the unknown support reaction.</p>
+<p>The prescribed displacement is imposed by modifying the assembled system. After this modification, the system solved by the code is</p>
+<p><span class="math display">\[
+  \mathbf{K}\mathbf{u}=\mathbf{f}.
+\]</span></p>
+<p>Here, <code>K</code> and <code>f</code> denote the modified algebraic system used by the solver. The original assembled stiffness matrix is preserved as <code>K_original</code>, so that physical quantities such as the support reaction and strain energy can be later recovered from the unmodified system.</p>
+<p>For the present model,</p>
+<p><span class="math display">\[
+  k_1=1\ \mathrm{N/mm},
+  \qquad
+  k_2=2\ \mathrm{N/mm},
+  \qquad
+  F=10\ \mathrm{N},
+  \qquad
+  u_2=0.
+\]</span></p>
+<p>The finite element model, global node numbering, and element connectivity are shown in <a href="two-springs-direct-stiffness.html#fig-spring-cart-fem-model" class="quarto-xref">Figure&nbsp;<span>4.7</span></a>. The physical nodes are ordered from left to right as global nodes 2, 3, and 1. Element 1 connects nodes 2 and 3, while element 2 connects nodes 3 and 1.</p>
+<p>The global displacement vector follows numerical node order:</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  u_1 &amp; u_2 &amp; u_3
+  \end{bmatrix}^{\mathsf T}.
+\]</span></p>
+<p>The expected reference results are</p>
+<p><span class="math display">\[
+  \mathbf{u}_{\mathrm{reference}}=
+  \begin{bmatrix}
+  15 &amp; 0 &amp; 10
+  \end{bmatrix}^{\mathsf T}\ \mathrm{mm},
+  \qquad
+  U_{\mathrm{reference}}=75\ \mathrm{N\,mm}.
+\]</span></p>
+</section>
+<section id="from-mathematical-objects-to-julia-data" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="from-mathematical-objects-to-julia-data"><span class="header-section-number">5.5</span> From mathematical objects to Julia data</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 56%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Mathematical object</th>
+<th style="text-align: left;">Julia representation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">number of nodes</td>
+<td style="text-align: left;"><code>num_nodes</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">degrees of freedom per node</td>
+<td style="text-align: left;"><code>dofs_per_node</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">total number of degrees of freedom</td>
+<td style="text-align: left;"><code>total_dofs</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">element connectivity</td>
+<td style="text-align: left;"><code>element_connectivity</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">spring stiffnesses</td>
+<td style="text-align: left;"><code>element_stiffness</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">element stiffness matrix <span class="math inline">\(\mathbf{K}^{(e)}\)</span></td>
+<td style="text-align: left;"><code>K_e</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">local-to-global degree-of-freedom map</td>
+<td style="text-align: left;"><code>dof_map</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">global stiffness matrix <span class="math inline">\(\mathbf{K}\)</span></td>
+<td style="text-align: left;"><code>K</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">known applied nodal-force vector <span class="math inline">\(\mathbf{f}_{\mathrm{app}}\)</span></td>
+<td style="text-align: left;"><code>f</code> before displacement-constraint modification</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">modified solver right-hand side <span class="math inline">\(\widetilde{\mathbf{f}}\)</span></td>
+<td style="text-align: left;"><code>f</code> after displacement-constraint modification</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">applied nodal forces</td>
+<td style="text-align: left;"><code>applied_forces</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">constrained degrees of freedom</td>
+<td style="text-align: left;"><code>constrained_dofs</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">displacement solution</td>
+<td style="text-align: left;"><code>u</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">unmodified assembled stiffness matrix</td>
+<td style="text-align: left;"><code>K_original</code></td>
+</tr>
+</tbody>
+</table>
+<p>Nodal coordinates are not stored in this first implementation because the spring stiffnesses are supplied directly and the coordinates are not required for the numerical calculation. They remain useful for describing and plotting the physical model and will be introduced when later element formulations require geometric information.</p>
+</section>
+<section id="pseudocode-summary-of-the-finite-element-procedure" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="pseudocode-summary-of-the-finite-element-procedure"><span class="header-section-number">5.6</span> Pseudocode summary of the finite element procedure</h2>
+<p>The program follows three main stages: pre-processing, processing, and post-processing. The processing stage is further divided into assembly, application of the boundary conditions, and solution.</p>
+<pre class="pseudocode"><code>1. Pre-processing: Input Data
+   - Define the number of nodes and displacement degrees of freedom per node
+   - Define the element connectivity
+   - Define the stiffness of each spring element
+   - Define the constrained degrees of freedom
+   - Define the applied nodal forces
+   - Compute the total number of degrees of freedom and elements
+   - Initialize the global stiffness matrix K
+   - Initialize the global force vector f
+
+2. Processing
+
+   2.1 Assembly: Build Global K
+       - For each element:
+         - Read the element stiffness k_e
+         - Construct the element stiffness matrix K_e
+         - Build the local-to-global degree-of-freedom map
+         - Add the entries of K_e to the corresponding entries of K
+       - Display the assembled global stiffness matrix K
+
+   2.2 Boundary Conditions
+       - Copy the assembled matrix K as K_original
+       - Add the applied nodal forces to f
+       - For each constrained degree of freedom:
+         - Set the corresponding row and column of K to zero
+         - Set the corresponding diagonal entry of K to one
+         - Set the corresponding entry of f to zero
+
+   2.3 Solver
+       - Solve the modified linear system K u = f
+       - Display the computed and analytical displacement vectors for comparison
+
+3. Post-processing: Strain Energy
+   - Compute the total internal strain energy from
+     1/2 u^T K_original u
+   - Compute the analytical strain energy
+   - Compare the numerical and analytical energy values</code></pre>
+</section>
+<section id="walkthrough-of-the-julia-script" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="walkthrough-of-the-julia-script"><span class="header-section-number">5.7</span> Walkthrough of the Julia script</h2>
+<p>The Julia language features used below were introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>. In this walkthrough we identify the finite element meaning of each data structure and computational step.</p>
+<section id="model-dimensions-and-input-data" class="level3" data-number="5.7.1">
+<h3 data-number="5.7.1" class="anchored" data-anchor-id="model-dimensions-and-input-data"><span class="header-section-number">5.7.1</span> Model dimensions and input data</h3>
+<p>The model dimensions are</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>num_nodes <span class="op">=</span> <span class="fl">3</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dofs_per_node <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>total_dofs <span class="op">=</span> num_nodes <span class="op">*</span> dofs_per_node</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>As there is one displacement degree of freedom per node, <code>total_dofs</code> is equal to <code>3</code>.</p>
+<p>The element connectivity is stored as a matrix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>element_connectivity <span class="op">=</span> [</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">2</span> <span class="fl">3</span>;</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fl">3</span> <span class="fl">1</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each row represents one element. The first and second columns contain the global nodes associated with local nodes 1 and 2:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 42%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">element number</th>
+<th style="text-align: right;">global node corresponding to local node 1</th>
+<th style="text-align: right;">global node corresponding to local node 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>The spring stiffnesses are stored in the same element order:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>element_stiffness <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>meaning that <code>element_stiffness[1]</code> belongs to element 1 and <code>element_stiffness[2]</code> belongs to element 2.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Consistent units
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The script stores physical quantities as ordinary numerical values; it does not attach or check units. The input data must therefore use a consistent unit system. In this example, forces are in newtons, lengths in millimetres, spring stiffnesses in newtons per millimetre, and strain energy in newton millimetres.</p>
+</div>
+</div>
+<p>The number of elements is obtained from the number of rows in the connectivity matrix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>num_elements <span class="op">=</span> <span class="fu">size</span>(element_connectivity, <span class="fl">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The applied force and homogeneous displacement constraint are represented by</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>applied_force <span class="op">=</span> <span class="fl">10.0</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>applied_forces <span class="op">=</span> [(<span class="fl">1</span>, applied_force)]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>constrained_dofs <span class="op">=</span> [<span class="fl">2</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each entry of <code>applied_forces</code> associates a global degree-of-freedom index with a force value. Here, the force acts at global degree of freedom 1.</p>
+<p>The vector <code>constrained_dofs</code> contains the index of the constrained degree of freedom. Because the prescribed displacement is zero in this first snapshot, there is no need for a data structure analogous to <code>applied_forces</code>; the code therefore stores only the constrained degree-of-freedom index.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Numerical order is not geometric order
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The physical nodes are arranged from left to right as <code>2 -&gt; 3 -&gt; 1</code>, whereas the global arrays follow numerical order. Consequently,</p>
+<pre class="text"><code>u[1] = displacement of the rightmost node
+u[2] = displacement of the fixed left node
+u[3] = displacement of the internal node</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Array indices and model identifiers
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this script, global degree-of-freedom numbers are used directly as Julia array indices. The internal degree-of-freedom numbering must therefore form the consecutive sequence</p>
+<pre class="text"><code>1, 2, ..., total_dofs</code></pre>
+<p>External mesh or data-file labels do not need to follow this rule. Arbitrary labels such as <code>3, 4, 5, 99</code> can be retained, provided that they are mapped to consecutive internal indices such as <code>1, 2, 3, 4</code> before the algebraic arrays are constructed.</p>
+</div>
+</div>
+</section>
+<section id="global-arrays" class="level3" data-number="5.7.2">
+<h3 data-number="5.7.2" class="anchored" data-anchor-id="global-arrays"><span class="header-section-number">5.7.2</span> Global arrays</h3>
+<p>The global stiffness matrix and force vector are initialized as zero-filled arrays:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="fu">zeros</span>(total_dofs, total_dofs)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">zeros</span>(total_dofs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For this problem, <code>K</code> is a <code>3 x 3</code> matrix and <code>f</code> is a vector with three entries. They begin at zero because element stiffness contributions and applied nodal forces will be accumulated into them.</p>
+</section>
+<section id="element-loop" class="level3" data-number="5.7.3">
+<h3 data-number="5.7.3" class="anchored" data-anchor-id="element-loop"><span class="header-section-number">5.7.3</span> Element loop</h3>
+<p>The assembly stage visits each spring element in turn. The computational part of the element loop is</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cn">e</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>num_elements</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    k_e <span class="op">=</span> element_stiffness[<span class="cn">e</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    K_e <span class="op">=</span> [</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span>k_e <span class="op">-</span>k_e;</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span>k_e <span class="op">+</span>k_e</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    dof_map <span class="op">=</span> [element_connectivity[<span class="cn">e</span>, <span class="fl">1</span>], element_connectivity[<span class="cn">e</span>, <span class="fl">2</span>]]</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        I <span class="op">=</span> dof_map[i]</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            J <span class="op">=</span> dof_map[j]</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>            K[I, J] <span class="op">+=</span> K_e[i, j]</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For each element, the script retrieves its stiffness, constructs its element stiffness matrix, builds the local-to-global degree-of-freedom map, and adds the element contribution to the global stiffness matrix. One iteration of this loop therefore performs the element-level operations required by the direct stiffness procedure.</p>
+</section>
+<section id="constructing-the-element-matrix" class="level3" data-number="5.7.4">
+<h3 data-number="5.7.4" class="anchored" data-anchor-id="constructing-the-element-matrix"><span class="header-section-number">5.7.4</span> Constructing the element matrix</h3>
+<p>For the current element, the stiffness value is retrieved with</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>k_e <span class="op">=</span> element_stiffness[<span class="cn">e</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>and the mathematical element matrix</p>
+<p><span class="math display">\[
+  \mathbf{K}^{(e)}=k_e
+  \begin{bmatrix}
+  1 &amp; -1\\
+  -1 &amp; 1
+  \end{bmatrix}
+\]</span></p>
+<p>is represented by</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>K_e <span class="op">=</span> [</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span>k_e <span class="op">-</span>k_e;</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>k_e <span class="op">+</span>k_e</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>K_e</code> contains the stiffness matrix of the current element and must not be confused with the assembled global matrix <code>K</code>.</p>
+</section>
+<section id="building-the-local-to-global-map" class="level3" data-number="5.7.5">
+<h3 data-number="5.7.5" class="anchored" data-anchor-id="building-the-local-to-global-map"><span class="header-section-number">5.7.5</span> Building the local-to-global map</h3>
+<p>For element <code>e</code>, the global degrees of freedom are read from the connectivity matrix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dof_map <span class="op">=</span> [element_connectivity[<span class="cn">e</span>, <span class="fl">1</span>], element_connectivity[<span class="cn">e</span>, <span class="fl">2</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The resulting maps are</p>
+<pre class="text"><code>element 1: dof_map = [2, 3]
+element 2: dof_map = [3, 1]</code></pre>
+<p>Because the model has one degree of freedom per node, the connected node numbers are also the global degree-of-freedom numbers. This equivalence will no longer hold automatically when several degrees of freedom are attached to each node.</p>
+<p>The two entries of <code>dof_map</code> correspond, in order, to local degrees of freedom 1 and 2. The map therefore identifies the global rows and columns into which the entries of <code>K_e</code> are assembled.</p>
+</section>
+<section id="assembling-the-global-stiffness-matrix" class="level3" data-number="5.7.6">
+<h3 data-number="5.7.6" class="anchored" data-anchor-id="assembling-the-global-stiffness-matrix"><span class="header-section-number">5.7.6</span> Assembling the global stiffness matrix</h3>
+<p>The element matrix must be transferred from its local ordering to the global matrix ordering. Suppose that the local degrees of freedom <span class="math inline">\(\{1,2\}\)</span> correspond to the global degrees of freedom <span class="math inline">\(\{2,3\}\)</span>:</p>
+<pre class="text"><code>local degree of freedom:   1   2
+global degree of freedom:  2   3</code></pre>
+<p>This correspondence defines a local-to-global map</p>
+<p><span class="math display">\[
+  g(1)=2,
+  \qquad
+  g(2)=3.
+\]</span></p>
+<p>An entry of the element matrix is identified by a local row index and a local column index. For a two-degree-of-freedom element, all element entries are therefore represented by the Cartesian product</p>
+<p><span class="math display">\[
+  \{1,2\}\times\{1,2\}
+  =
+  \{(1,1),\ (1,2),\ (2,1),\ (2,2)\}.
+\]</span></p>
+<p>The local-to-global map is applied separately to the row and column indices:</p>
+<p><span class="math display">\[
+  (i,j)
+  \longmapsto
+  \bigl(g(i),g(j)\bigr).
+\]</span></p>
+<p>For element 1,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  (1,1)&amp;\longmapsto(2,2),\\
+  (1,2)&amp;\longmapsto(2,3),\\
+  (2,1)&amp;\longmapsto(3,2),\\
+  (2,2)&amp;\longmapsto(3,3).
+  \end{aligned}
+\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  K_{22} &amp;\mathrel{+}= K^{(1)}_{11},\\
+  K_{23} &amp;\mathrel{+}= K^{(1)}_{12},\\
+  K_{32} &amp;\mathrel{+}= K^{(1)}_{21},\\
+  K_{33} &amp;\mathrel{+}= K^{(1)}_{22}.
+  \end{aligned}
+\]</span></p>
+<p>The nested loops implement exactly this operation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> dof_map[i]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        J <span class="op">=</span> dof_map[j]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        K[I, J] <span class="op">+=</span> K_e[i, j]</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Lowercase <code>i</code> and <code>j</code> identify local row and column positions, whereas uppercase <code>I</code> and <code>J</code> identify the corresponding global positions. In mathematical form, the operation performed for every local pair is</p>
+<p><span class="math display">\[
+  K_{g(i),g(j)}\mathrel{+}=K^{(e)}_{ij}.
+\]</span></p>
+<p>The contribution is added rather than overwritten because different elements may contribute to the same global matrix entry. In this model, both elements contribute to <code>K[3, 3]</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise – Modify one element stiffness
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Change the stiffness of element 2 from</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>element_stiffness <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>to</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>element_stiffness <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">3.0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Before running the script, predict which entries of the assembled global stiffness matrix <code>K</code> will change and which will remain unchanged.</p>
+<p>Then run the script and compare the new matrix with the original one. Use the connectivity of element 2 and its local-to-global degree-of-freedom map to explain the result.</p>
+<p>For this exercise, focus only on the assembled matrix <code>K</code>; the hard-coded analytical displacement later in the script corresponds to the original stiffness values.</p>
+</div>
+</div>
+</section>
+<section id="preserving-the-assembled-matrix" class="level3" data-number="5.7.7">
+<h3 data-number="5.7.7" class="anchored" data-anchor-id="preserving-the-assembled-matrix"><span class="header-section-number">5.7.7</span> Preserving the assembled matrix</h3>
+<p>Before the displacement condition modifies the global matrix, the script preserves the assembled physical stiffness matrix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>K_original <span class="op">=</span> <span class="fu">copy</span>(K)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This distinction is important mechanically. <code>K_original</code> represents the assembled stiffness matrix before the displacement constraint is imposed, whereas <code>K</code> will subsequently be modified into the algebraic system matrix used by the solver. The original matrix is required for the strain-energy computation and can also be used to recover reactions.</p>
+<p>The Julia semantics of <code>copy</code> were introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>; here its purpose is to keep the original physical operator available after <code>K</code> is modified.</p>
+</section>
+<section id="assembling-the-applied-force" class="level3" data-number="5.7.8">
+<h3 data-number="5.7.8" class="anchored" data-anchor-id="assembling-the-applied-force"><span class="header-section-number">5.7.8</span> Assembling the applied force</h3>
+<p>The applied nodal-force data are transferred into the global vector with</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dof, value) <span class="kw">in</span> applied_forces</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    f[dof] <span class="op">+=</span> value</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For the current data, the resulting vector is</p>
+<p><span class="math display">\[
+  \mathbf{f}_{\mathrm{app}}=
+  \begin{bmatrix}
+  10\\0\\0
+  \end{bmatrix}
+  \ \mathrm{N}.
+\]</span></p>
+<p>The support reaction is not entered as an applied load because it is unknown. It can be recovered after the displacement solution from the original equilibrium equations.</p>
+</section>
+<section id="imposing-the-homogeneous-displacement-constraint" class="level3" data-number="5.7.9">
+<h3 data-number="5.7.9" class="anchored" data-anchor-id="imposing-the-homogeneous-displacement-constraint"><span class="header-section-number">5.7.9</span> Imposing the homogeneous displacement constraint</h3>
+<p>The zero displacement at degree of freedom 2 is imposed with</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> dof <span class="kw">in</span> constrained_dofs</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>total_dofs</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>        K[i, dof] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        K[dof, i] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    K[dof, dof] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    f[dof] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For each constrained degree of freedom, the code zeros the corresponding row and column, places one on the diagonal, and sets the corresponding right-hand side entry to zero. For the present problem, the modified system is</p>
+<p><span class="math display">\[
+  \begin{bmatrix}
+  2 &amp; 0 &amp; -2\\
+  0 &amp; 1 &amp; 0\\
+  -2 &amp; 0 &amp; 3
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_1\\u_2\\u_3
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  10\\0\\0
+  \end{bmatrix}.
+\]</span></p>
+<p>Its second equation is exactly <span class="math inline">\(u_2=0\)</span>.</p>
+<p>In <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>, the modified arrays were denoted by <span class="math inline">\(\widetilde{\mathbf{K}}\)</span> and <span class="math inline">\(\widetilde{\mathbf{f}}\)</span>. The script does not introduce new variable names for them: <code>K</code> and <code>f</code> are <a href="../glossary.html#gls-modified-in-place">modified in place</a>. After this operation, <code>K</code> represents the modified algebraic system matrix rather than the original physical stiffness matrix. The original assembled matrix remains available as <code>K_original</code>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Scope of this implementation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This row-and-column modification is sufficient for a homogeneous prescribed displacement. A nonzero prescribed value also requires a consistent correction of the right-hand side and is introduced in a later snapshot.</p>
+</div>
+</div>
+</section>
+<section id="solving-the-linear-system" class="level3" data-number="5.7.10">
+<h3 data-number="5.7.10" class="anchored" data-anchor-id="solving-the-linear-system"><span class="header-section-number">5.7.10</span> Solving the linear system</h3>
+<p>The modified system is solved with</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> K <span class="op">\</span> f</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>which computes the solution of</p>
+<p><span class="math display">\[
+  \mathbf{K}\mathbf{u}=\mathbf{f}.
+\]</span></p>
+<p>The backslash operator was introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>. Its finite element role here is simply to solve the constrained global equilibrium system for the unknown nodal displacements.</p>
+</section>
+<section id="comparing-displacement-results" class="level3" data-number="5.7.11">
+<h3 data-number="5.7.11" class="anchored" data-anchor-id="comparing-displacement-results"><span class="header-section-number">5.7.11</span> Comparing displacement results</h3>
+<p>The reference displacement vector is stored in global order:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>u_analytical <span class="op">=</span> [<span class="fl">15.0</span>, <span class="fl">0.0</span>, <span class="fl">10.0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>and is displayed alongside the numerical solution for comparison.</p>
+</section>
+<section id="computing-the-internal-strain-energy" class="level3" data-number="5.7.12">
+<h3 data-number="5.7.12" class="anchored" data-anchor-id="computing-the-internal-strain-energy"><span class="header-section-number">5.7.12</span> Computing the internal strain energy</h3>
+<p>The numerical internal strain energy is computed with the original assembled matrix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>strain_energy_global <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fu">transpose</span>(u) <span class="op">*</span> K_original <span class="op">*</span> u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This is the Julia representation of</p>
+<p><span class="math display">\[
+  U=\frac{1}{2}\mathbf{u}^{\mathsf T}
+  \mathbf{K}_{\mathrm{original}}\mathbf{u}.
+\]</span></p>
+<p>The independent reference value is computed from the two spring stiffnesses:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>k_1 <span class="op">=</span> element_stiffness[<span class="fl">1</span>]</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>k_2 <span class="op">=</span> element_stiffness[<span class="fl">2</span>]</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>strain_energy_analytical <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> applied_force<span class="op">^</span><span class="fl">2</span> <span class="op">*</span> (<span class="fl">1</span> <span class="op">/</span> k_1 <span class="op">+</span> <span class="fl">1</span> <span class="op">/</span> k_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The derivation of this expression is given in <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>. The important point here is that the numerical energy uses the original assembled stiffness matrix, not the matrix after the displacement constraint has been inserted.</p>
+</section>
+</section>
+<section id="verification" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="verification"><span class="header-section-number">5.8</span> Verification</h2>
+<p>A program result should not be accepted merely because the script runs. The present example provides several checks against quantities already derived independently.</p>
+<section id="assembled-stiffness-matrix" class="level3" data-number="5.8.1">
+<h3 data-number="5.8.1" class="anchored" data-anchor-id="assembled-stiffness-matrix"><span class="header-section-number">5.8.1</span> Assembled stiffness matrix</h3>
+<p>Before boundary conditions, the expected global matrix is</p>
+<p><span class="math display">\[
+  \mathbf{K}_{\mathrm{expected}}=
+  \begin{bmatrix}
+  2 &amp; 0 &amp; -2\\
+  0 &amp; 1 &amp; -1\\
+  -2 &amp; -1 &amp; 3
+  \end{bmatrix}
+  \ \mathrm{N/mm}.
+\]</span></p>
+<p>The matrix should be symmetric. Each row should sum to zero before displacement constraints are imposed.</p>
+</section>
+<section id="displacements" class="level3" data-number="5.8.2">
+<h3 data-number="5.8.2" class="anchored" data-anchor-id="displacements"><span class="header-section-number">5.8.2</span> Displacements</h3>
+<p>The numerical solution should be</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  15\\0\\10
+  \end{bmatrix}
+  \ \mathrm{mm}.
+\]</span></p>
+<p>Remember that the entries are in global numerical order. The rightmost node is the first entry, the fixed left node is the second, and the internal node is the third.</p>
+</section>
+<section id="element-elongations-and-spring-forces" class="level3" data-number="5.8.3">
+<h3 data-number="5.8.3" class="anchored" data-anchor-id="element-elongations-and-spring-forces"><span class="header-section-number">5.8.3</span> Element elongations and spring forces</h3>
+<p>Using the element connectivity,</p>
+<p><span class="math display">\[
+  \delta_1=u_3-u_2=10\ \mathrm{mm},
+  \qquad
+  \delta_2=u_1-u_3=5\ \mathrm{mm}.
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  F_s^{(1)}=k_1\delta_1=10\ \mathrm{N},
+  \qquad
+  F_s^{(2)}=k_2\delta_2=10\ \mathrm{N}.
+\]</span></p>
+<p>The equal internal spring forces confirm equilibrium at the internal node.</p>
+</section>
+<section id="internal-strain-energy" class="level3" data-number="5.8.4">
+<h3 data-number="5.8.4" class="anchored" data-anchor-id="internal-strain-energy"><span class="header-section-number">5.8.4</span> Internal strain energy</h3>
+<p>Both the global quadratic form and the independent spring expression should give</p>
+<p><span class="math display">\[
+  U=75\ \mathrm{N\,mm}.
+\]</span></p>
+<p>The script reports the absolute difference between the numerical and analytical energy values. For this small problem, the difference should be zero or a very small value arising from floating-point rounding. Approximate comparisons and numerical tolerances are discussed in Part II of <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
+<p>Recovery of the support reaction provides one further equilibrium check and is left as Exercise 3.</p>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">5.9</span> Exercises</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise 1 – Change the applied force
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Keep <span class="math inline">\(k_1=1\ \mathrm{N/mm}\)</span> and <span class="math inline">\(k_2=2\ \mathrm{N/mm}\)</span>, but set</p>
+<p><span class="math display">\[
+  F=6\ \mathrm{N}.
+\]</span></p>
+<p>Before running the script:</p>
+<ol type="1">
+<li>compute the global displacement vector;</li>
+<li>compute the internal strain energy;</li>
+<li>predict how displacements and energy scale relative to the original problem.</li>
+</ol>
+<p>Then update <code>applied_force</code> and <code>u_analytical</code> and run the script. The expected results are</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  9\\0\\6
+  \end{bmatrix}
+  \ \mathrm{mm},
+  \qquad
+  U=27\ \mathrm{N\,mm}.
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise 2 – Change both spring stiffnesses
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use</p>
+<p><span class="math display">\[
+  k_1=2\ \mathrm{N/mm},
+  \qquad
+  k_2=4\ \mathrm{N/mm},
+  \qquad
+  F=8\ \mathrm{N}.
+\]</span></p>
+<p>Update <code>element_stiffness</code>, <code>applied_force</code>, and <code>u_analytical</code>. Determine the reference displacement vector and strain energy before running the code. The expected results are</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  6\\0\\4
+  \end{bmatrix}
+  \ \mathrm{mm},
+  \qquad
+  U=24\ \mathrm{N\,mm}.
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise 3 – Recover the support reaction
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The reaction can be recovered from the original assembled equilibrium equations,</p>
+<p><span class="math display">\[
+  \mathbf{r}
+  =
+  \mathbf{K}_{\mathrm{original}}\mathbf{u}
+  -
+  \mathbf{f}_{\mathrm{app}}.
+\]</span></p>
+<p>After solving for <code>u</code>, reconstruct the applied-load vector <span class="math inline">\(\mathbf{f}_{\mathrm{app}}\)</span> for the present problem and implement this relation in Julia.</p>
+<p>Check that only the constrained degree of freedom has a nonzero reaction and that the applied force and support reaction satisfy global equilibrium.</p>
+</div>
+</div>
+</section>
+<section id="what-comes-next" class="level2" data-number="5.10">
+<h2 data-number="5.10" class="anchored" data-anchor-id="what-comes-next"><span class="header-section-number">5.10</span> What comes next</h2>
+<p>This first snapshot exposes the core direct stiffness calculation in a single script. Later snapshots will progressively separate recurring operations from problem-specific data and make the implementation easier to reuse and verify.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/two-springs-direct-stiffness.html" class="pagination-link" aria-label="Two springs in series: the direct stiffness method">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

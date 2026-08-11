@@ -272,5 +272,155 @@
       "The direct stiffness method",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Two springs in series: the direct stiffness method</span>"
     ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html",
+    "href": "chapters/two-springs-julia.html",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "",
+    "text": "5.1 Purpose of the example\nThis chapter accompanies two_springs.jl, the first pure-Julia MiniFEM example, which applies the direct stiffness method to the two-spring system shown in Figure 4.1.\nThe mechanical formulation, hand assembly, and analytical solution were derived in Chapter 4. In this chapter, the mathematical objects and finite element operations are mapped to their corresponding Julia representations.\nThe script is intentionally written as a top-level, dependency-free program. Every finite element operation remains visible, and only the basic Julia constructs introduced in Chapter 2 are used. The implementation favours explicit, imperative logic over compact syntax or custom abstractions, so that the program can be read in the same order as the hand calculation.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#learning-objectives",
+    "href": "chapters/two-springs-julia.html#learning-objectives",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.2 Learning objectives",
+    "text": "5.2 Learning objectives\nAfter completing this chapter, you should be able to:\n\nrelate the mathematical formulation of the two-spring problem to its Julia implementation;\nexplain how element data, connectivity, and degrees of freedom are represented and used in the finite element procedure;\nfollow the assembly, application of boundary conditions, and solution of the global system;\nverify the numerical results against independently derived reference values.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#running-the-example",
+    "href": "chapters/two-springs-julia.html#running-the-example",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.3 Running the example",
+    "text": "5.3 Running the example\nRun the example from the directory containing the file:\njulia two_springs.jl",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#mathematical-specification-used-by-the-script",
+    "href": "chapters/two-springs-julia.html#mathematical-specification-used-by-the-script",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.4 Mathematical specification used by the script",
+    "text": "5.4 Mathematical specification used by the script\nThe code implements the formulation derived in Chapter 4. The mathematical information required by the script is summarized below.\nFor every spring element,\n\\[\n  \\mathbf{K}^{(e)}=k_e\n  \\begin{bmatrix}\n  1 & -1\\\\\n  -1 & 1\n  \\end{bmatrix}.\n\\]\nThe mathematical matrix \\(\\mathbf{K}^{(e)}\\) is represented in the Julia code by the variable K_e.\nThe assembled equilibrium equations can be written as\n\\[\n  \\mathbf{K}\\mathbf{u}\n  =\n  \\mathbf{f}_{\\mathrm{app}}+\\mathbf{r},\n\\]\nwhere \\(\\mathbf{f}_{\\mathrm{app}}\\) contains the known applied nodal forces and \\(\\mathbf{r}\\) contains the unknown support reaction.\nThe prescribed displacement is imposed by modifying the assembled system. After this modification, the system solved by the code is\n\\[\n  \\mathbf{K}\\mathbf{u}=\\mathbf{f}.\n\\]\nHere, K and f denote the modified algebraic system used by the solver. The original assembled stiffness matrix is preserved as K_original, so that physical quantities such as the support reaction and strain energy can be later recovered from the unmodified system.\nFor the present model,\n\\[\n  k_1=1\\ \\mathrm{N/mm},\n  \\qquad\n  k_2=2\\ \\mathrm{N/mm},\n  \\qquad\n  F=10\\ \\mathrm{N},\n  \\qquad\n  u_2=0.\n\\]\nThe finite element model, global node numbering, and element connectivity are shown in Figure 4.7. The physical nodes are ordered from left to right as global nodes 2, 3, and 1. Element 1 connects nodes 2 and 3, while element 2 connects nodes 3 and 1.\nThe global displacement vector follows numerical node order:\n\\[\n  \\mathbf{u}=\n  \\begin{bmatrix}\n  u_1 & u_2 & u_3\n  \\end{bmatrix}^{\\mathsf T}.\n\\]\nThe expected reference results are\n\\[\n  \\mathbf{u}_{\\mathrm{reference}}=\n  \\begin{bmatrix}\n  15 & 0 & 10\n  \\end{bmatrix}^{\\mathsf T}\\ \\mathrm{mm},\n  \\qquad\n  U_{\\mathrm{reference}}=75\\ \\mathrm{N\\,mm}.\n\\]",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#from-mathematical-objects-to-julia-data",
+    "href": "chapters/two-springs-julia.html#from-mathematical-objects-to-julia-data",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.5 From mathematical objects to Julia data",
+    "text": "5.5 From mathematical objects to Julia data\n\n\n\n\n\n\n\nMathematical object\nJulia representation\n\n\n\n\nnumber of nodes\nnum_nodes\n\n\ndegrees of freedom per node\ndofs_per_node\n\n\ntotal number of degrees of freedom\ntotal_dofs\n\n\nelement connectivity\nelement_connectivity\n\n\nspring stiffnesses\nelement_stiffness\n\n\nelement stiffness matrix \\(\\mathbf{K}^{(e)}\\)\nK_e\n\n\nlocal-to-global degree-of-freedom map\ndof_map\n\n\nglobal stiffness matrix \\(\\mathbf{K}\\)\nK\n\n\nknown applied nodal-force vector \\(\\mathbf{f}_{\\mathrm{app}}\\)\nf before displacement-constraint modification\n\n\nmodified solver right-hand side \\(\\widetilde{\\mathbf{f}}\\)\nf after displacement-constraint modification\n\n\napplied nodal forces\napplied_forces\n\n\nconstrained degrees of freedom\nconstrained_dofs\n\n\ndisplacement solution\nu\n\n\nunmodified assembled stiffness matrix\nK_original\n\n\n\nNodal coordinates are not stored in this first implementation because the spring stiffnesses are supplied directly and the coordinates are not required for the numerical calculation. They remain useful for describing and plotting the physical model and will be introduced when later element formulations require geometric information.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#pseudocode-summary-of-the-finite-element-procedure",
+    "href": "chapters/two-springs-julia.html#pseudocode-summary-of-the-finite-element-procedure",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.6 Pseudocode summary of the finite element procedure",
+    "text": "5.6 Pseudocode summary of the finite element procedure\nThe program follows three main stages: pre-processing, processing, and post-processing. The processing stage is further divided into assembly, application of the boundary conditions, and solution.\n1. Pre-processing: Input Data\n   - Define the number of nodes and displacement degrees of freedom per node\n   - Define the element connectivity\n   - Define the stiffness of each spring element\n   - Define the constrained degrees of freedom\n   - Define the applied nodal forces\n   - Compute the total number of degrees of freedom and elements\n   - Initialize the global stiffness matrix K\n   - Initialize the global force vector f\n\n2. Processing\n\n   2.1 Assembly: Build Global K\n       - For each element:\n         - Read the element stiffness k_e\n         - Construct the element stiffness matrix K_e\n         - Build the local-to-global degree-of-freedom map\n         - Add the entries of K_e to the corresponding entries of K\n       - Display the assembled global stiffness matrix K\n\n   2.2 Boundary Conditions\n       - Copy the assembled matrix K as K_original\n       - Add the applied nodal forces to f\n       - For each constrained degree of freedom:\n         - Set the corresponding row and column of K to zero\n         - Set the corresponding diagonal entry of K to one\n         - Set the corresponding entry of f to zero\n\n   2.3 Solver\n       - Solve the modified linear system K u = f\n       - Display the computed and analytical displacement vectors for comparison\n\n3. Post-processing: Strain Energy\n   - Compute the total internal strain energy from\n     1/2 u^T K_original u\n   - Compute the analytical strain energy\n   - Compare the numerical and analytical energy values",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#walkthrough-of-the-julia-script",
+    "href": "chapters/two-springs-julia.html#walkthrough-of-the-julia-script",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.7 Walkthrough of the Julia script",
+    "text": "5.7 Walkthrough of the Julia script\nThe Julia language features used below were introduced in Chapter 2. In this walkthrough we identify the finite element meaning of each data structure and computational step.\n\n5.7.1 Model dimensions and input data\nThe model dimensions are\nnum_nodes = 3\ndofs_per_node = 1\ntotal_dofs = num_nodes * dofs_per_node\nAs there is one displacement degree of freedom per node, total_dofs is equal to 3.\nThe element connectivity is stored as a matrix:\nelement_connectivity = [\n    2 3;\n    3 1\n]\nEach row represents one element. The first and second columns contain the global nodes associated with local nodes 1 and 2:\n\n\n\n\n\n\n\n\nelement number\nglobal node corresponding to local node 1\nglobal node corresponding to local node 2\n\n\n\n\n1\n2\n3\n\n\n2\n3\n1\n\n\n\nThe spring stiffnesses are stored in the same element order:\nelement_stiffness = [1.0, 2.0]\nmeaning that element_stiffness[1] belongs to element 1 and element_stiffness[2] belongs to element 2.\n\n\n\n\n\n\nImportantConsistent units\n\n\n\nThe script stores physical quantities as ordinary numerical values; it does not attach or check units. The input data must therefore use a consistent unit system. In this example, forces are in newtons, lengths in millimetres, spring stiffnesses in newtons per millimetre, and strain energy in newton millimetres.\n\n\nThe number of elements is obtained from the number of rows in the connectivity matrix:\nnum_elements = size(element_connectivity, 1)\nThe applied force and homogeneous displacement constraint are represented by\napplied_force = 10.0\napplied_forces = [(1, applied_force)]\nconstrained_dofs = [2]\nEach entry of applied_forces associates a global degree-of-freedom index with a force value. Here, the force acts at global degree of freedom 1.\nThe vector constrained_dofs contains the index of the constrained degree of freedom. Because the prescribed displacement is zero in this first snapshot, there is no need for a data structure analogous to applied_forces; the code therefore stores only the constrained degree-of-freedom index.\n\n\n\n\n\n\nImportantNumerical order is not geometric order\n\n\n\nThe physical nodes are arranged from left to right as 2 -&gt; 3 -&gt; 1, whereas the global arrays follow numerical order. Consequently,\nu[1] = displacement of the rightmost node\nu[2] = displacement of the fixed left node\nu[3] = displacement of the internal node\n\n\n\n\n\n\n\n\nNoteArray indices and model identifiers\n\n\n\nIn this script, global degree-of-freedom numbers are used directly as Julia array indices. The internal degree-of-freedom numbering must therefore form the consecutive sequence\n1, 2, ..., total_dofs\nExternal mesh or data-file labels do not need to follow this rule. Arbitrary labels such as 3, 4, 5, 99 can be retained, provided that they are mapped to consecutive internal indices such as 1, 2, 3, 4 before the algebraic arrays are constructed.\n\n\n\n\n5.7.2 Global arrays\nThe global stiffness matrix and force vector are initialized as zero-filled arrays:\nK = zeros(total_dofs, total_dofs)\nf = zeros(total_dofs)\nFor this problem, K is a 3 x 3 matrix and f is a vector with three entries. They begin at zero because element stiffness contributions and applied nodal forces will be accumulated into them.\n\n\n5.7.3 Element loop\nThe assembly stage visits each spring element in turn. The computational part of the element loop is\nfor e in 1:num_elements\n    k_e = element_stiffness[e]\n    K_e = [\n        +k_e -k_e;\n        -k_e +k_e\n    ]\n\n    dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]\n\n    for i in 1:2\n        I = dof_map[i]\n        for j in 1:2\n            J = dof_map[j]\n            K[I, J] += K_e[i, j]\n        end\n    end\nend\nFor each element, the script retrieves its stiffness, constructs its element stiffness matrix, builds the local-to-global degree-of-freedom map, and adds the element contribution to the global stiffness matrix. One iteration of this loop therefore performs the element-level operations required by the direct stiffness procedure.\n\n\n5.7.4 Constructing the element matrix\nFor the current element, the stiffness value is retrieved with\nk_e = element_stiffness[e]\nand the mathematical element matrix\n\\[\n  \\mathbf{K}^{(e)}=k_e\n  \\begin{bmatrix}\n  1 & -1\\\\\n  -1 & 1\n  \\end{bmatrix}\n\\]\nis represented by\nK_e = [\n    +k_e -k_e;\n    -k_e +k_e\n]\nK_e contains the stiffness matrix of the current element and must not be confused with the assembled global matrix K.\n\n\n5.7.5 Building the local-to-global map\nFor element e, the global degrees of freedom are read from the connectivity matrix:\ndof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]\nThe resulting maps are\nelement 1: dof_map = [2, 3]\nelement 2: dof_map = [3, 1]\nBecause the model has one degree of freedom per node, the connected node numbers are also the global degree-of-freedom numbers. This equivalence will no longer hold automatically when several degrees of freedom are attached to each node.\nThe two entries of dof_map correspond, in order, to local degrees of freedom 1 and 2. The map therefore identifies the global rows and columns into which the entries of K_e are assembled.\n\n\n5.7.6 Assembling the global stiffness matrix\nThe element matrix must be transferred from its local ordering to the global matrix ordering. Suppose that the local degrees of freedom \\(\\{1,2\\}\\) correspond to the global degrees of freedom \\(\\{2,3\\}\\):\nlocal degree of freedom:   1   2\nglobal degree of freedom:  2   3\nThis correspondence defines a local-to-global map\n\\[\n  g(1)=2,\n  \\qquad\n  g(2)=3.\n\\]\nAn entry of the element matrix is identified by a local row index and a local column index. For a two-degree-of-freedom element, all element entries are therefore represented by the Cartesian product\n\\[\n  \\{1,2\\}\\times\\{1,2\\}\n  =\n  \\{(1,1),\\ (1,2),\\ (2,1),\\ (2,2)\\}.\n\\]\nThe local-to-global map is applied separately to the row and column indices:\n\\[\n  (i,j)\n  \\longmapsto\n  \\bigl(g(i),g(j)\\bigr).\n\\]\nFor element 1,\n\\[\n  \\begin{aligned}\n  (1,1)&\\longmapsto(2,2),\\\\\n  (1,2)&\\longmapsto(2,3),\\\\\n  (2,1)&\\longmapsto(3,2),\\\\\n  (2,2)&\\longmapsto(3,3).\n  \\end{aligned}\n\\]\nConsequently,\n\\[\n  \\begin{aligned}\n  K_{22} &\\mathrel{+}= K^{(1)}_{11},\\\\\n  K_{23} &\\mathrel{+}= K^{(1)}_{12},\\\\\n  K_{32} &\\mathrel{+}= K^{(1)}_{21},\\\\\n  K_{33} &\\mathrel{+}= K^{(1)}_{22}.\n  \\end{aligned}\n\\]\nThe nested loops implement exactly this operation:\nfor i in 1:2\n    I = dof_map[i]\n    for j in 1:2\n        J = dof_map[j]\n        K[I, J] += K_e[i, j]\n    end\nend\nLowercase i and j identify local row and column positions, whereas uppercase I and J identify the corresponding global positions. In mathematical form, the operation performed for every local pair is\n\\[\n  K_{g(i),g(j)}\\mathrel{+}=K^{(e)}_{ij}.\n\\]\nThe contribution is added rather than overwritten because different elements may contribute to the same global matrix entry. In this model, both elements contribute to K[3, 3].\n\n\n\n\n\n\nTipExercise – Modify one element stiffness\n\n\n\nChange the stiffness of element 2 from\nelement_stiffness = [1.0, 2.0]\nto\nelement_stiffness = [1.0, 3.0]\nBefore running the script, predict which entries of the assembled global stiffness matrix K will change and which will remain unchanged.\nThen run the script and compare the new matrix with the original one. Use the connectivity of element 2 and its local-to-global degree-of-freedom map to explain the result.\nFor this exercise, focus only on the assembled matrix K; the hard-coded analytical displacement later in the script corresponds to the original stiffness values.\n\n\n\n\n5.7.7 Preserving the assembled matrix\nBefore the displacement condition modifies the global matrix, the script preserves the assembled physical stiffness matrix:\nK_original = copy(K)\nThis distinction is important mechanically. K_original represents the assembled stiffness matrix before the displacement constraint is imposed, whereas K will subsequently be modified into the algebraic system matrix used by the solver. The original matrix is required for the strain-energy computation and can also be used to recover reactions.\nThe Julia semantics of copy were introduced in Chapter 2; here its purpose is to keep the original physical operator available after K is modified.\n\n\n5.7.8 Assembling the applied force\nThe applied nodal-force data are transferred into the global vector with\nfor (dof, value) in applied_forces\n    f[dof] += value\nend\nFor the current data, the resulting vector is\n\\[\n  \\mathbf{f}_{\\mathrm{app}}=\n  \\begin{bmatrix}\n  10\\\\0\\\\0\n  \\end{bmatrix}\n  \\ \\mathrm{N}.\n\\]\nThe support reaction is not entered as an applied load because it is unknown. It can be recovered after the displacement solution from the original equilibrium equations.\n\n\n5.7.9 Imposing the homogeneous displacement constraint\nThe zero displacement at degree of freedom 2 is imposed with\nfor dof in constrained_dofs\n    for i in 1:total_dofs\n        K[i, dof] = 0.0\n        K[dof, i] = 0.0\n    end\n\n    K[dof, dof] = 1.0\n    f[dof] = 0.0\nend\nFor each constrained degree of freedom, the code zeros the corresponding row and column, places one on the diagonal, and sets the corresponding right-hand side entry to zero. For the present problem, the modified system is\n\\[\n  \\begin{bmatrix}\n  2 & 0 & -2\\\\\n  0 & 1 & 0\\\\\n  -2 & 0 & 3\n  \\end{bmatrix}\n  \\begin{bmatrix}\n  u_1\\\\u_2\\\\u_3\n  \\end{bmatrix}\n  =\n  \\begin{bmatrix}\n  10\\\\0\\\\0\n  \\end{bmatrix}.\n\\]\nIts second equation is exactly \\(u_2=0\\).\nIn Chapter 4, the modified arrays were denoted by \\(\\widetilde{\\mathbf{K}}\\) and \\(\\widetilde{\\mathbf{f}}\\). The script does not introduce new variable names for them: K and f are modified in place. After this operation, K represents the modified algebraic system matrix rather than the original physical stiffness matrix. The original assembled matrix remains available as K_original.\n\n\n\n\n\n\nNoteScope of this implementation\n\n\n\nThis row-and-column modification is sufficient for a homogeneous prescribed displacement. A nonzero prescribed value also requires a consistent correction of the right-hand side and is introduced in a later snapshot.\n\n\n\n\n5.7.10 Solving the linear system\nThe modified system is solved with\nu = K \\ f\nwhich computes the solution of\n\\[\n  \\mathbf{K}\\mathbf{u}=\\mathbf{f}.\n\\]\nThe backslash operator was introduced in Chapter 2. Its finite element role here is simply to solve the constrained global equilibrium system for the unknown nodal displacements.\n\n\n5.7.11 Comparing displacement results\nThe reference displacement vector is stored in global order:\nu_analytical = [15.0, 0.0, 10.0]\nand is displayed alongside the numerical solution for comparison.\n\n\n5.7.12 Computing the internal strain energy\nThe numerical internal strain energy is computed with the original assembled matrix:\nstrain_energy_global = 0.5 * transpose(u) * K_original * u\nThis is the Julia representation of\n\\[\n  U=\\frac{1}{2}\\mathbf{u}^{\\mathsf T}\n  \\mathbf{K}_{\\mathrm{original}}\\mathbf{u}.\n\\]\nThe independent reference value is computed from the two spring stiffnesses:\nk_1 = element_stiffness[1]\nk_2 = element_stiffness[2]\nstrain_energy_analytical = 0.5 * applied_force^2 * (1 / k_1 + 1 / k_2)\nThe derivation of this expression is given in Chapter 4. The important point here is that the numerical energy uses the original assembled stiffness matrix, not the matrix after the displacement constraint has been inserted.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#verification",
+    "href": "chapters/two-springs-julia.html#verification",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.8 Verification",
+    "text": "5.8 Verification\nA program result should not be accepted merely because the script runs. The present example provides several checks against quantities already derived independently.\n\n5.8.1 Assembled stiffness matrix\nBefore boundary conditions, the expected global matrix is\n\\[\n  \\mathbf{K}_{\\mathrm{expected}}=\n  \\begin{bmatrix}\n  2 & 0 & -2\\\\\n  0 & 1 & -1\\\\\n  -2 & -1 & 3\n  \\end{bmatrix}\n  \\ \\mathrm{N/mm}.\n\\]\nThe matrix should be symmetric. Each row should sum to zero before displacement constraints are imposed.\n\n\n5.8.2 Displacements\nThe numerical solution should be\n\\[\n  \\mathbf{u}=\n  \\begin{bmatrix}\n  15\\\\0\\\\10\n  \\end{bmatrix}\n  \\ \\mathrm{mm}.\n\\]\nRemember that the entries are in global numerical order. The rightmost node is the first entry, the fixed left node is the second, and the internal node is the third.\n\n\n5.8.3 Element elongations and spring forces\nUsing the element connectivity,\n\\[\n  \\delta_1=u_3-u_2=10\\ \\mathrm{mm},\n  \\qquad\n  \\delta_2=u_1-u_3=5\\ \\mathrm{mm}.\n\\]\nTherefore,\n\\[\n  F_s^{(1)}=k_1\\delta_1=10\\ \\mathrm{N},\n  \\qquad\n  F_s^{(2)}=k_2\\delta_2=10\\ \\mathrm{N}.\n\\]\nThe equal internal spring forces confirm equilibrium at the internal node.\n\n\n5.8.4 Internal strain energy\nBoth the global quadratic form and the independent spring expression should give\n\\[\n  U=75\\ \\mathrm{N\\,mm}.\n\\]\nThe script reports the absolute difference between the numerical and analytical energy values. For this small problem, the difference should be zero or a very small value arising from floating-point rounding. Approximate comparisons and numerical tolerances are discussed in Part II of Chapter 2.\nRecovery of the support reaction provides one further equilibrium check and is left as Exercise 3.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#exercises",
+    "href": "chapters/two-springs-julia.html#exercises",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.9 Exercises",
+    "text": "5.9 Exercises\n\n\n\n\n\n\nTipExercise 1 – Change the applied force\n\n\n\nKeep \\(k_1=1\\ \\mathrm{N/mm}\\) and \\(k_2=2\\ \\mathrm{N/mm}\\), but set\n\\[\n  F=6\\ \\mathrm{N}.\n\\]\nBefore running the script:\n\ncompute the global displacement vector;\ncompute the internal strain energy;\npredict how displacements and energy scale relative to the original problem.\n\nThen update applied_force and u_analytical and run the script. The expected results are\n\\[\n  \\mathbf{u}=\n  \\begin{bmatrix}\n  9\\\\0\\\\6\n  \\end{bmatrix}\n  \\ \\mathrm{mm},\n  \\qquad\n  U=27\\ \\mathrm{N\\,mm}.\n\\]\n\n\n\n\n\n\n\n\nTipExercise 2 – Change both spring stiffnesses\n\n\n\nUse\n\\[\n  k_1=2\\ \\mathrm{N/mm},\n  \\qquad\n  k_2=4\\ \\mathrm{N/mm},\n  \\qquad\n  F=8\\ \\mathrm{N}.\n\\]\nUpdate element_stiffness, applied_force, and u_analytical. Determine the reference displacement vector and strain energy before running the code. The expected results are\n\\[\n  \\mathbf{u}=\n  \\begin{bmatrix}\n  6\\\\0\\\\4\n  \\end{bmatrix}\n  \\ \\mathrm{mm},\n  \\qquad\n  U=24\\ \\mathrm{N\\,mm}.\n\\]\n\n\n\n\n\n\n\n\nTipExercise 3 – Recover the support reaction\n\n\n\nThe reaction can be recovered from the original assembled equilibrium equations,\n\\[\n  \\mathbf{r}\n  =\n  \\mathbf{K}_{\\mathrm{original}}\\mathbf{u}\n  -\n  \\mathbf{f}_{\\mathrm{app}}.\n\\]\nAfter solving for u, reconstruct the applied-load vector \\(\\mathbf{f}_{\\mathrm{app}}\\) for the present problem and implement this relation in Julia.\nCheck that only the constrained degree of freedom has a nonzero reaction and that the applied force and support reaction satisfy global equilibrium.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/two-springs-julia.html#what-comes-next",
+    "href": "chapters/two-springs-julia.html#what-comes-next",
+    "title": "5  Your first FEM code: two springs in series",
+    "section": "5.10 What comes next",
+    "text": "5.10 What comes next\nThis first snapshot exposes the core direct stiffness calculation in a single script. Later snapshots will progressively separate recurring operations from problem-specific data and make the implementation easier to reuse and verify.",
+    "crumbs": [
+      "The direct stiffness method",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Your first FEM code: two springs in series</span>"
+    ]
+  },
+  {
+    "objectID": "glossary.html",
+    "href": "glossary.html",
+    "title": "Glossary",
+    "section": "",
+    "text": "D",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Glossary</span>"
+    ]
+  },
+  {
+    "objectID": "glossary.html#d",
+    "href": "glossary.html#d",
+    "title": "Glossary",
+    "section": "",
+    "text": "Declarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Glossary</span>"
+    ]
+  },
+  {
+    "objectID": "glossary.html#i",
+    "href": "glossary.html#i",
+    "title": "Glossary",
+    "section": "I",
+    "text": "I\n\nImperative programming\nA programming paradigm in which a computation is expressed as an explicit sequence of commands that describe how a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.\nSee also: Declarative programming. Further details: Wikipedia — Imperative programming.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Glossary</span>"
+    ]
+  },
+  {
+    "objectID": "glossary.html#m",
+    "href": "glossary.html#m",
+    "title": "Glossary",
+    "section": "M",
+    "text": "M\n\nModified in place\nDescribes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.\nFor example, in Julia, integers are immutable:\nx = 4\nx = x + 1\nHere, x is not modified in place. Instead, x is rebound from the value 4 to the new value 5.\nBy contrast, an array is mutable:\nx = [4]\nx[1] += 1\nHere, the existing array is modified in place, changing its contents from [4] to [5].\nSee also: Mutable object; Immutable object.\n\n\nMutable object\nAn object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.\nSee also: Immutable object; Modified in place.\n\n\nImmutable object\nAn object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.\nSee also: Mutable object; Modified in place.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Glossary</span>"
+    ]
   }
 ]
