@@ -684,8 +684,9 @@ $$
   \ \mathrm{N/mm}.
 $$
 
-The matrix should be symmetric. Each row should sum to zero before displacement
-constraints are imposed.
+The matrix should be symmetric, and each row should sum to zero before
+displacement constraints are imposed, reflecting the rigid-translation mode of
+the unconstrained assembly.
 
 ### Displacements
 
