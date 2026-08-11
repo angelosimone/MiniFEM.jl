@@ -289,7 +289,7 @@ Figure&nbsp;4.1: Two carts connected in series by springs of stiffness <span cla
 </figcaption>
 </figure>
 </div>
-<p>To analyse the system, we first construct an idealised mechanical model. The motion is restricted to one dimension, the carts are treated as rigid bodies that can translate only in the <span class="math inline">\(x\)</span> direction, and the springs are assumed to be massless and linearly elastic. The problem is quasi-static and the carts are frictionless.</p>
+<p>To analyze the system, we first construct an idealized mechanical model. The motion is restricted to one dimension, the carts are treated as rigid bodies that can translate only in the <span class="math inline">\(x\)</span> direction, and the springs are assumed to be massless and linearly elastic. The problem is quasi-static and the carts are frictionless.</p>
 <p>In this one-dimensional model, shown in <a href="#fig-carts-springs-model" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>, the spring end points and their connections to the carts and support are represented by <strong>nodes</strong>. Each spring connects two nodes and forms an <strong>element</strong> of the model. The displacement of a node in the <span class="math inline">\(x\)</span> direction is a <strong>degree of freedom</strong>. The complete mechanical system can therefore be described by its nodes, spring elements, nodal displacements, applied forces, and displacement constraints.</p>
 <div id="fig-carts-springs-model" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -297,7 +297,7 @@ Figure&nbsp;4.1: Two carts connected in series by springs of stiffness <span cla
 <img src="images/cart-spring-model.png" class="img-fluid figure-img" style="width:36.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-carts-springs-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.2: Idealised one-dimensional model of the spring-and-cart system.
+Figure&nbsp;4.2: Idealized one-dimensional model of the spring-and-cart system.
 </figcaption>
 </figure>
 </div>
@@ -334,7 +334,7 @@ Figure&nbsp;4.2: Idealised one-dimensional model of the spring-and-cart system.
 <img src="images/cart-spring-model-free-body.png" class="img-fluid figure-img" style="width:93.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cart-spring-model-free-body-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.3: Free-body representation of the idealised one-dimensional model, showing the forces transmitted by the two springs, <span class="math inline">\(F_s^{(1)}\)</span> and <span class="math inline">\(F_s^{(2)}\)</span>, together with the support reaction <span class="math inline">\(R\)</span> and the applied force <span class="math inline">\(F\)</span>.
+Figure&nbsp;4.3: Free-body representation of the idealized one-dimensional model, showing the forces transmitted by the two springs, <span class="math inline">\(F_s^{(1)}\)</span> and <span class="math inline">\(F_s^{(2)}\)</span>, together with the support reaction <span class="math inline">\(R\)</span> and the applied force <span class="math inline">\(F\)</span>.
 </figcaption>
 </figure>
 </div>
@@ -621,7 +621,7 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
 </figure>
 </div>
 <p>The connectivity of an element specifies how its local nodes are associated with the global nodes of the model. The ordering of the local nodes also defines the local direction of the element, taken here from local node 1 to local node 2. For a two-node spring element, the connectivity therefore consists of the two global node numbers corresponding to local nodes 1 and 2.</p>
-<p>With reference to <a href="#fig-spring-cart-fem-model" class="quarto-xref">Figure&nbsp;<span>4.7</span></a>, the connectivity for this model is summarised in the table below:</p>
+<p>With reference to <a href="#fig-spring-cart-fem-model" class="quarto-xref">Figure&nbsp;<span>4.7</span></a>, the connectivity for this model is summarized in the table below:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 14%">
@@ -680,7 +680,7 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
 </div>
 <div class="callout-body-container callout-body">
 <p>All quantities must be expressed in a consistent system of units. This requirement applies even though the matrices in this example are initially written symbolically and can be solved by hand. In larger systems, numerical values are normally supplied to linear-algebra software, which usually stores matrix entries as numbers without interpreting their physical units. The input values must therefore already belong to one coherent system of units.</p>
-<p>Here, forces are expressed in newtons, displacements in millimetres, spring stiffnesses in newtons per millimetre, and strain energy in newton millimetres. With these choices, solving the numerical system returns displacements in millimetres. For the same reason, a bar element with axial stiffness <span class="math inline">\(EA/L\)</span> would require Young’s modulus <span class="math inline">\(E\)</span> in newtons per square millimetre, the cross-sectional area <span class="math inline">\(A\)</span> in square millimetres, and the bar length <span class="math inline">\(L\)</span> in millimetres.</p>
+<p>Here, forces are expressed in newtons, displacements in millimeters, spring stiffnesses in newtons per millimeter, and strain energy in newton millimeters. With these choices, solving the numerical system returns displacements in millimeters. For the same reason, a bar element with axial stiffness <span class="math inline">\(EA/L\)</span> would require Young’s modulus <span class="math inline">\(E\)</span> in newtons per square millimeter, the cross-sectional area <span class="math inline">\(A\)</span> in square millimeters, and the bar length <span class="math inline">\(L\)</span> in millimeters.</p>
 <p>Alternatively, forces may be expressed in newtons and lengths in metres. In that case, spring stiffnesses must be expressed in newtons per metre, <span class="math inline">\(E\)</span> in newtons per square metre, <span class="math inline">\(A\)</span> in square metres, and the computed displacements will be in metres. Any consistent system of units may be used, but all input quantities must be expressed using the same system.</p>
 </div>
 </div>
@@ -689,7 +689,7 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
 <h3 data-number="4.3.3" class="anchored" data-anchor-id="degrees-of-freedom-and-global-ordering"><span class="header-section-number">4.3.3</span> Degrees of freedom and global ordering</h3>
 <p>A degree of freedom (DOF) is a scalar variable used to describe one component of the possible motion of a node. A node and a degree of freedom are therefore distinct concepts: a node identifies a point in the model, whereas a degree of freedom describes one component of its motion.</p>
 <p>In this one-dimensional spring model, each node has one axial displacement degree of freedom. We choose the global degree-of-freedom numbering to coincide with the global node numbering. Thus, node 1 carries degree of freedom 1, node 2 carries degree of freedom 2, and node 3 carries degree of freedom 3.</p>
-<p>The global node ordering is summarised below.</p>
+<p>The global node ordering is summarized below.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 20%">
