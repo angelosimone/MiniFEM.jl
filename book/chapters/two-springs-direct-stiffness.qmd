@@ -778,8 +778,9 @@ Several properties can already be checked:
   \mathbf{0},
   $$
 
-  meaning that assigning the same displacement to every node does not deform
-  either spring and therefore produces no internal forces;
+meaning that assigning the same displacement to every node corresponds to a
+rigid translation of the assembly and therefore does not deform either spring or
+generate internal forces; equivalently, each row of $\mathbf{K}$ sums to zero;
 
 - the matrix is singular before a displacement constraint is applied because the
   unconstrained assembly can translate without deforming either spring;
