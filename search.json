@@ -190,7 +190,7 @@
     "href": "chapters/continuous-and-discrete-models.html#a-continuous-system-a-one-dimensional-bar",
     "title": "3  From continuous systems to discrete models",
     "section": "",
-    "text": "Figure 3.1: One-dimensional bar fixed at the left end, with distributed axial load \\(q\\), end force \\(F\\), coordinate \\(x\\), cross-sectional area \\(A\\), Young’s modulus \\(E\\), and axial displacement field \\(u(x)\\).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 3.2: Cross-section \\(A\\) with axial stress \\(\\sigma_x\\), represented equivalently by the internal axial force \\(N\\). A positive internal force corresponds to tension.",
+    "text": "Figure 3.1: One-dimensional bar fixed at the left end, with end force \\(F\\), coordinate \\(x\\), cross-sectional area \\(A\\), Young’s modulus \\(E\\), and axial displacement field \\(u(x)\\).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 3.2: Cross-section \\(A\\) with axial stress \\(\\sigma_x\\), represented equivalently by the internal axial force \\(N\\). A positive internal force corresponds to tension.",
     "crumbs": [
       "The direct stiffness method",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>From continuous systems to discrete models</span>"
@@ -201,7 +201,7 @@
     "href": "chapters/continuous-and-discrete-models.html#a-discrete-system-a-one-dimensional-spring",
     "title": "3  From continuous systems to discrete models",
     "section": "3.2 A discrete system: a one-dimensional spring",
-    "text": "3.2 A discrete system: a one-dimensional spring\nA spring is already a discrete mechanical system. Its state can be described by quantities defined only at its end points.\n\n\n\n\n\n\nFigure 3.3: One-dimensional spring of stiffness \\(k_s\\) between end points 1 and 2. The end displacements \\(u_1\\) and \\(u_2\\) and the end forces are referred to the positive \\(x\\) direction.\n\n\n\nThe spring elongation or spring stretch is a measure of the spring deformation and is defined as\n\\[\n  \\delta=u_2-u_1.\n\\]\nA positive elongation corresponds to a stretched spring. The internal spring force is related to the elongation by\n\\[\n  F_s=k_s\\delta=k_s(u_2-u_1),\n\\]\nwhere \\(k_s\\) is the spring stiffness.\n\n\n\n\n\n\nFigure 3.4: Positive sign convention for the internal spring force \\(F_s\\): outward forces at the two sides of a cut spring indicate tension.",
+    "text": "3.2 A discrete system: a one-dimensional spring\nA spring is already a discrete mechanical system. Its state can be described by quantities defined only at its end points.\n\n\n\n\n\n\nFigure 3.3: One-dimensional spring of stiffness \\(k_s\\) between end points 1 and 2. The end displacements \\(u_1\\) and \\(u_2\\) are referred to the positive \\(x\\) direction.\n\n\n\nThe spring elongation or spring stretch is a measure of the spring deformation and is defined as\n\\[\n  \\delta=u_2-u_1.\n\\]\nA positive elongation corresponds to a stretched spring. The internal spring force is related to the elongation by\n\\[\n  F_s=k_s\\delta=k_s(u_2-u_1),\n\\]\nwhere \\(k_s\\) is the spring stiffness.\n\n\n\n\n\n\nFigure 3.4: Positive sign convention for the internal spring force \\(F_s\\): outward forces at the two sides of a cut spring indicate tension.",
     "crumbs": [
       "The direct stiffness method",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>From continuous systems to discrete models</span>"
