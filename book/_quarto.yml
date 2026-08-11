@@ -18,6 +18,8 @@ book:
       chapters:
         - chapters/continuous-and-discrete-models.qmd
         - chapters/two-springs-direct-stiffness.qmd
+        - chapters/two-springs-julia.qmd
+    - glossary.qmd
     - references.qmd
 
 format:

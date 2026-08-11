@@ -1,0 +1,87 @@
+---
+number-sections: false
+---
+
+# Glossary
+
+## D
+
+### Declarative programming {#gls-declarative-programming}
+
+A programming paradigm in which the desired result is specified without
+explicitly prescribing the sequence of operations required to obtain it. In
+other words, declarative programming focuses on **what** should be achieved,
+while the underlying implementation determines **how** to achieve it. For
+example, selecting all even values from an array using a filtering operation
+expresses the desired result without explicitly defining the iteration and state
+changes required to construct it.
+
+**See also:** [Imperative programming](#gls-imperative-programming). **Further
+details:** [Wikipedia --- Declarative
+programming](https://en.wikipedia.org/wiki/Declarative_programming).
+
+## I
+
+### Imperative programming {#gls-imperative-programming}
+
+A programming paradigm in which a computation is expressed as an explicit
+sequence of commands that describe **how** a result should be obtained.
+Imperative programs typically modify variables or other aspects of the program
+state as execution proceeds. For example, selecting all even values from an
+array by iterating through its elements, testing each value, and adding the
+matching values to a new array follows an imperative approach.
+
+**See also:** [Declarative programming](#gls-declarative-programming). **Further
+details:** [Wikipedia --- Imperative
+programming](https://en.wikipedia.org/wiki/Imperative_programming).
+
+## M
+
+### Modified in place {#gls-modified-in-place}
+
+Describes an operation that changes an existing object or data structure
+directly, rather than creating and returning a separate modified copy.
+
+For example, in Julia, integers are immutable:
+
+```julia
+x = 4
+x = x + 1
+```
+
+Here, `x` is not modified in place. Instead, `x` is rebound from the value `4`
+to the new value `5`.
+
+By contrast, an array is mutable:
+
+```julia
+x = [4]
+x[1] += 1
+```
+
+Here, the existing array is modified in place, changing its contents from `[4]`
+to `[5]`.
+
+**See also:** [Mutable object](#gls-mutable-object); [Immutable
+object](#gls-immutable-object).
+
+### Mutable object {#gls-mutable-object}
+
+An object whose contents or internal state can be changed after it has been
+created. Operations on a mutable object may therefore modify the existing object
+directly rather than creating a new one. Lists and dictionaries are common
+examples of mutable objects in many programming languages.
+
+**See also:** [Immutable object](#gls-immutable-object); [Modified in
+place](#gls-modified-in-place).
+
+### Immutable object {#gls-immutable-object}
+
+An object whose contents or internal state cannot be changed after it has been
+created. An operation that appears to modify an immutable object instead creates
+a new object representing the modified value, leaving the original object
+unchanged. Strings and numbers are common examples of immutable objects in many
+programming languages.
+
+**See also:** [Mutable object](#gls-mutable-object); [Modified in
+place](#gls-modified-in-place).
