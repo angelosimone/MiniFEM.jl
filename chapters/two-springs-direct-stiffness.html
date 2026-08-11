@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Two springs in series: the direct stiffness method – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../references.html" rel="next">
+<link href="../chapters/continuous-and-discrete-models.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">The direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-direct-stiffness.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">The direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">4.1</span> Learning objectives</a></li>
+  <li><a href="#solution-using-equilibrium" id="toc-solution-using-equilibrium" class="nav-link" data-scroll-target="#solution-using-equilibrium"><span class="header-section-number">4.2</span> Solution using equilibrium</a>
+  <ul class="collapse">
+  <li><a href="#sec-direct-equilibrium-solution" id="toc-sec-direct-equilibrium-solution" class="nav-link" data-scroll-target="#sec-direct-equilibrium-solution"><span class="header-section-number">4.2.1</span> Direct equilibrium solution</a></li>
+  <li><a href="#systematic-equilibrium-formulation" id="toc-systematic-equilibrium-formulation" class="nav-link" data-scroll-target="#systematic-equilibrium-formulation"><span class="header-section-number">4.2.2</span> Systematic equilibrium formulation</a></li>
+  </ul></li>
+  <li><a href="#solution-using-the-direct-stiffness-method" id="toc-solution-using-the-direct-stiffness-method" class="nav-link" data-scroll-target="#solution-using-the-direct-stiffness-method"><span class="header-section-number">4.3</span> Solution using the direct stiffness method</a>
+  <ul class="collapse">
+  <li><a href="#nodal-equilibrium-relation-for-a-spring" id="toc-nodal-equilibrium-relation-for-a-spring" class="nav-link" data-scroll-target="#nodal-equilibrium-relation-for-a-spring"><span class="header-section-number">4.3.1</span> Nodal equilibrium relation for a spring</a></li>
+  <li><a href="#pre-processing-nodes-elements-and-model-data" id="toc-pre-processing-nodes-elements-and-model-data" class="nav-link" data-scroll-target="#pre-processing-nodes-elements-and-model-data"><span class="header-section-number">4.3.2</span> Pre-processing: nodes, elements, and model data</a></li>
+  <li><a href="#degrees-of-freedom-and-global-ordering" id="toc-degrees-of-freedom-and-global-ordering" class="nav-link" data-scroll-target="#degrees-of-freedom-and-global-ordering"><span class="header-section-number">4.3.3</span> Degrees of freedom and global ordering</a></li>
+  <li><a href="#global-equilibrium-system" id="toc-global-equilibrium-system" class="nav-link" data-scroll-target="#global-equilibrium-system"><span class="header-section-number">4.3.4</span> Global equilibrium system</a></li>
+  <li><a href="#assembly-of-element-1" id="toc-assembly-of-element-1" class="nav-link" data-scroll-target="#assembly-of-element-1"><span class="header-section-number">4.3.5</span> Assembly of element 1</a></li>
+  <li><a href="#assembly-of-element-2" id="toc-assembly-of-element-2" class="nav-link" data-scroll-target="#assembly-of-element-2"><span class="header-section-number">4.3.6</span> Assembly of element 2</a></li>
+  <li><a href="#assembled-stiffness-matrix" id="toc-assembled-stiffness-matrix" class="nav-link" data-scroll-target="#assembled-stiffness-matrix"><span class="header-section-number">4.3.7</span> Assembled stiffness matrix</a></li>
+  <li><a href="#external-forces-displacement-constraint-and-reaction" id="toc-external-forces-displacement-constraint-and-reaction" class="nav-link" data-scroll-target="#external-forces-displacement-constraint-and-reaction"><span class="header-section-number">4.3.8</span> External forces, displacement constraint, and reaction</a></li>
+  <li><a href="#imposing-the-homogeneous-displacement-condition" id="toc-imposing-the-homogeneous-displacement-condition" class="nav-link" data-scroll-target="#imposing-the-homogeneous-displacement-condition"><span class="header-section-number">4.3.9</span> Imposing the homogeneous displacement condition</a></li>
+  <li><a href="#solution" id="toc-solution" class="nav-link" data-scroll-target="#solution"><span class="header-section-number">4.3.10</span> Solution</a></li>
+  <li><a href="#post-processing-and-verification" id="toc-post-processing-and-verification" class="nav-link" data-scroll-target="#post-processing-and-verification"><span class="header-section-number">4.3.11</span> Post-processing and verification</a></li>
+  </ul></li>
+  <li><a href="#automation-from-formulation-to-implementation" id="toc-automation-from-formulation-to-implementation" class="nav-link" data-scroll-target="#automation-from-formulation-to-implementation"><span class="header-section-number">4.4</span> Automation: from formulation to implementation</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">The direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-direct-stiffness.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-two-springs-theory" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>We begin with the physical system shown in <a href="#fig-carts-springs" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>: two carts connected in series by linear springs, with the left end fixed and a force <span class="math inline">\(F\)</span> applied to the right cart.</p>
+<div id="fig-carts-springs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-carts-springs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/cart-spring-problem.png" class="img-fluid figure-img" style="width:36.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-carts-springs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Two carts connected in series by springs of stiffness <span class="math inline">\(k_1\)</span> and <span class="math inline">\(k_2\)</span>. The left end of the first spring is fixed, and a force <span class="math inline">\(F\)</span> acts on the right cart.
+</figcaption>
+</figure>
+</div>
+<p>To analyse the system, we first construct an idealised mechanical model. The motion is restricted to one dimension, the carts are treated as rigid bodies that can translate only in the <span class="math inline">\(x\)</span> direction, and the springs are assumed to be massless and linearly elastic. The problem is quasi-static and the carts are frictionless.</p>
+<p>In this one-dimensional model, shown in <a href="#fig-carts-springs-model" class="quarto-xref">Figure&nbsp;<span>4.2</span></a>, the spring end points and their connections to the carts and support are represented by <strong>nodes</strong>. Each spring connects two nodes and forms an <strong>element</strong> of the model. The displacement of a node in the <span class="math inline">\(x\)</span> direction is a <strong>degree of freedom</strong>. The complete mechanical system can therefore be described by its nodes, spring elements, nodal displacements, applied forces, and displacement constraints.</p>
+<div id="fig-carts-springs-model" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-carts-springs-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/cart-spring-model.png" class="img-fluid figure-img" style="width:36.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-carts-springs-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Idealised one-dimensional model of the spring-and-cart system.
+</figcaption>
+</figure>
+</div>
+<p>The objective is to determine the displacements of the two carts. We first solve the problem directly from equilibrium, providing an independent reference solution. We then obtain the same result using the direct stiffness method.</p>
+<p>For the numerical example we define</p>
+<p><span class="math display">\[
+  k_1=1\ \mathrm{N/mm},
+  \qquad
+  k_2=2\ \mathrm{N/mm},
+  \qquad
+  F=10\ \mathrm{N}.
+\]</span></p>
+<p>These values are chosen to keep the arithmetic simple while producing displacements that are easy to interpret physically.</p>
+<section id="learning-objectives" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">4.1</span> Learning objectives</h2>
+<p>After completing this chapter, you should be able to:</p>
+<ul>
+<li>derive the stiffness relation for a one-dimensional spring;</li>
+<li>formulate and assemble the global stiffness system for a spring model;</li>
+<li>apply displacement boundary conditions and solve for the unknown nodal displacements;</li>
+<li>recover and verify quantities such as spring forces and reactions.</li>
+</ul>
+</section>
+<section id="solution-using-equilibrium" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="solution-using-equilibrium"><span class="header-section-number">4.2</span> Solution using equilibrium</h2>
+<section id="sec-direct-equilibrium-solution" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="sec-direct-equilibrium-solution"><span class="header-section-number">4.2.1</span> Direct equilibrium solution</h3>
+<p>Before introducing the direct stiffness method, we solve the problem directly from mechanical equilibrium. This provides an independent solution against which the stiffness-method result can later be checked.</p>
+<p>For this derivation, let <span class="math inline">\(u_L\)</span> and <span class="math inline">\(u_R\)</span> denote the displacements of the left and right carts, respectively. We denote the scalar internal force in spring <span class="math inline">\(e\)</span> by <span class="math inline">\(F_s^{(e)}\)</span>, where the superscript identifies the spring. A positive value of <span class="math inline">\(F_s^{(e)}\)</span> denotes tension.</p>
+<p>The geometric displacement notation used here is limited to the equilibrium solution; a separate global node numbering is introduced later.</p>
+<div id="fig-cart-spring-model-free-body" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cart-spring-model-free-body-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/cart-spring-model-free-body.png" class="img-fluid figure-img" style="width:93.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cart-spring-model-free-body-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.3: Free-body representation of the idealised one-dimensional model, showing the spring end forces and their relation to the nodal forces, together with the reaction force <span class="math inline">\(R\)</span> and the applied force <span class="math inline">\(F\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Because the system is in static equilibrium, the net force acting on each cart must be zero.</p>
+<p>Consider first the right cart. The applied force <span class="math inline">\(F\)</span> must be balanced by the force transmitted by spring 2. Therefore,</p>
+<p><span class="math display">\[
+  F_s^{(2)}=F.
+\]</span></p>
+<p>Equilibrium of the left cart requires the forces transmitted by the two springs to be equal. Hence,</p>
+<p><span class="math display">\[
+  F_s^{(1)}=F_s^{(2)}=F.
+\]</span></p>
+<p>Both springs therefore carry the same internal force <span class="math inline">\(F\)</span>, as expected for two springs connected in series.</p>
+<p>From the spring relation</p>
+<p><span class="math display">\[
+  F_s=k_s\delta,
+\]</span></p>
+<p>the elongations of the two springs are</p>
+<p><span class="math display">\[
+  \delta_1=\frac{F}{k_1},
+  \qquad
+  \delta_2=\frac{F}{k_2}.
+\]</span></p>
+<p>The left end of spring 1 is fixed, so its elongation is equal to the displacement of the left cart:</p>
+<p><span class="math display">\[
+  u_L=\delta_1=\frac{F}{k_1}.
+\]</span></p>
+<p>The elongation of spring 2 is the relative displacement of its two ends,</p>
+<p><span class="math display">\[
+  \delta_2=u_R-u_L.
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  u_R=u_L+\delta_2
+  =\frac{F}{k_1}+\frac{F}{k_2}.
+\]</span></p>
+<p>For the numerical data,</p>
+<p><span class="math display">\[
+  u_L=10\ \mathrm{mm},
+  \qquad
+  u_R=15\ \mathrm{mm}.
+\]</span></p>
+<p>Finally, equilibrium of the complete system gives the support reaction</p>
+<p><span class="math display">\[
+  R=-F=-10\ \mathrm{N}.
+\]</span></p>
+<p>The negative sign indicates that the reaction acts opposite to the positive <span class="math inline">\(x\)</span> direction.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Are these values realistic?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Are these values realistic?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The numerical values are representative of a small tabletop experiment rather than a structural component.</p>
+<ul>
+<li>A load of <span class="math inline">\(10\ \mathrm{N}\)</span> is approximately the weight of a <span class="math inline">\(1\ \mathrm{kg}\)</span> mass under gravity.</li>
+<li>A spring stiffness of <span class="math inline">\(1\ \mathrm{N/mm}\)</span> means that the spring extends by <span class="math inline">\(1\ \mathrm{mm}\)</span> for each newton of applied force.</li>
+<li>A spring stiffness of <span class="math inline">\(2\ \mathrm{N/mm}\)</span> means that the spring extends by <span class="math inline">\(0.5\ \mathrm{mm}\)</span> for each newton of applied force.</li>
+</ul>
+<p>Under the applied load, the two springs in series extend by</p>
+<p><span class="math display">\[
+  u_R=10\left(\frac{1}{1}+\frac{1}{2}\right)=15\ \mathrm{mm}.
+\]</span></p>
+<p>The right cart therefore moves by <span class="math inline">\(15\ \mathrm{mm}\)</span>, while the extension of the second spring is</p>
+<p><span class="math display">\[
+  u_R-u_L=5\ \mathrm{mm}.
+\]</span></p>
+<p>These displacements are deliberately large enough to be visible and measurable in a simple laboratory demonstration.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Independent checks">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Independent checks
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The solution should be checked independently whenever possible.</p>
+<p><strong>Dimensional consistency.</strong> Because stiffness has units of force divided by length, <span class="math inline">\(F/k\)</span> has units of displacement.</p>
+<p><strong>Equivalent stiffness.</strong> For two springs in series,</p>
+<p><span class="math display">\[
+  \frac{1}{k_{\mathrm{eq}}}
+  =
+  \frac{1}{k_1}+\frac{1}{k_2},
+\]</span></p>
+<p>so that <span class="math inline">\(u_R=F/k_{\mathrm{eq}}\)</span>.</p>
+<p><strong>Limiting cases.</strong> If <span class="math inline">\(k_1\to\infty\)</span>, spring 1 becomes rigid and <span class="math inline">\(u_L\to0\)</span>. If <span class="math inline">\(k_2\to\infty\)</span>, spring 2 becomes rigid and both carts move together, with <span class="math inline">\(u_R=u_L=F/k_1\)</span>.</p>
+<p><strong>Equivalence to other mechanical elements.</strong> For axial deformation, a uniform rod behaves like a linear spring with stiffness <span class="math inline">\(k_s=EA/L\)</span>, and the displacement of a uniform rod fixed at one end and loaded axially by <span class="math inline">\(F\)</span> at the other is <span class="math inline">\(FL/EA\)</span>. Substituting the spring stiffness</p>
+<p><span class="math display">\[
+  k_s = \frac{EA}{L}
+\]</span></p>
+<p>into the spring displacement expression,</p>
+<p><span class="math display">\[
+  u = \frac{F}{k_s},
+\]</span></p>
+<p>gives</p>
+<p><span class="math display">\[
+  u
+  = \frac{F}{EA/L}
+  = \frac{FL}{EA},
+\]</span></p>
+<p>which agrees with the expression of the axial displacement of a uniform rod.</p>
+</div>
+</div>
+</section>
+<section id="systematic-equilibrium-formulation" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="systematic-equilibrium-formulation"><span class="header-section-number">4.2.2</span> Systematic equilibrium formulation</h3>
+<p>The equilibrium solution above used the fact that two springs in series carry the same internal force. We now formulate the same mechanical problem in a more systematic way by treating the spring-end forces, the support reaction, and the cart displacements as unknown quantities.</p>
+<p>For the complete assembly to be in equilibrium, each spring and each cart must satisfy equilibrium. The support reaction enters as the unknown force applied at the fixed end, while the complete assembly must also satisfy global force balance. At the same time, the two springs are connected through the carts, so all spring ends attached to the same cart must share the same displacement. This enforces kinematic compatibility. Together with the force–displacement relation of each spring, these conditions provide a complete set of algebraic equations for the mechanical system. Rather than solving simultaneously for every force and displacement, we will use this formulation to show how the nodal displacements can be selected as the primary unknowns and the remaining quantities recovered afterwards. The direct stiffness method will then reproduce the same displacement system from the element stiffness relations, connectivity, and equilibrium at the global nodes.</p>
+<p>To formulate equilibrium systematically, we now distinguish the forces acting at the two ends of each spring. We denote by <span class="math inline">\(F_i^{(e)}\)</span> the signed nodal force acting on spring <span class="math inline">\(e\)</span> at local end <span class="math inline">\(i\)</span>, referred to the positive <span class="math inline">\(x\)</span> direction. The superscript identifies the spring, whereas the subscript identifies the local spring end. For both springs, local end 1 is the left end and local end 2 is the right end.</p>
+<div id="fig-cart-spring-model-signed-free-body" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cart-spring-model-signed-free-body-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/cart-spring-model-signed-free-body.png" class="img-fluid figure-img" style="width:93.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cart-spring-model-signed-free-body-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.4: Element free-body diagrams for the spring-and-cart system showing the signed end forces. For each spring <span class="math inline">\(e\)</span>, <span class="math inline">\(F_1^{(e)}\)</span> and <span class="math inline">\(F_2^{(e)}\)</span> denote the forces acting at local ends 1 and 2, respectively.
+</figcaption>
+</figure>
+</div>
+<p>At the fixed left end of spring 1, the corresponding nodal force <span class="math inline">\(F_1^{(1)}\)</span> is the support reaction <span class="math inline">\(R\)</span>.</p>
+<p>Spring 1 has end displacements <span class="math inline">\(0\)</span> and <span class="math inline">\(u_L\)</span>. Its elongation is therefore</p>
+<p><span class="math display">\[
+  \delta_1=u_L,
+\]</span></p>
+<p>and its internal force is</p>
+<p><span class="math display">\[
+  F_s^{(1)}=k_1u_L.
+\]</span></p>
+<p>The signed nodal forces associated with its two ends are therefore</p>
+<p><span class="math display">\[
+  R=-F_s^{(1)}=-k_1u_L,
+  \qquad
+  F_2^{(1)}=F_s^{(1)}=k_1u_L.
+\]</span></p>
+<p>Spring 2 has end displacements <span class="math inline">\(u_L\)</span> and <span class="math inline">\(u_R\)</span>, so its elongation is</p>
+<p><span class="math display">\[
+  \delta_2=u_R-u_L,
+\]</span></p>
+<p>and its internal force is</p>
+<p><span class="math display">\[
+  F_s^{(2)}=k_2(u_R-u_L).
+\]</span></p>
+<p>Equilibrium of the two ends of spring 2 gives</p>
+<p><span class="math display">\[
+  F_1^{(2)}=-F_s^{(2)}
+  =k_2u_L-k_2u_R,
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  F_2^{(2)}=F_s^{(2)}
+  =-k_2u_L+k_2u_R.
+\]</span></p>
+<p>We now impose equilibrium of the carts. By action and reaction, the forces exerted by the springs on the carts are opposite to the corresponding spring-end nodal forces defined above. This implies</p>
+<ul>
+<li><p>for the left cart, <span class="math inline">\(-F_2^{(1)}-F_1^{(2)}=0, \quad \mathrm{or,\ equivalently,} \quad F_2^{(1)}+F_1^{(2)}=0;\)</span></p></li>
+<li><p>for the right cart, <span class="math inline">\(-F_2^{(2)}+F=0, \quad \mathrm{and\ therefore} \quad F_2^{(2)}=F.\)</span></p></li>
+</ul>
+<p>The prescribed zero displacement at the fixed support has already been used in the relation for spring 1. Once <span class="math inline">\(u_L\)</span> has been determined, the support reaction can be recovered from</p>
+<p><span class="math display">\[
+  R=-k_1u_L=-F_2^{(1)}.
+\]</span></p>
+<p>Equilibrium of the complete assembly also gives</p>
+<p><span class="math display">\[
+  R+F=0.
+\]</span></p>
+<p>However, this equation is dependent on the others: it follows from the spring relations together with equilibrium of the two carts.</p>
+<p>After substituting the two internal-force expressions, the spring-end force relations provide four scalar equations, equilibrium of the two carts provides two more, and equilibrium of the complete assembly provides one. Of these seven scalar relations, one is redundant. We are, therefore, left with six independent equations in the six unknowns</p>
+<p><span class="math display">\[
+  u_L,\qquad u_R,\qquad R,\qquad
+  F_2^{(1)},\qquad F_1^{(2)},\qquad F_2^{(2)}.
+\]</span></p>
+<p>All six unknowns could be determined simultaneously. However, in a displacement-based formulation we choose the nodal displacements as the primary unknowns. The spring-end forces and the support reaction can then be recovered from the displacements after the solution has been obtained. Eliminating the spring-end forces from the cart-equilibrium equations gives</p>
+<p><span class="math display">\[
+  \begin{bmatrix}
+  k_1+k_2 &amp; -k_2\\
+  -k_2 &amp; k_2
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_L\\u_R
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  0\\F
+  \end{bmatrix}.
+\]</span></p>
+<p>Solving this system yields the same displacements obtained from the direct equilibrium argument above. More importantly, this is the displacement system that the direct stiffness method will reproduce systematically by combining the element stiffness relations according to the model connectivity and enforcing equilibrium at the global nodes.</p>
+</section>
+</section>
+<section id="solution-using-the-direct-stiffness-method" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="solution-using-the-direct-stiffness-method"><span class="header-section-number">4.3</span> Solution using the direct stiffness method</h2>
+<p>The systematic equilibrium formulation discussed above produced a displacement system by writing the spring relations, enforcing equilibrium, and eliminating the spring-end forces. The direct stiffness method organizes these same mechanical operations into a standard procedure that can be applied systematically to larger assemblies and automated.</p>
+<p>The method constructs the global system of equations</p>
+<p><span class="math display">\[
+  \mathbf{K}\mathbf{u}=\mathbf{f}
+\]</span></p>
+<p>from the stiffness relations of the individual elements and their connectivity. We begin by deriving the nodal force–displacement relation for a single spring.</p>
+<section id="nodal-equilibrium-relation-for-a-spring" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="nodal-equilibrium-relation-for-a-spring"><span class="header-section-number">4.3.1</span> Nodal equilibrium relation for a spring</h3>
+<p>Consider a spring of stiffness <span class="math inline">\(k_s\)</span> connecting nodes <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, as shown in <a href="#fig-spring-1d-element" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>. The nodal displacements <span class="math inline">\(u_a\)</span> and <span class="math inline">\(u_b\)</span> are measured along the <span class="math inline">\(x\)</span> direction, while <span class="math inline">\(F_a\)</span> and <span class="math inline">\(F_b\)</span> denote the corresponding nodal force components acting on the spring, taken as positive in the positive <span class="math inline">\(x\)</span> direction. The end labels <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> correspond to local nodes 1 and 2, respectively.</p>
+<div id="fig-spring-1d-element" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spring-1d-element-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/spring-1d-element.png" class="img-fluid figure-img" style="width:27.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-1d-element-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.5: Spring of stiffness <span class="math inline">\(k_s\)</span> between nodes <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>. At each end, the nodal displacement and nodal force are referred to the positive global <span class="math inline">\(x\)</span> direction.
+</figcaption>
+</figure>
+</div>
+<p>From the previous chapter, the internal spring force is</p>
+<p><span class="math display">\[
+  F_s=k_s(u_b-u_a),
+\]</span></p>
+<p>where <span class="math inline">\(F_s&gt;0\)</span> denotes tension.</p>
+<p>The nodal-force convention and the internal-force convention describe different signed quantities. The nodal forces <span class="math inline">\(F_a\)</span> and <span class="math inline">\(F_b\)</span> act on the spring and are referred to the positive global <span class="math inline">\(x\)</span> direction, whereas <span class="math inline">\(F_s&gt;0\)</span> denotes internal tension. The nodal forces required to equilibrate a spring in tension therefore have the pattern <span class="math inline">\([-F_s,\ F_s]^{\mathsf T}\)</span>.</p>
+<p>To express equilibrium, cut the spring and consider the two separated parts shown in <a href="#fig-spring-1d-cut" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>.</p>
+<div id="fig-spring-1d-cut" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spring-1d-cut-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/spring-1d-cut.png" class="img-fluid figure-img" style="width:45.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-1d-cut-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.6: Equilibrium of a spring is expressed by considering the two parts obtained by cutting the spring.
+</figcaption>
+</figure>
+</div>
+<p>Equilibrium of the two parts gives</p>
+<p><span class="math display">\[
+  \begin{cases}
+  F_a+F_s=0,\\
+  -F_s+F_b=0.
+  \end{cases}
+\]</span></p>
+<p>Substituting <span class="math inline">\(F_s=k_s(u_b-u_a)\)</span> yields</p>
+<p><span class="math display">\[
+  \begin{cases}
+  k_su_a-k_su_b=F_a,\\
+  -k_su_a+k_su_b=F_b,
+  \end{cases}
+\]</span></p>
+<p>which can be written in matrix form as</p>
+<p><span class="math display">\[
+  \underbrace{
+  k_s
+  \begin{bmatrix}
+  1 &amp; -1\\
+  -1 &amp; 1
+  \end{bmatrix}
+  }_{\mathbf{K}_s}
+  \underbrace{
+  \begin{bmatrix}
+  u_a\\u_b
+  \end{bmatrix}
+  }_{\mathbf{u}_s}
+  =
+  \underbrace{
+  \begin{bmatrix}
+  F_a\\F_b
+  \end{bmatrix}
+  }_{\mathbf{f}_s}.
+\]</span></p>
+<p>Here, <span class="math inline">\(\mathbf{u}_s\)</span> is the vector of nodal displacements, <span class="math inline">\(\mathbf{f}_s\)</span> is the vector of nodal forces, and <span class="math inline">\(\mathbf{K}_s\)</span> is the spring stiffness matrix.</p>
+</section>
+<section id="pre-processing-nodes-elements-and-model-data" class="level3" data-number="4.3.2">
+<h3 data-number="4.3.2" class="anchored" data-anchor-id="pre-processing-nodes-elements-and-model-data"><span class="header-section-number">4.3.2</span> Pre-processing: nodes, elements, and model data</h3>
+<p>In this example, the mechanical system is already discrete. The pre-processing step therefore consists of describing it in the form required by the direct stiffness method: defining the nodes and elements, their connectivity and properties, and the applied loads and displacement constraints.</p>
+<p>We use one spring element for each physical spring and one node at each distinct connection point between the springs, carts, and support. The model therefore contains three nodes and two elements. Node and element labels are identifiers; they do not need to follow the geometric order. To make this independence explicit, use the global node numbering shown in <a href="#fig-spring-cart-fem-model" class="quarto-xref">Figure&nbsp;<span>4.7</span></a>.</p>
+<div id="fig-spring-cart-fem-model" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spring-cart-fem-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/spring-cart-fem-model.png" class="img-fluid figure-img" style="width:99.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-cart-fem-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right as global nodes 2, 3, and 1. Element 1 connects global nodes 2 and 3, and element 2 connects global nodes 3 and 1. The local direction of each element runs from local node 1 to local node 2.
+</figcaption>
+</figure>
+</div>
+<p>The connectivity of an element specifies how its local nodes are associated with the global nodes of the model. The ordering of the local nodes also defines the local direction of the element, taken here from local node 1 to local node 2. For a two-node spring element, the connectivity therefore consists of the two global node numbers corresponding to local nodes 1 and 2.</p>
+<p>With reference to <a href="#fig-spring-cart-fem-model" class="quarto-xref">Figure&nbsp;<span>4.7</span></a>, the connectivity for this model is summarised in the table below:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 42%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">element number</th>
+<th style="text-align: right;">global node corresponding to local node 1</th>
+<th style="text-align: right;">global node corresponding to local node 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>The spring stiffness is supplied directly as an element property. The element stiffness data are</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">element number</th>
+<th style="text-align: left;">spring stiffness assigned to the element</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;"><span class="math inline">\(k_1=1\ \mathrm{N/mm}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;"><span class="math inline">\(k_2=2\ \mathrm{N/mm}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>In general, <span class="math inline">\(k_e\)</span> denotes the stiffness assigned to element <span class="math inline">\(e\)</span>; for this model, the two values are <span class="math inline">\(k_1\)</span> and <span class="math inline">\(k_2\)</span>.</p>
+<p>The nodal coordinates describe the geometry of the model. Because the spring stiffness <span class="math inline">\(k_e\)</span> is supplied directly, the nodal coordinates do not enter the element stiffness calculation in this example. They remain useful for describing and plotting the model.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Consistent systems of units">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Consistent systems of units
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All quantities must be expressed in a consistent system of units. This requirement applies even though the matrices in this example are initially written symbolically and can be solved by hand. In larger systems, numerical values are normally supplied to linear-algebra software, which usually stores matrix entries as numbers without interpreting their physical units. The input values must therefore already belong to one coherent system of units.</p>
+<p>Here, forces are expressed in newtons, displacements in millimetres, spring stiffnesses in newtons per millimetre, and strain energy in newton millimetres. With these choices, solving the numerical system returns displacements in millimetres. For the same reason, a bar element with axial stiffness <span class="math inline">\(EA/L\)</span> would require Young’s modulus <span class="math inline">\(E\)</span> in newtons per square millimetre, the cross-sectional area <span class="math inline">\(A\)</span> in square millimetres, and the bar length <span class="math inline">\(L\)</span> in millimetres.</p>
+<p>Alternatively, forces may be expressed in newtons and lengths in metres. In that case, spring stiffnesses must be expressed in newtons per metre, <span class="math inline">\(E\)</span> in newtons per square metre, <span class="math inline">\(A\)</span> in square metres, and the computed displacements will be in metres. Any consistent system of units may be used, but all input quantities must be expressed using the same system.</p>
+</div>
+</div>
+</section>
+<section id="degrees-of-freedom-and-global-ordering" class="level3" data-number="4.3.3">
+<h3 data-number="4.3.3" class="anchored" data-anchor-id="degrees-of-freedom-and-global-ordering"><span class="header-section-number">4.3.3</span> Degrees of freedom and global ordering</h3>
+<p>A degree of freedom is a scalar variable used to describe one component of the possible motion of a node. A node and a degree of freedom are therefore distinct concepts: a node identifies a point in the model, whereas a degree of freedom describes one component of its motion.</p>
+<p>In this one-dimensional spring model, each node has one axial displacement degree of freedom. We choose the global degree-of-freedom numbering to coincide with the global node numbering. Thus, node 1 carries degree of freedom 1, node 2 carries degree of freedom 2, and node 3 carries degree of freedom 3.</p>
+<p>The global node ordering is summarised below.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 19%">
+<col style="width: 35%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">global node number</th>
+<th style="text-align: left;">physical location</th>
+<th style="text-align: right;">global degree-of-freedom number</th>
+<th style="text-align: left;">displacement variable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">right cart</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;"><span class="math inline">\(u_1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">fixed left end</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;"><span class="math inline">\(u_2\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">internal cart</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;"><span class="math inline">\(u_3\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The global displacement vector follows numerical order, not geometric order:</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  u_1\\u_2\\u_3
+  \end{bmatrix}.
+\]</span></p>
+<p>The connectivity introduced previously maps local nodes to global nodes. For assembly, we also need a local-to-global degree-of-freedom map, which identifies where the local degrees of freedom of each element appear in the global algebraic system.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 45%">
+<col style="width: 45%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">element number</th>
+<th style="text-align: right;">global degree of freedom corresponding to local degree of freedom 1</th>
+<th style="text-align: right;">global degree of freedom corresponding to local degree of freedom 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>Because there is exactly one degree of freedom per node and the degree-of-freedom numbering has been chosen to match the node numbering, the degree-of-freedom map contains the same numbers as the connectivity table. The two maps nevertheless represent different information:</p>
+<ul>
+<li>the connectivity maps local nodes to global nodes;</li>
+<li>the degree-of-freedom map maps local element unknowns to positions in the global algebraic system.</li>
+</ul>
+<p>A different degree-of-freedom numbering changes the ordering of the global arrays but not the physical solution.</p>
+<p>When a node carries more than one degree of freedom, node numbers and degree-of-freedom numbers no longer have a one-to-one numerical correspondence. For example, in two-dimensional elasticity each node typically carries two displacement degrees of freedom, <span class="math inline">\(u_x\)</span> and <span class="math inline">\(u_y\)</span>.</p>
+</section>
+<section id="global-equilibrium-system" class="level3" data-number="4.3.4">
+<h3 data-number="4.3.4" class="anchored" data-anchor-id="global-equilibrium-system"><span class="header-section-number">4.3.4</span> Global equilibrium system</h3>
+<p>There are three global degrees of freedom, so the global displacement and force vectors contain three entries and the global stiffness matrix has size <span class="math inline">\(3\times3\)</span>: <span class="math display">\[
+  \mathbf{K}\in\mathbb{R}^{3\times3},
+  \qquad
+  \mathbf{u},\mathbf{f}\in\mathbb{R}^{3}.
+\]</span></p>
+<p>For each spring element <span class="math inline">\(e\)</span>, <span class="math display">\[
+  \mathbf{K}^{(e)}
+  =
+  k_e
+  \begin{bmatrix}
+  1 &amp; -1\\
+  -1 &amp; 1
+  \end{bmatrix}.
+\]</span> Each element relation is written in terms of its two local degrees of freedom. To obtain equilibrium equations for the complete model, the element contributions must be expressed in the global degree-of-freedom ordering.</p>
+<p>The local-to-global degree-of-freedom map tells us where the rows and columns of each element stiffness matrix belong in the global matrix. If more than one element contributes to the same global matrix entry, those contributions are added. This process is called <strong>assembly</strong>.</p>
+<p>The addition of contributions at shared degrees of freedom has a direct mechanical meaning: it sums the signed element-end force contributions associated with the same global degree of freedom. At an internal node with no applied load, these contributions sum to zero. At a loaded or constrained node, their sum equals the corresponding applied nodal load or reaction.</p>
+<p>We now perform this operation explicitly for the two spring elements.</p>
+</section>
+<section id="assembly-of-element-1" class="level3" data-number="4.3.5">
+<h3 data-number="4.3.5" class="anchored" data-anchor-id="assembly-of-element-1"><span class="header-section-number">4.3.5</span> Assembly of element 1</h3>
+<p>For element 1,</p>
+<p><span class="math display">\[
+  \mathbf{K}^{(1)}=
+  k_1
+  \begin{bmatrix}
+  1 &amp; -1\\
+  -1 &amp; 1
+  \end{bmatrix},
+\]</span></p>
+<p>and the local-to-global map is</p>
+<p><span class="math display">\[
+  [1,2]_{\mathrm{local}}
+  \longrightarrow
+  [2,3]_{\mathrm{global}}.
+\]</span></p>
+<p>The four ordered local index pairs</p>
+<p><span class="math display">\[
+  (1,1),\ (1,2),\ (2,1),\ (2,2)
+\]</span></p>
+<p>map to the global positions</p>
+<p><span class="math display">\[
+  (2,2),\ (2,3),\ (3,2),\ (3,3).
+\]</span></p>
+<p>Thus,</p>
+<p><span class="math display">\[
+  \mathbf{K}_{\mathrm{from\ element\ 1}}=
+  \begin{bmatrix}
+  0 &amp; 0 &amp; 0\\
+  0 &amp; k_1 &amp; -k_1\\
+  0 &amp; -k_1 &amp; k_1
+  \end{bmatrix}.
+\]</span></p>
+<div id="fig-local-global-mapping" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-local-global-mapping-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/local-global-mapping.png" class="img-fluid figure-img" style="width:99.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-local-global-mapping-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom 1 and 2 map to global degrees of freedom 2 and 3.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="assembly-of-element-2" class="level3" data-number="4.3.6">
+<h3 data-number="4.3.6" class="anchored" data-anchor-id="assembly-of-element-2"><span class="header-section-number">4.3.6</span> Assembly of element 2</h3>
+<p>For element 2,</p>
+<p><span class="math display">\[
+  \mathbf{K}^{(2)}=
+  k_2
+  \begin{bmatrix}
+  1 &amp; -1\\
+  -1 &amp; 1
+  \end{bmatrix},
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+  [1,2]_{\mathrm{local}}
+  \longrightarrow
+  [3,1]_{\mathrm{global}}.
+\]</span></p>
+<p>The four ordered local index pairs map to global positions</p>
+<p><span class="math display">\[
+  (3,3),\ (3,1),\ (1,3),\ (1,1).
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  \mathbf{K}_{\mathrm{from\ element\ 2}}=
+  \begin{bmatrix}
+  k_2 &amp; 0 &amp; -k_2\\
+  0 &amp; 0 &amp; 0\\
+  -k_2 &amp; 0 &amp; k_2
+  \end{bmatrix}.
+\]</span></p>
+</section>
+<section id="assembled-stiffness-matrix" class="level3" data-number="4.3.7">
+<h3 data-number="4.3.7" class="anchored" data-anchor-id="assembled-stiffness-matrix"><span class="header-section-number">4.3.7</span> Assembled stiffness matrix</h3>
+<p>Adding both element contributions gives</p>
+<p><span class="math display">\[
+  \mathbf{K}=
+  \begin{bmatrix}
+  k_2 &amp; 0 &amp; -k_2\\
+  0 &amp; k_1 &amp; -k_1\\
+  -k_2 &amp; -k_1 &amp; k_1+k_2
+  \end{bmatrix}.
+\]</span></p>
+<p>The entry <span class="math inline">\(K_{33}=k_1+k_2\)</span> illustrates the essential assembly operation. Global degree of freedom 3 is shared by both elements, so both spring stiffnesses contribute to the equilibrium equation associated with that degree of freedom.</p>
+<p>For <span class="math inline">\(k_1=1\ \mathrm{N/mm}\)</span> and <span class="math inline">\(k_2=2\ \mathrm{N/mm}\)</span>,</p>
+<p><span class="math display">\[
+  \mathbf{K}=
+  \begin{bmatrix}
+  2 &amp; 0 &amp; -2\\
+  0 &amp; 1 &amp; -1\\
+  -2 &amp; -1 &amp; 3
+  \end{bmatrix}
+  \ \mathrm{N/mm}.
+\]</span></p>
+<p>Several properties can already be checked:</p>
+<ul>
+<li><p>the diagonal entries are positive for this connected spring assembly;</p></li>
+<li><p>the matrix is symmetric: <span class="math inline">\(K_{ij}=K_{ji}\)</span>;</p></li>
+<li><p><span class="math inline">\(K_{12}=K_{21}=0\)</span> because global degrees of freedom 1 and 2 do not belong to the same element;</p></li>
+<li><p>rigid translation is a null mode because <span class="math display">\[
+\mathbf{K}
+\begin{bmatrix}
+1\\
+1\\
+1
+\end{bmatrix}
+=
+\mathbf{0},
+\]</span></p>
+<p>meaning that assigning the same displacement to every node does not deform either spring and therefore produces no internal forces;</p></li>
+<li><p>the matrix is singular before a displacement constraint is applied because the unconstrained assembly can translate without deforming either spring;</p></li>
+<li><p>for larger problems with local connectivity, the global matrix is sparse, meaning that many entries are zero.</p></li>
+</ul>
+</section>
+<section id="external-forces-displacement-constraint-and-reaction" class="level3" data-number="4.3.8">
+<h3 data-number="4.3.8" class="anchored" data-anchor-id="external-forces-displacement-constraint-and-reaction"><span class="header-section-number">4.3.8</span> External forces, displacement constraint, and reaction</h3>
+<p>The vector of known applied nodal loads is</p>
+<p><span class="math display">\[
+  \mathbf{f}_{\mathrm{app}}=
+  \begin{bmatrix}
+  F\\0\\0
+  \end{bmatrix}.
+\]</span></p>
+<p>The fixed left end imposes</p>
+<p><span class="math display">\[
+  u_2=0.
+\]</span></p>
+<p>The support reaction is unknown before the solution and is represented by</p>
+<p><span class="math display">\[
+  \mathbf{r}=
+  \begin{bmatrix}
+  0\\ R\\ 0
+  \end{bmatrix}.
+\]</span></p>
+<p>The complete nodal equilibrium relation is therefore</p>
+<p><span class="math display">\[
+  \mathbf{K}\mathbf{u}
+  =
+  \mathbf{f}_{\mathrm{app}}+\mathbf{r}.
+\]</span></p>
+<p>Only the known applied load vector is used when solving for the unknown displacements at the free degrees of freedom. The reaction is recovered afterward from the original assembled system.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Displacement and force boundary conditions">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Displacement and force boundary conditions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A prescribed displacement is an essential, or Dirichlet, boundary condition. In a continuum problem, a prescribed traction is a natural, or Neumann, boundary condition. In the present discrete spring model, the corresponding quantity is a prescribed nodal force.</p>
+<p>In this discrete spring model, <span class="math inline">\(u_2=0\)</span> is a homogeneous displacement boundary condition and <span class="math inline">\(F\)</span> is a prescribed nodal load. The support reaction <span class="math inline">\(R\)</span> is not a prescribed load; it is an output recovered after the displacement solution has been computed.</p>
+</div>
+</div>
+</section>
+<section id="imposing-the-homogeneous-displacement-condition" class="level3" data-number="4.3.9">
+<h3 data-number="4.3.9" class="anchored" data-anchor-id="imposing-the-homogeneous-displacement-condition"><span class="header-section-number">4.3.9</span> Imposing the homogeneous displacement condition</h3>
+<p>The displacement condition must be imposed before the linear system is solved. Two standard algebraic approaches are useful for this example.</p>
+<section id="approach-1-eliminate-the-constrained-row-and-column" class="level4" data-number="4.3.9.1">
+<h4 data-number="4.3.9.1" class="anchored" data-anchor-id="approach-1-eliminate-the-constrained-row-and-column"><span class="header-section-number">4.3.9.1</span> Approach 1: eliminate the constrained row and column</h4>
+<p>Deleting row 2 and column 2 yields the reduced system</p>
+<p><span class="math display">\[
+  \begin{bmatrix}
+  k_2 &amp; -k_2\\
+  -k_2 &amp; k_1+k_2
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_1\\u_3
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  F\\0
+  \end{bmatrix}.
+\]</span></p>
+<p>This reduced system is the same displacement system obtained earlier from the systematic equilibrium formulation. The apparent difference is only due to the global degree-of-freedom ordering.</p>
+<p>In the present numbering,</p>
+<p><span class="math display">\[
+  u_1=u_R,
+  \qquad
+  u_3=u_L.
+\]</span></p>
+<p>The reduced global vector is therefore ordered as <span class="math inline">\([u_R,\ u_L]^{\mathsf T}\)</span>, whereas the equilibrium formulation used the geometric ordering <span class="math inline">\([u_L,\ u_R]^{\mathsf T}\)</span>.</p>
+<p>Reordering the equations and unknowns into the geometric order used in the classical equilibrium formulation gives</p>
+<p><span class="math display">\[
+  \begin{bmatrix}
+  k_1+k_2 &amp; -k_2\\
+  -k_2 &amp; k_2
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_3\\
+  u_1
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  0\\
+  F
+  \end{bmatrix},
+\]</span></p>
+<p>which is exactly the displacement system obtained previously from classical equilibrium.</p>
+<p>The direct stiffness method has therefore reproduced the same mechanical equations through element formulation, connectivity, assembly, and the application of the displacement constraint.</p>
+<p>This approach reduces the size of the linear system. The prescribed value <span class="math inline">\(u_2=0\)</span> is inserted into the complete displacement vector after the reduced system has been solved.</p>
+</section>
+<section id="approach-2-modify-the-full-system" class="level4" data-number="4.3.9.2">
+<h4 data-number="4.3.9.2" class="anchored" data-anchor-id="approach-2-modify-the-full-system"><span class="header-section-number">4.3.9.2</span> Approach 2: modify the full system</h4>
+<p>Alternatively, zero row 2 and column 2, place one on the corresponding diagonal entry, and set the corresponding right-hand-side entry to zero. Denoting the modified arrays by <span class="math inline">\(\widetilde{\mathbf{K}}\)</span> and <span class="math inline">\(\widetilde{\mathbf{f}}\)</span> gives</p>
+<p><span class="math display">\[
+  \underbrace{
+  \begin{bmatrix}
+  k_2 &amp; 0 &amp; -k_2\\
+  0 &amp; 1 &amp; 0\\
+  -k_2 &amp; 0 &amp; k_1+k_2
+  \end{bmatrix}
+  }_{\widetilde{\mathbf{K}}}
+  \begin{bmatrix}
+  u_1\\u_2\\u_3
+  \end{bmatrix}
+  =
+  \underbrace{
+  \begin{bmatrix}
+  F\\0\\0
+  \end{bmatrix}
+  }_{\widetilde{\mathbf{f}}}.
+\]</span></p>
+<p>The second equation is exactly <span class="math inline">\(u_2=0\)</span>. This approach preserves the full vector size and is simple to implement for homogeneous prescribed displacements. The modified matrix is an algebraic system matrix, not the original physical stiffness matrix; the replaced row represents the displacement equation rather than nodal force equilibrium.</p>
+<p>For this small example the replacement by one is harmless. In larger problems, the scale of the replacement can affect numerical conditioning, so elimination or a suitably scaled modification is normally preferred.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Scope of the row-and-column modification">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Scope of the row-and-column modification
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The form shown here applies to a prescribed displacement equal to zero. A nonzero prescribed displacement requires a consistent correction of the right-hand side before the row and column are modified. That general case is introduced later.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="solution" class="level3" data-number="4.3.10">
+<h3 data-number="4.3.10" class="anchored" data-anchor-id="solution"><span class="header-section-number">4.3.10</span> Solution</h3>
+<p>Both approaches give</p>
+<p><span class="math display">\[
+  u_1=F\left(\frac{1}{k_1}+\frac{1}{k_2}\right),
+  \qquad
+  u_2=0,
+  \qquad
+  u_3=\frac{F}{k_1}.
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  F\left(\dfrac{1}{k_1}+\dfrac{1}{k_2}\right)\\[4pt]
+  0\\[4pt]
+  \dfrac{F}{k_1}
+  \end{bmatrix}.
+\]</span></p>
+<p>Substituting the numerical values of the parameters gives</p>
+<p><span class="math display">\[
+  \mathbf{u}=
+  \begin{bmatrix}
+  15\\0\\10
+  \end{bmatrix}
+  \ \mathrm{mm}.
+\]</span></p>
+<p>Because of the deliberately non-geometric numbering, this means:</p>
+<ul>
+<li>right cart: <span class="math inline">\(u_1=15\ \mathrm{mm}\)</span>;</li>
+<li>fixed left end: <span class="math inline">\(u_2=0\)</span>;</li>
+<li>internal cart: <span class="math inline">\(u_3=10\ \mathrm{mm}\)</span>.</li>
+</ul>
+<p>The values are identical to those obtained from direct equilibrium: <span class="math inline">\(u_L=u_3=10\ \mathrm{mm}\)</span> and <span class="math inline">\(u_R=u_1=15\ \mathrm{mm}\)</span>.</p>
+</section>
+<section id="post-processing-and-verification" class="level3" data-number="4.3.11">
+<h3 data-number="4.3.11" class="anchored" data-anchor-id="post-processing-and-verification"><span class="header-section-number">4.3.11</span> Post-processing and verification</h3>
+<p>Post-processing consists of operations performed after the displacement vector has been computed. Here we recover spring elongations, internal forces, the support reaction, and strain energy.</p>
+<section id="spring-elongations-and-internal-forces" class="level4" data-number="4.3.11.1">
+<h4 data-number="4.3.11.1" class="anchored" data-anchor-id="spring-elongations-and-internal-forces"><span class="header-section-number">4.3.11.1</span> Spring elongations and internal forces</h4>
+<p>The elongations follow from the element local-to-global maps:</p>
+<p><span class="math display">\[
+  \delta_1=u_3-u_2=10\ \mathrm{mm},
+  \qquad
+  \delta_2=u_1-u_3=5\ \mathrm{mm}.
+\]</span></p>
+<p>The corresponding internal spring forces are</p>
+<p><span class="math display">\[
+  F_s^{(1)}=k_1\delta_1=10\ \mathrm{N},
+  \qquad
+  F_s^{(2)}=k_2\delta_2=10\ \mathrm{N}.
+\]</span></p>
+<p>Both springs carry the applied force, as required by equilibrium.</p>
+</section>
+<section id="support-reaction" class="level4" data-number="4.3.11.2">
+<h4 data-number="4.3.11.2" class="anchored" data-anchor-id="support-reaction"><span class="header-section-number">4.3.11.2</span> Support reaction</h4>
+<p>Let <span class="math inline">\(\mathbf{K}_{\mathrm{original}}\)</span> denote the assembled stiffness matrix before the displacement boundary condition is imposed. Using the original assembled stiffness matrix and the original applied load vector,</p>
+<p><span class="math display">\[
+  \mathbf{r}
+  =
+  \mathbf{K}_{\mathrm{original}}\mathbf{u}
+  -
+  \mathbf{f}_{\mathrm{app}}
+  =
+  \begin{bmatrix}
+  0\\-10\\0
+  \end{bmatrix}
+  \ \mathrm{N}.
+\]</span></p>
+<p>The support reaction is <span class="math inline">\(R=-10\ \mathrm{N}\)</span>.</p>
+</section>
+<section id="internal-strain-energy" class="level4" data-number="4.3.11.3">
+<h4 data-number="4.3.11.3" class="anchored" data-anchor-id="internal-strain-energy"><span class="header-section-number">4.3.11.3</span> Internal strain energy</h4>
+<p>For a linear elastic system,</p>
+<p><span class="math display">\[
+  U=\frac{1}{2}
+  \mathbf{u}^{\mathsf T}
+  \mathbf{K}_{\mathrm{original}}
+  \mathbf{u}.
+\]</span></p>
+<p>The same energy can be computed element by element:</p>
+<p><span class="math display">\[
+  U=
+  \sum_{e=1}^{n_e}
+  \frac{1}{2}k_e\delta_e^2.
+\]</span></p>
+<p>For the two springs,</p>
+<p><span class="math display">\[
+  U=
+  \frac{1}{2}k_1\delta_1^2
+  +
+  \frac{1}{2}k_2\delta_2^2
+  =75\ \mathrm{N\,mm}.
+\]</span></p>
+<p>Since both springs carry the same internal force <span class="math inline">\(F\)</span>, their elongations are</p>
+<p><span class="math display">\[
+  \delta_1=\frac{F}{k_1},
+  \qquad
+  \delta_2=\frac{F}{k_2}.
+\]</span></p>
+<p>Substituting these expressions into the element-wise strain-energy relation</p>
+<p><span class="math display">\[
+  U=
+  \frac{1}{2}k_1\delta_1^2
+  +
+  \frac{1}{2}k_2\delta_2^2
+\]</span></p>
+<p>gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  U
+  &amp;=
+  \frac{1}{2}k_1
+  \left(\frac{F}{k_1}\right)^2
+  +
+  \frac{1}{2}k_2
+  \left(\frac{F}{k_2}\right)^2
+  \\
+  &amp;=
+  \frac{1}{2}F^2
+  \left(
+  \frac{1}{k_1}
+  +
+  \frac{1}{k_2}
+  \right).
+  \end{aligned}
+\]</span></p>
+<p>This is the same strain energy written in terms of the applied force and the two spring stiffnesses.</p>
+<p>Since the total displacement of the right cart is</p>
+<p><span class="math display">\[
+  u_R=
+  F\left(
+  \frac{1}{k_1}+\frac{1}{k_2}
+  \right),
+\]</span></p>
+<p>the strain energy can also be written as</p>
+<p><span class="math display">\[
+  U=\frac{1}{2}Fu_R.
+\]</span></p>
+<p>Substituting the numerical values of the parameters gives</p>
+<p><span class="math display">\[
+  U
+  =
+  \frac{1}{2}(10)(15)
+  =
+  75\ \mathrm{N\,mm}.
+\]</span></p>
+</section>
+<section id="verification-summary" class="level4" data-number="4.3.11.4">
+<h4 data-number="4.3.11.4" class="anchored" data-anchor-id="verification-summary"><span class="header-section-number">4.3.11.4</span> Verification summary</h4>
+<p>The result has been checked in several independent ways:</p>
+<ul>
+<li>dimensional consistency: <span class="math inline">\(F/k\)</span> has units of displacement;</li>
+<li>agreement with the direct equilibrium solution;</li>
+<li>equal internal force in both springs;</li>
+<li>global force balance through the recovered reaction;</li>
+<li>agreement among global, element, and external-work strain-energy expressions.</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled" title="Exercise -- Change the global numbering">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise – Change the global numbering
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Renumber the three global nodes in geometric order. Reconstruct the connectivity table, global displacement vector, load vector, and stiffness matrix. Which algebraic quantities change, and which physical results remain unchanged?</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="automation-from-formulation-to-implementation" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="automation-from-formulation-to-implementation"><span class="header-section-number">4.4</span> Automation: from formulation to implementation</h2>
+<p>The direct stiffness calculation can now be automated. In general, a finite element program must perform the following stages:</p>
+<ol type="1">
+<li>represent the model data, including elements, connectivity, loads, and constraints;</li>
+<li>evaluate the contribution of each element;</li>
+<li>assemble the element contributions into a global algebraic system;</li>
+<li>impose the prescribed boundary conditions;</li>
+<li>solve for the unknown degrees of freedom;</li>
+<li>post-process the solution to obtain relevant mechanical quantities;</li>
+<li>verify the numerical results using independent checks.</li>
+</ol>
+<p>The next chapter translates this procedure into Julia code for the two-spring assembly, using the mechanical formulation developed here.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/continuous-and-discrete-models.html" class="pagination-link" aria-label="From continuous systems to discrete models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
