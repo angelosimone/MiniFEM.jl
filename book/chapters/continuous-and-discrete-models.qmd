@@ -6,7 +6,7 @@ entire domain.
 
 ## A continuous system: a one-dimensional bar
 
-![One-dimensional bar fixed at the left end, with distributed axial load $q$,
+![One-dimensional bar fixed at the left end, with
 end force $F$, coordinate $x$, cross-sectional area $A$, Young's modulus $E$,
 and axial displacement field
 $u(x)$.](images/bar_in_tension-1d.png){
@@ -54,7 +54,7 @@ $$
 the internal axial force $N$. A positive internal force corresponds to
 tension.](images/bar-cross-section.png){
   #fig-bar-cross-section
-  width=30%
+  width=27%
 }
 
 ## A discrete system: a one-dimensional spring
@@ -63,10 +63,10 @@ A spring is already a discrete mechanical system. Its state can be described by
 quantities defined only at its end points.
 
 ![One-dimensional spring of stiffness $k_s$ between end points 1 and 2. The end
-displacements $u_1$ and $u_2$ and the end forces are referred to the positive
+displacements $u_1$ and $u_2$ are referred to the positive
 $x$ direction.](images/spring-1d.png){
   #fig-spring-1d
-  width=30%
+  width=27%
 }
 
 The spring elongation or spring stretch is a measure of the spring deformation
@@ -89,7 +89,7 @@ where $k_s$ is the spring stiffness.
 at the two sides of a cut spring indicate
 tension.](images/spring-1d-convention.png){
   #fig-spring-1d-convention
-  width=30%
+  width=27%
 }
 
 ## Continuous and discrete descriptions
