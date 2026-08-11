@@ -888,8 +888,10 @@ Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom
 \end{bmatrix}
 =
 \mathbf{0},
-\]</span></p>
-<p>meaning that assigning the same displacement to every node does not deform either spring and therefore produces no internal forces;</p></li>
+\]</span></p></li>
+</ul>
+<p>meaning that assigning the same displacement to every node corresponds to a rigid translation of the assembly and therefore does not deform either spring or generate internal forces; equivalently, each row of <span class="math inline">\(\mathbf{K}\)</span> sums to zero;</p>
+<ul>
 <li><p>the matrix is singular before a displacement constraint is applied because the unconstrained assembly can translate without deforming either spring;</p></li>
 <li><p>for larger problems with local connectivity, the global matrix is sparse, meaning that many entries are zero.</p></li>
 </ul>
