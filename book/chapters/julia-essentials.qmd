@@ -652,7 +652,7 @@ println(B)
 For an ordinary numerical matrix such as `Matrix{Float64}`, `copy` is sufficient
 to preserve the original entries.
 
-The distinction can be summarized as:
+The distinction can be summarised as:
 
 ```text
 B = A        same matrix, two names

@@ -49,7 +49,7 @@ julia two_springs.jl
 ## Mathematical specification used by the script
 
 The code implements the formulation derived in @sec-two-springs-theory. The
-mathematical information required by the script is summarized below.
+mathematical information required by the script is summarised below.
 
 For every spring element,
 
@@ -126,22 +126,22 @@ $$
 
 ## From mathematical objects to Julia data
 
-  | Mathematical object                                          | Julia representation                            |
-  | :----------------------------------------------------------- | :---------------------------------------------- |
-  | number of nodes                                              | `num_nodes`                                     |
-  | degrees of freedom per node                                  | `dofs_per_node`                                 |
-  | total number of degrees of freedom                           | `total_dofs`                                    |
-  | element connectivity                                         | `element_connectivity`                          |
-  | spring stiffnesses                                           | `element_stiffness`                             |
-  | element stiffness matrix $\mathbf{K}^{(e)}$                  | `K_e`                                           |
-  | local-to-global degree-of-freedom map                        | `dof_map`                                       |
-  | global stiffness matrix $\mathbf{K}$                         | `K`                                             |
-  | known applied nodal-force vector $\mathbf{f}_{\mathrm{app}}$ | `f` before displacement-constraint modification |
-  | modified solver right-hand side $\widetilde{\mathbf{f}}$     | `f` after displacement-constraint modification  |
-  | applied nodal forces                                         | `applied_forces`                                |
-  | constrained degrees of freedom                               | `constrained_dofs`                              |
-  | displacement solution                                        | `u`                                             |
-  | unmodified assembled stiffness matrix                        | `K_original`                                    |
+  | Mathematical object                                          | Julia representation                                                             |
+  | :----------------------------------------------------------- | :------------------------------------------------------------------------------- |
+  | number of nodes                                              | `num_nodes`                                                                      |
+  | degrees of freedom per node                                  | `dofs_per_node`                                                                  |
+  | total number of degrees of freedom                           | `total_dofs`                                                                     |
+  | element connectivity                                         | `element_connectivity`                                                           |
+  | spring stiffnesses                                           | `element_stiffness`                                                              |
+  | element stiffness matrix $\mathbf{K}^{(e)}$                  | `K_e`                                                                            |
+  | local-to-global degree-of-freedom map                        | `dof_map`                                                                        |
+  | global stiffness matrix $\mathbf{K}$                         | `K`                                                                              |
+  | known applied nodal-force vector $\mathbf{f}_{\mathrm{app}}$ | `f` after applied-force assembly and before displacement-constraint modification |
+  | modified solver right-hand side $\widetilde{\mathbf{f}}$     | `f` after displacement-constraint modification                                   |
+  | applied nodal forces                                         | `applied_forces`                                                                 |
+  | constrained degrees of freedom                               | `constrained_dofs`                                                               |
+  | displacement solution                                        | `u`                                                                              |
+  | unmodified assembled stiffness matrix                        | `K_original`                                                                     |
 
 Nodal coordinates are not stored in this first implementation because the spring
 stiffnesses are supplied directly and the coordinates are not required for the

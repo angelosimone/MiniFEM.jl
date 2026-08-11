@@ -547,10 +547,10 @@ must be expressed using the same system.
 
 ### Degrees of freedom and global ordering
 
-A degree of freedom is a scalar variable used to describe one component of the
-possible motion of a node. A node and a degree of freedom are therefore distinct
-concepts: a node identifies a point in the model, whereas a degree of freedom
-describes one component of its motion.
+A degree of freedom (DOF) is a scalar variable used to describe one component of
+the possible motion of a node. A node and a degree of freedom are therefore
+distinct concepts: a node identifies a point in the model, whereas a degree of
+freedom describes one component of its motion.
 
 In this one-dimensional spring model, each node has one axial displacement
 degree of freedom. We choose the global degree-of-freedom numbering to coincide
