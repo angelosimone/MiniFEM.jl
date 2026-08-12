@@ -1,5 +1,5 @@
-# Solve a series combination of two 1D springs with finite element operations
-# organized in functions.
+# Solve a series combination of two 1D springs with a callable finite element
+# analysis.
 
 # Physical layout:
 #
@@ -75,80 +75,50 @@ function strain_energy(K, u)
 end
 
 # -------------------------------
-# 1. Pre-processing: Input Data
+# Complete two-spring analysis
 # -------------------------------
 
-# Number of nodes and displacement DOFs per node
-num_nodes = 3  # physical nodes: labeled [2, 3, 1] from left to right
-dofs_per_node = 1  # one displacement DOF per node
+function solve_two_springs(k_1, k_2, applied_force)
+    # Fixed topology: physical nodes are labeled [2, 3, 1] from left to right.
+    num_nodes = 3
+    dofs_per_node = 1
 
-# Connectivity matrix defining which nodes belong to each element
-element_connectivity = [
-    2 3;  # spring between physical nodes 2 and 3
-    3 1   # spring between physical nodes 3 and 1
-]
+    element_connectivity = [
+        2 3;  # spring between physical nodes 2 and 3
+        3 1   # spring between physical nodes 3 and 1
+    ]
 
-# Spring constants for each element in N/mm (k_1 and k_2)
-element_stiffness = [1.0, 2.0]
+    constrained_dofs = [2]
+    element_stiffness = [k_1, k_2]
+    applied_forces = [(1, applied_force)]
 
-# Boundary conditions
+    total_dofs = num_nodes * dofs_per_node
+    K = zeros(total_dofs, total_dofs)
+    f = zeros(total_dofs)
 
-# Prescribed displacement (Dirichlet boundary condition)
-# - Constrain physical node 2 (DOF 2) to zero displacement:
-constrained_dofs = [2]
+    assemble_stiffness!(K, element_connectivity, element_stiffness)
 
-# Applied force (Neumann boundary condition)
-# - Apply a force of intensity 10 N at physical node 1 (DOF 1):
+    # Preserve the physical stiffness matrix before Dirichlet modification.
+    K_original = copy(K)
+
+    assemble_forces!(f, applied_forces)
+    apply_homogeneous_constraints!(K, f, constrained_dofs)
+
+    u = K \ f
+    strain_energy_global = strain_energy(K_original, u)
+
+    return u, strain_energy_global
+end
+
+# -------------------------------
+# Canonical two-spring benchmark
+# -------------------------------
+
+k_1 = 1.0
+k_2 = 2.0
 applied_force = 10.0
-applied_forces = [(1, applied_force)]
 
-# Derived quantity
-# - Number of degrees of freedom
-total_dofs = num_nodes * dofs_per_node
-
-# Initialize global K matrix and force vector.
-K = zeros(total_dofs, total_dofs)
-f = zeros(total_dofs)
-
-# -------------------------------
-# 2. Processing
-# 2.1 Assembly: Build Global K
-# -------------------------------
-
-println("\n- Assembling local stiffness matrices into global K")
-assemble_stiffness!(K, element_connectivity, element_stiffness)
-
-println("\n- Global stiffness matrix K:")
-display(K)
-
-# -------------------------------
-# 2.2 Boundary Conditions
-# -------------------------------
-
-# Save the original K for the energy computation later.
-K_original = copy(K)
-
-# Apply Neumann BCs (forces).
-assemble_forces!(f, applied_forces)
-
-println("\n- Global force vector f:")
-display(f)
-
-# Apply homogeneous Dirichlet BCs (prescribed displacements).
-apply_homogeneous_constraints!(K, f, constrained_dofs)
-
-println("\n- Global stiffness matrix K after BCs:")
-display(K)
-println("\n- Global force vector f after BCs:")
-display(f)
-
-# -------------------------------
-# 2.3 Solver
-# -------------------------------
-
-# Solve the linear system K * u = f.
-# The backslash operator solves the system without explicitly computing inv(K).
-u = K \ f
+u, strain_energy_global = solve_two_springs(k_1, k_2, applied_force)
 
 println("\n- Nodal displacements u [mm]:")
 display(u)
@@ -161,12 +131,8 @@ println("\n- Analytical nodal displacements u [mm]:")
 display(u_analytical)
 
 # -------------------------------
-# 3. Post-processing: Strain Energy
+# Analytical verification
 # -------------------------------
-
-# Compute the total internal strain energy stored in the springs using
-# the stiffness matrix before the Dirichlet modifications.
-strain_energy_global = strain_energy(K_original, u)
 
 println(
     "\n- Total internal strain energy stored in the springs (global computation) [N mm]: ",
@@ -175,8 +141,6 @@ println(
 
 # Compute the analytical strain energy.
 # For two springs in series, the total compliance is 1/k_1 + 1/k_2.
-k_1 = element_stiffness[1]
-k_2 = element_stiffness[2]
 strain_energy_analytical = 0.5 * applied_force^2 * (1 / k_1 + 1 / k_2)
 
 println(
