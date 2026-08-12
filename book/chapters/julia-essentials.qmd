@@ -417,6 +417,28 @@ A *range* represents a sequence of values. For example:
 
 represents the integers `1`, `2`, and `3`.
 
+A range can also specify a start value, an increment, and a stop value:
+
+```julia
+0.1:0.1:0.9
+```
+
+This is the form `start:step:stop`. It begins at `0.1`, increases by `0.1`,
+and ends at `0.9`.
+
+The function `range` provides two useful explicit forms:
+
+```julia
+range(0.1, 0.9; step=0.1)
+range(0.1, 0.9; length=9)
+```
+
+The first form prescribes the increment between values. The second form
+prescribes the number of values between the start and stop values.
+
+A `for` loop can iterate over either integer or non-integer ranges, although
+integer ranges are especially common when the values represent array indices.
+
 Ranges are commonly used in `for` loops:
 
 ```julia
@@ -1232,6 +1254,20 @@ The returned value can then be assigned to a variable:
 ```julia
 y = scale_value(4.0, 2.5)
 ```
+
+A function can also return two values:
+
+```julia
+function sum_and_difference(a, b)
+    return a + b, a - b
+end
+
+sum_value, difference_value = sum_and_difference(5.0, 2.0)
+```
+
+Comma-separated returned values form a tuple. The tuple can be destructured
+using the same comma-separated assignment syntax introduced earlier in this
+chapter.
 
 Julia also permits compact one-line definitions:
 

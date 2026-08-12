@@ -1,0 +1,274 @@
+# Making the two-spring analysis callable {#sec-two-springs-callable-analysis}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S02-functions`\
+**Target snapshot:** `2026-27/S03-callable-analysis`
+:::
+
+::: {.callout-important}
+## Task: Make the complete two-spring analysis callable
+
+Refactor the complete two-spring finite element analysis into a single,
+problem-specific callable function. Preserve the mechanical model, finite
+element formulation, and numerical results exactly.
+:::
+
+## Starting point
+
+In @sec-two-springs-functions, the operations used by the two-spring finite
+element calculation were organized into functions. The script can now assemble
+the stiffness matrix, assemble forces, apply the homogeneous displacement
+constraint, and compute strain energy through named operations.
+
+The complete analysis, however, is still performed by top-level statements. To
+solve the same problem with different spring stiffnesses or applied forces, a
+program would need to duplicate or manually edit that whole top-level workflow.
+
+This snapshot addresses that remaining limitation. We will keep the established
+finite element operations and organize the complete two-spring calculation into
+one callable analysis.
+
+## Why make the complete analysis callable?
+
+Calling a complete analysis makes it possible to request results for new
+physical input values without repeating the finite element workflow at every
+call site. The analysis remains visible in the code, but it is now grouped
+together as one operation with a defined interface.
+
+This organization will also be useful later. A repeated study, such as a
+parametric study, can call the same analysis many times, and automated
+regression tests can request meaningful numerical results directly.
+
+## What varies and what remains fixed
+
+For this two-spring benchmark, three physical quantities vary:
+
+```julia
+k_1
+k_2
+applied_force
+```
+
+The topology remains fixed: the physical nodes are numbered `2`, `3`, and `1`
+from left to right; the spring connectivity is `(2, 3)` and `(3, 1)`; and node 2
+has a homogeneous prescribed displacement. These choices belong to this
+particular benchmark, so they remain inside the callable analysis.
+
+The result is deliberately not a generic MiniFEM solver. It is a reusable
+analysis for one specific, already-understood two-spring problem.
+
+## Introducing `solve_two_springs`
+
+The callable analysis receives the three varying physical quantities:
+
+```julia
+function solve_two_springs(k_1, k_2, applied_force)
+```
+
+Inside the function, the existing finite element workflow is preserved: problem
+definition, assembly, application of boundary conditions, solution, and
+post-processing remain in the same order as before.
+
+The corresponding function is:
+
+```julia
+function solve_two_springs(k_1, k_2, applied_force)
+    # Fixed topology: physical nodes are labeled [2, 3, 1] from left to right.
+    num_nodes = 3
+    dofs_per_node = 1
+
+    element_connectivity = [
+        2 3;
+        3 1
+    ]
+
+    constrained_dofs = [2]
+    element_stiffness = [k_1, k_2]
+    applied_forces = [(1, applied_force)]
+
+    total_dofs = num_nodes * dofs_per_node
+    K = zeros(total_dofs, total_dofs)
+    f = zeros(total_dofs)
+
+    assemble_stiffness!(K, element_connectivity, element_stiffness)
+
+    # Preserve the physical stiffness matrix before Dirichlet modification.
+    K_original = copy(K)
+
+    assemble_forces!(f, applied_forces)
+    apply_homogeneous_constraints!(K, f, constrained_dofs)
+
+    u = K \ f
+    strain_energy_global = strain_energy(K_original, u)
+
+    return u, strain_energy_global
+end
+```
+
+The copy of `K` is needed because applying the homogeneous constraint modifies
+the system matrix, while the strain energy must be computed using the original
+assembled stiffness matrix.
+
+## Returning the displacement vector and strain energy
+
+The analysis returns two quantities:
+
+```julia
+return u, strain_energy_global
+```
+
+Here `u` is the complete global displacement vector, and `strain_energy_global`
+is the total internal strain energy. The Julia variable `strain_energy_global`
+corresponds to the mathematical total strain energy denoted by $U$. The returned
+tuple can be destructured using the syntax introduced in @sec-julia-essentials:
+
+```julia
+u, strain_energy_global = solve_two_springs(k_1, k_2, applied_force)
+```
+
+The complete vector `u` is returned rather than only one selected displacement.
+The vector is the finite element solution of the global system, and later
+analyses may require different displacement components. A selected physical
+response can always be extracted from the complete result when needed.
+
+## Separate calculation from presentation
+
+The helper functions and `solve_two_springs` perform only the numerical analysis
+and do not print intermediate results. Any presentation of the results remains
+at top level, after the analysis has returned. This keeps the numerical function
+reusable and its outputs explicit.
+
+## The canonical benchmark
+
+The top-level script still defines the canonical physical inputs:
+
+```julia
+k_1 = 1.0
+k_2 = 2.0
+applied_force = 10.0
+
+u, strain_energy_global = solve_two_springs(k_1, k_2, applied_force)
+```
+
+It can then display the final displacement vector and total strain energy. The
+same canonical problem therefore remains visible at the end of the script, while
+the complete finite element workflow is now callable.
+
+## Analytical verification
+
+The analytical comparison remains outside `solve_two_springs` because it is used
+only to check the numerical result for this benchmark.
+
+For the canonical inputs, the displacement vector remains
+
+$$
+  \mathbf{u}=
+  \begin{bmatrix}
+  15\\
+  0\\
+  10
+  \end{bmatrix}
+  \ \mathrm{mm},
+$$
+
+in global-vector order `[u_1, u_2, u_3]`, and the total strain energy remains
+
+$$
+  U=75\ \mathrm{N\,mm}.
+$$
+
+## What the new organization enables
+
+The refactoring changes only the organization of the program. The mechanical
+model and numerical results remain unchanged. The callable analysis can now be
+invoked repeatedly with different values of `k_1`, `k_2`, and `applied_force`.
+The exercise below uses this ability for a small parameter study. In the next
+implementation snapshot, the returned quantities `u` and `strain_energy_global`
+will also provide meaningful targets for automated regression tests.
+
+::: {.callout-tip}
+## Exercise --- A stiffness-allocation study
+
+Use `solve_two_springs` to study how the response changes when the total spring
+stiffness remains fixed:
+
+$$
+  k_1+k_2=k_{\mathrm{total}},
+$$
+
+with
+
+$$
+  k_1=\alpha k_{\mathrm{total}},
+  \qquad
+  k_2=(1-\alpha)k_{\mathrm{total}},
+  \qquad
+  0<\alpha<1.
+$$
+
+Use the following study inputs:
+
+```julia
+k_total = 3.0
+applied_force = 10.0
+```
+
+Study values of $\alpha$ from `0.1` to `0.9` in increments of `0.1`. Create a
+variable named `alpha_values` yourself using one of the range constructions
+introduced in @sec-julia-essentials.
+
+Work through the following steps.
+
+1. Confirm that `alpha_values` contains values strictly between `0` and `1`.
+
+2. Use `length(alpha_values)` to determine the number of analyses.
+
+3. Preallocate a numerical matrix named `results` with one row per value of
+   `alpha` and three columns using `zeros`. Use the columns in this order:
+
+   ```text
+   alpha | u_loaded | U
+   ```
+
+4. Use an indexed `for` loop of the form `for i in 1:length(alpha_values)` to
+   call `solve_two_springs` once for each value of `alpha`. Keep the parameter
+   study outside `solve_two_springs`.
+
+5. Within each iteration, obtain `alpha` from `alpha_values[i]`, compute `k_1`
+   and `k_2`, call `solve_two_springs(k_1, k_2, applied_force)`, and assign the
+   two returned values to `u` and `strain_energy_global`.
+
+6. The physical displacement of interest is the displacement at the loaded end.
+   Call it `u_loaded`. Because this benchmark uses the deliberately
+   nonsequential physical node ordering `[2, 3, 1]`, the loaded node is global
+   DOF 1. Extract it from the returned vector as `u_loaded = u[1]`.
+
+7. Store the Julia variables `alpha`, `u_loaded`, and the returned
+   `strain_energy_global` in row `i` of `results`. When the loop is complete,
+   display that matrix.
+
+8. Verify the computed entries against the analytical solution. For a force $F$,
+   the two springs in series give
+
+   $$
+     u_{\mathrm{loaded}}
+     = F\left(\frac{1}{k_1}+\frac{1}{k_2}\right),
+     \qquad
+     U
+     = \frac{F^2}{2}\left(\frac{1}{k_1}+\frac{1}{k_2}\right).
+   $$
+
+   In these equations, $U$ is the mathematical strain-energy symbol. In the
+   Julia code, the corresponding returned value is `strain_energy_global`; use
+   `applied_force` for the quantity denoted by $F$.
+
+9. Interpret the results. At which value of $\alpha$ are the loaded displacement
+   and strain energy smallest? Is the response symmetric about $\alpha=0.5$?
+   What happens as $\alpha$ approaches `0` or `1`, and why must those endpoint
+   values be excluded from the numerical study?
+
+No plot is required for this exercise.
+:::
