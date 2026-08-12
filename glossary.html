@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./references.html" rel="next">
-<link href="./chapters/two-springs-julia.html" rel="prev">
+<link href="./chapters/two-springs-functions.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -82,7 +82,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c72bfcf2850aa2268dce9df1d5752dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -133,7 +133,7 @@ window.MathJax = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -214,12 +214,18 @@ window.MathJax = {
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./glossary.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -244,13 +250,21 @@ window.MathJax = {
   </ul></li>
   <li><a href="#i" id="toc-i" class="nav-link" data-scroll-target="#i">I</a>
   <ul class="collapse">
+  <li><a href="#gls-immutable-object" id="toc-gls-immutable-object" class="nav-link" data-scroll-target="#gls-immutable-object">Immutable object</a></li>
   <li><a href="#gls-imperative-programming" id="toc-gls-imperative-programming" class="nav-link" data-scroll-target="#gls-imperative-programming">Imperative programming</a></li>
   </ul></li>
   <li><a href="#m" id="toc-m" class="nav-link" data-scroll-target="#m">M</a>
   <ul class="collapse">
   <li><a href="#gls-modified-in-place" id="toc-gls-modified-in-place" class="nav-link" data-scroll-target="#gls-modified-in-place">Modified in place</a></li>
   <li><a href="#gls-mutable-object" id="toc-gls-mutable-object" class="nav-link" data-scroll-target="#gls-mutable-object">Mutable object</a></li>
-  <li><a href="#gls-immutable-object" id="toc-gls-immutable-object" class="nav-link" data-scroll-target="#gls-immutable-object">Immutable object</a></li>
+  </ul></li>
+  <li><a href="#r" id="toc-r" class="nav-link" data-scroll-target="#r">R</a>
+  <ul class="collapse">
+  <li><a href="#gls-refactoring" id="toc-gls-refactoring" class="nav-link" data-scroll-target="#gls-refactoring">Refactoring</a></li>
+  </ul></li>
+  <li><a href="#s" id="toc-s" class="nav-link" data-scroll-target="#s">S</a>
+  <ul class="collapse">
+  <li><a href="#gls-separation-of-concerns" id="toc-gls-separation-of-concerns" class="nav-link" data-scroll-target="#gls-separation-of-concerns">Separation of concerns</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -287,6 +301,11 @@ window.MathJax = {
 </section>
 <section id="i" class="level2">
 <h2 class="anchored" data-anchor-id="i">I</h2>
+<section id="gls-immutable-object" class="level3">
+<h3 class="anchored" data-anchor-id="gls-immutable-object">Immutable object</h3>
+<p>An object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.</p>
+<p><strong>See also:</strong> <a href="#gls-mutable-object">Mutable object</a>; <a href="#gls-modified-in-place">Modified in place</a>.</p>
+</section>
 <section id="gls-imperative-programming" class="level3">
 <h3 class="anchored" data-anchor-id="gls-imperative-programming">Imperative programming</h3>
 <p>A programming paradigm in which a computation is expressed as an explicit sequence of commands that describe <strong>how</strong> a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.</p>
@@ -313,10 +332,20 @@ window.MathJax = {
 <p>An object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.</p>
 <p><strong>See also:</strong> <a href="#gls-immutable-object">Immutable object</a>; <a href="#gls-modified-in-place">Modified in place</a>.</p>
 </section>
-<section id="gls-immutable-object" class="level3">
-<h3 class="anchored" data-anchor-id="gls-immutable-object">Immutable object</h3>
-<p>An object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.</p>
-<p><strong>See also:</strong> <a href="#gls-mutable-object">Mutable object</a>; <a href="#gls-modified-in-place">Modified in place</a>.</p>
+</section>
+<section id="r" class="level2">
+<h2 class="anchored" data-anchor-id="r">R</h2>
+<section id="gls-refactoring" class="level3">
+<h3 class="anchored" data-anchor-id="gls-refactoring">Refactoring</h3>
+<p>Restructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.</p>
+</section>
+</section>
+<section id="s" class="level2">
+<h2 class="anchored" data-anchor-id="s">S</h2>
+<section id="gls-separation-of-concerns" class="level3">
+<h3 class="anchored" data-anchor-id="gls-separation-of-concerns">Separation of concerns</h3>
+<p>A software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.</p>
+<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Separation_of_concerns">Wikipedia — Separation of concerns</a>.</p>
 
 
 </section>
@@ -725,8 +754,8 @@ window.MathJax = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./chapters/two-springs-julia.html" class="pagination-link" aria-label="Your first FEM code: two springs in series">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span>
+      <a href="./chapters/two-springs-functions.html" class="pagination-link" aria-label="Organizing finite element operations with functions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
