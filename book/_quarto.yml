@@ -19,6 +19,7 @@ book:
         - chapters/continuous-and-discrete-models.qmd
         - chapters/two-springs-direct-stiffness.qmd
         - chapters/two-springs-julia.qmd
+        - chapters/two-springs-functions.qmd
     - glossary.qmd
     - references.qmd
 

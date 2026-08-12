@@ -1,0 +1,688 @@
+# Organizing finite element operations with functions {#sec-two-springs-functions}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S01-two-springs`\
+**Target snapshot:** `2026-27/S02-functions`
+:::
+
+::: {.callout-important}
+## Task: Organize the FEM operations into functions
+
+Refactor the two-spring script so that its main finite element operations are
+implemented as Julia functions, while preserving the existing finite element
+calculation and numerical results.
+:::
+
+## Starting point
+
+In @sec-two-springs-code, the direct stiffness procedure was translated into the
+first MiniFEM Julia script. The resulting program is intentionally explicit: the
+input data, element operations, assembly, boundary conditions, solution, and
+post-processing all appear directly in the top-level script. This makes the
+numerical procedure easy to follow line by line. However, several parts of the
+program now represent well-defined operations that can be given names of their
+own. For example, the element stiffness matrix is constructed directly inside
+the element loop:
+
+```julia
+K_e = [
+    +k_e -k_e;
+    -k_e +k_e
+]
+```
+
+Similarly, global assembly, force assembly, application of the displacement
+constraint, and strain-energy computation are all written directly where they
+are used.
+
+We will use the final code from the previous snapshot as our starting point and
+[refactor](../glossary.qmd#gls-refactoring) its implementation without changing
+the finite element calculation.
+
+## Goal of this snapshot
+
+The goal of this snapshot is to refactor the existing two-spring program using
+Julia functions.
+
+The mechanical problem, finite element formulation, input data, boundary
+conditions, and numerical results will remain unchanged. The implementation will
+be reorganized into functions, and some diagnostic output will be simplified.
+
+By the end of the snapshot, the following finite element operations will have
+their own functions:
+
+```text
+spring_stiffness
+assemble_stiffness!
+assemble_forces!
+apply_homogeneous_constraints!
+strain_energy
+```
+
+The top-level part of the script will then describe the overall finite element
+workflow by calling the higher-level functions, while `assemble_stiffness!` will
+use `spring_stiffness` internally.
+
+The refactored program must reproduce exactly the same numerical results as the
+starting snapshot. We will verify this after completing the refactoring.
+
+## From operations to functions
+
+The syntax for defining and calling Julia functions was introduced in
+@sec-julia-defining-functions. We now apply those ideas to the existing
+two-spring implementation.
+
+Our approach will be incremental. For each finite element operation, we will
+first identify the corresponding block of code in the starting snapshot and move
+that code into a function with as little modification as possible. We will then
+replace the original block with a call to the new function. We will consider
+further improvements to the function only after this direct extraction.
+
+Two types of functions will appear in this snapshot:
+
+- functions that compute and return a result;
+- functions that modify an existing object supplied as an argument.
+
+The distinction will become clear as we refactor the code.
+
+As each function is introduced below, place its definition before the top-level
+pre-processing section. The finite element functions will therefore remain
+grouped together, followed by the top-level analysis that calls them.
+
+Variables introduced inside the extracted functions are local to those
+functions, following the function-scope rules introduced in
+@sec-julia-defining-functions. This allows each operation to manage its own
+temporary quantities without exposing them to the top-level analysis.
+
+## First step: extract the element stiffness operation
+
+A useful way to introduce functions into an existing program is to begin with a
+small, self-contained operation.
+
+In the previous snapshot, the element stiffness matrix is constructed inside the
+element loop:
+
+```julia
+k_e = element_stiffness[e]
+K_e = [
+    +k_e -k_e;
+    -k_e +k_e
+]
+```
+
+The matrix construction depends only on `k_e`, so it can be moved directly into
+a function, as shown below.
+
+*Before*
+
+```julia
+K_e = [
+    +k_e -k_e;
+    -k_e +k_e
+]
+```
+
+*After*
+
+```julia
+function spring_stiffness(k_e)
+    K_e = [
+        +k_e -k_e;
+        -k_e +k_e
+    ]
+    return K_e
+end
+```
+
+Place this function near the beginning of the file, immediately below the
+descriptive comment in the file header.
+
+The original matrix construction inside the element loop is then replaced by
+
+```julia
+K_e = spring_stiffness(k_e)
+```
+
+Nothing has changed mathematically. The same value of `k_e` produces the same
+matrix `K_e`: the operation has simply been given a name.
+
+This is the first type of function introduced above: `spring_stiffness` receives
+the data required for the calculation and returns a new result. It does not
+modify `k_e`.
+
+This first transformation illustrates an important refactoring principle used
+throughout this snapshot:
+
+> first move an existing operation into a function without changing how the
+> operation itself is performed.
+
+Once the function works, its interface can be considered separately.
+
+Before attempting the next refactoring step, run the program and confirm that it
+produces the same numerical results as before.
+
+## Extracting global stiffness assembly
+
+The next operation is larger. After extracting the element stiffness operation,
+global stiffness assembly is still performed by the complete element loop:
+
+```julia
+for e in 1:num_elements
+    # Element stiffness matrix: K_e = k_e * [1 -1; -1 1]
+    k_e = element_stiffness[e]
+    K_e = spring_stiffness(k_e)
+
+    println("\n-- Element ", e, ", k_e = ", k_e)
+    println("   Element stiffness matrix K_e:")
+    display(K_e)
+
+    # Map local DOFs to global DOFs for an element:
+    # the local to global DOF mapping is built from element nodes
+    # through the element connectivity matrix (for elements with one DOF
+    # per node, the global DOF is the same as the node number).
+    dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
+
+    # Assemble the local stiffness matrix into the global stiffness matrix.
+    for i in 1:2
+        I = dof_map[i]
+        for j in 1:2
+            J = dof_map[j]
+            K[I, J] += K_e[i, j]
+        end
+    end
+end
+```
+
+At this stage, keep the loop unchanged and place it inside a function:
+
+```julia
+function assemble_stiffness!(
+    K,
+    element_connectivity,
+    element_stiffness,
+    num_elements,
+)
+    for e in 1:num_elements
+        # Element stiffness matrix: K_e = k_e * [1 -1; -1 1]
+        k_e = element_stiffness[e]
+        K_e = spring_stiffness(k_e)
+
+        println("\n-- Element ", e, ", k_e = ", k_e)
+        println("   Element stiffness matrix K_e:")
+        display(K_e)
+
+        # Map local DOFs to global DOFs for an element:
+        # the local to global DOF mapping is built from element nodes
+        # through the element connectivity matrix (for elements with one DOF
+        # per node, the global DOF is the same as the node number).
+        dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
+
+        # Assemble the local stiffness matrix into the global stiffness matrix.
+        for i in 1:2
+            I = dof_map[i]
+            for j in 1:2
+                J = dof_map[j]
+                K[I, J] += K_e[i, j]
+            end
+        end
+    end
+end
+```
+
+The original element loop can now be replaced by
+
+```julia
+assemble_stiffness!(
+    K,
+    element_connectivity,
+    element_stiffness,
+    num_elements,
+)
+```
+
+Again, the assembly algorithm itself has not changed. The nested loops, the
+local-to-global map, and the additive update of `K` are exactly the operations
+used in the previous snapshot.
+
+Unlike `spring_stiffness`, this function does not construct and return a new
+global matrix. It modifies the existing matrix `K` through the accumulated
+assignment
+
+```julia
+K[I, J] += K_e[i, j]
+```
+
+For this reason, the function is named `assemble_stiffness!`. As introduced in
+@sec-julia-defining-functions, the trailing `!` is a Julia naming convention
+used to signal that a function modifies one or more of its arguments; the `!`
+does not itself cause the modification.
+
+## Choosing function arguments
+
+The first version of `assemble_stiffness!` reproduces the existing assembly
+operation with as little modification as possible. We can now move from direct
+extraction to a small refinement of its interface by inspecting its arguments.
+
+The function currently receives
+
+```julia
+num_elements
+```
+
+but the number of elements can already be determined from
+
+```julia
+element_connectivity
+```
+
+using
+
+```julia
+size(element_connectivity, 1)
+```
+
+Passing both pieces of information creates unnecessary duplication. To remove
+this redundancy, move the calculation
+
+```julia
+num_elements = size(element_connectivity, 1)
+```
+
+inside the function:
+
+```julia
+function assemble_stiffness!(K, element_connectivity, element_stiffness)
+    num_elements = size(element_connectivity, 1)
+
+    # element loop
+end
+```
+
+The call then becomes
+
+```julia
+assemble_stiffness!(K, element_connectivity, element_stiffness)
+```
+
+and the top-level definition of `num_elements` is no longer required.
+
+This gives a useful guideline for designing function interfaces:
+
+> pass the information required to perform an operation, but avoid passing a
+> quantity that can be obtained unambiguously from information already available
+> to the function.
+
+This is a guideline rather than an absolute rule. Later implementations may make
+different choices for reasons of efficiency or software design.
+
+## Keeping numerical operations separate from printed output
+
+The first extracted assembly function still contains the diagnostic output from
+the starting script:
+
+```julia
+println("\n-- Element ", e, ", k_e = ", k_e)
+println("   Element stiffness matrix K_e:")
+display(K_e)
+```
+
+These statements were useful in the first snapshot because the intermediate
+element matrices were deliberately exposed while introducing assembly. The
+purpose of `assemble_stiffness!`, however, is to perform the numerical assembly
+itself. Displaying intermediate results is a separate task: it does not
+contribute to the assembly operation and need not be part of the function.
+
+You can therefore remove these three statements from `assemble_stiffness!` and
+let the top-level script report the beginning and result of the assembly
+operation:
+
+```julia
+println("\n- Assembling local stiffness matrices into global K")
+assemble_stiffness!(K, element_connectivity, element_stiffness)
+
+println("\n- Global stiffness matrix K:")
+display(K)
+```
+
+The numerical calculation has not changed; only the diagnostic output produced
+inside the assembly loop has been removed. This keeps the numerical operation
+separate from the decision about what information should be displayed to the
+user.
+
+This is an example of [separation of
+concerns](../glossary.qmd#gls-separation-of-concerns): the numerical function is
+responsible for performing the assembly, while decisions about diagnostic output
+are kept outside the function.
+
+## Extracting force assembly
+
+The applied nodal forces are still assembled directly in the top-level script:
+
+```julia
+for (dof, value) in applied_forces
+    f[dof] += value
+end
+```
+
+This is already a small, self-contained operation.
+
+Move it directly into
+
+```julia
+function assemble_forces!(f, applied_forces)
+    for (dof, value) in applied_forces
+        f[dof] += value
+    end
+end
+```
+
+and replace the original loop with
+
+```julia
+assemble_forces!(f, applied_forces)
+```
+
+The function modifies `f`, so its name follows the `!` convention.
+
+Notice also that the function does not need to know anything about springs. It
+only receives a global force vector and a collection of degree-of-freedom/value
+pairs.
+
+This is the first indication that some of the operations being extracted from
+the two-spring example are more general than the particular mechanical problem
+that introduced them.
+
+## Extracting the displacement constraint
+
+The homogeneous prescribed displacement is still imposed directly in the
+top-level script:
+
+```julia
+for dof in constrained_dofs
+    for i in 1:total_dofs
+        K[i, dof] = 0.0
+        K[dof, i] = 0.0
+    end
+
+    K[dof, dof] = 1.0
+    f[dof] = 0.0
+end
+```
+
+As before, begin with a direct extraction:
+
+```julia
+function apply_homogeneous_constraints!(
+    K,
+    f,
+    constrained_dofs,
+    total_dofs,
+)
+    for dof in constrained_dofs
+        for i in 1:total_dofs
+            K[i, dof] = 0.0
+            K[dof, i] = 0.0
+        end
+
+        K[dof, dof] = 1.0
+        f[dof] = 0.0
+    end
+end
+```
+
+The original loop can then be replaced by
+
+```julia
+apply_homogeneous_constraints!(
+    K,
+    f,
+    constrained_dofs,
+    total_dofs,
+)
+```
+
+The function modifies both `K` and `f`, which again motivates the trailing `!`.
+
+### Refining the arguments
+
+As with `num_elements` in the assembly function, one of the arguments can be
+obtained from information already available to the function.
+
+The number of global degrees of freedom is equal to the number of rows of `K`,
+so it can be determined directly from the matrix:
+
+```julia
+total_dofs = size(K, 1)
+```
+
+There is therefore no need to pass `total_dofs` as a separate argument. Move
+this calculation inside the function.
+
+The function definition therefore changes from
+
+```julia
+function apply_homogeneous_constraints!(
+    K,
+    f,
+    constrained_dofs,
+    total_dofs,
+)
+
+    # constraint loop
+end
+```
+to
+
+```julia
+function apply_homogeneous_constraints!(
+    K,
+    f,
+    constrained_dofs,
+)
+    total_dofs = size(K, 1)
+
+    # constraint loop
+end
+```
+
+and the corresponding call becomes
+
+```julia
+apply_homogeneous_constraints!(K, f, constrained_dofs)
+```
+
+Unlike `num_elements`, the top-level variable `total_dofs` is still required
+elsewhere in the script to initialize the global arrays:
+
+```julia
+K = zeros(total_dofs, total_dofs)
+f = zeros(total_dofs)
+```
+
+It therefore remains part of the pre-processing stage. The `total_dofs` defined
+inside `apply_homogeneous_constraints!` is local to that function and is
+separate from the top-level variable with the same name.
+
+## Extracting the strain-energy computation
+
+The global strain energy is still computed directly in the top-level script:
+
+```julia
+strain_energy_global = 0.5 * transpose(u) * K_original * u
+```
+
+Extract this operation into a function that receives a stiffness matrix and a
+displacement vector and returns the corresponding strain energy:
+
+```julia
+function strain_energy(K, u)
+    return 0.5 * transpose(u) * K * u
+end
+```
+
+and replace the original expression with
+
+```julia
+strain_energy_global = strain_energy(K_original, u)
+```
+
+The analytical reference calculation remains in the top-level script because it
+is specific to the two-spring benchmark:
+
+```julia
+k_1 = element_stiffness[1]
+k_2 = element_stiffness[2]
+strain_energy_analytical =
+    0.5 * applied_force^2 * (1 / k_1 + 1 / k_2)
+```
+
+The same applies to the analytical displacement vector:
+
+```julia
+u_analytical = [15.0, 0.0, 10.0]
+```
+
+These quantities are used to verify the finite element solution rather than to
+define reusable finite element operations.
+
+Before finishing the refactoring, clean up the comments so that they describe
+the new program structure rather than the original top-level implementation.
+Update headings and descriptive comments where necessary, add concise comments
+for the new function block, and remove comments that have become redundant.
+These changes affect the documentation only, not the executable code.
+
+## Structure of the refactored program
+
+The mathematical sequence of the program has not changed. The main difference is
+that several finite element operations now have explicit names:
+
+```text
+Pre-processing
+    define model data
+    initialize K and f
+
+Processing
+    assemble_stiffness!(...)
+    preserve K_original
+    assemble_forces!(...)
+    apply_homogeneous_constraints!(...)
+    solve K * u = f
+
+Post-processing
+    strain_energy(...)
+
+Verification
+    compare with independently derived reference results
+```
+
+The resulting top-level script exposes the overall finite element workflow,
+while the implementation of individual operations is contained in separate
+functions.
+
+@fig-s02-program-structure shows how the top-level script delegates individual
+finite element operations to the functions introduced in this snapshot.
+
+```{mermaid}
+%%| label: fig-s02-program-structure
+%%| fig-cap: >-
+%%|   Function-call structure of the refactored two-spring program.
+
+flowchart TB
+    TOP["Top-level script"]
+
+    ASSEMBLY["assemble_stiffness!"]
+    FORCES["assemble_forces!"]
+    BC["apply_homogeneous_constraints!"]
+    ENERGY["strain_energy"]
+    ELEMENT["spring_stiffness"]
+
+    TOP --> ASSEMBLY
+    TOP --> FORCES
+    TOP --> BC
+    TOP --> ENERGY
+
+    ASSEMBLY --> ELEMENT
+```
+
+## What changed?
+
+The finite element procedure itself has not changed. What has changed is where
+the details of each operation are expressed.
+
+In the starting snapshot, the top-level script describes directly *how* an
+operation is performed. For example:
+
+```julia
+for (dof, value) in applied_forces
+    f[dof] += value
+end
+```
+
+After refactoring, the top-level script instead states *what* operation should
+be performed:
+
+```julia
+assemble_forces!(f, applied_forces)
+```
+
+The implementation has not disappeared; it has moved into a named function.
+
+The same transition has been made for stiffness assembly, application of the
+homogeneous constraints, and strain-energy computation. The top-level script
+therefore exposes the finite element procedure more clearly, while the detailed
+implementation remains available in the function definitions.
+
+## Verification after refactoring
+
+Refactoring should not alter the numerical problem being solved.
+
+Run the modified program and verify that the assembled stiffness matrix is still
+
+$$
+  \mathbf{K}=
+  \begin{bmatrix}
+  2 & 0 & -2\\
+  0 & 1 & -1\\
+  -2 & -1 & 3
+  \end{bmatrix}
+  \ \mathrm{N/mm}.
+$$
+
+Before displacement constraints are imposed, the matrix should remain symmetric
+and each row should sum to zero, reflecting the rigid-translation mode of the
+unconstrained assembly.
+
+The displacement vector should remain
+
+$$
+  \mathbf{u}=
+  \begin{bmatrix}
+  15\\
+  0\\
+  10
+  \end{bmatrix}
+  \ \mathrm{mm},
+$$
+
+and the numerical strain energy should remain
+
+$$
+  U=75\ \mathrm{N\,mm}.
+$$
+
+## What comes next
+
+The finite element operations are now represented by individual functions, but
+the overall analysis is still executed by top-level statements in the script.
+
+The next snapshot will use these functions to make the complete two-spring
+analysis callable as a single operation. This will provide a natural interface
+for running the same analysis from other Julia code and, subsequently, for
+automated regression testing.
+
+For now, the **explicit top-level operations → named finite element functions**
+transition is complete. The finite element mathematics has stayed the same while
+the program has become more structured and reusable.

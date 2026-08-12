@@ -22,6 +22,17 @@ programming](https://en.wikipedia.org/wiki/Declarative_programming).
 
 ## I
 
+### Immutable object {#gls-immutable-object}
+
+An object whose contents or internal state cannot be changed after it has been
+created. An operation that appears to modify an immutable object instead creates
+a new object representing the modified value, leaving the original object
+unchanged. Strings and numbers are common examples of immutable objects in many
+programming languages.
+
+**See also:** [Mutable object](#gls-mutable-object); [Modified in
+place](#gls-modified-in-place).
+
 ### Imperative programming {#gls-imperative-programming}
 
 A programming paradigm in which a computation is expressed as an explicit
@@ -75,13 +86,21 @@ examples of mutable objects in many programming languages.
 **See also:** [Immutable object](#gls-immutable-object); [Modified in
 place](#gls-modified-in-place).
 
-### Immutable object {#gls-immutable-object}
+## R
 
-An object whose contents or internal state cannot be changed after it has been
-created. An operation that appears to modify an immutable object instead creates
-a new object representing the modified value, leaving the original object
-unchanged. Strings and numbers are common examples of immutable objects in many
-programming languages.
+### Refactoring {#gls-refactoring}
 
-**See also:** [Mutable object](#gls-mutable-object); [Modified in
-place](#gls-modified-in-place).
+Restructuring existing code to improve its organization, readability, or reuse
+while preserving its intended computational behavior.
+
+## S
+
+### Separation of concerns {#gls-separation-of-concerns}
+
+A software-design principle in which different aspects of a program are kept in
+distinct parts of the code so that each part addresses a specific concern. For
+example, a numerical function can perform a finite element operation while
+diagnostic output is handled separately.
+
+**Further details:** [Wikipedia --- Separation of
+concerns](https://en.wikipedia.org/wiki/Separation_of_concerns).

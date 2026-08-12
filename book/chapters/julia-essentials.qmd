@@ -8,7 +8,7 @@ features only when they become useful.
 
 No previous programming experience is assumed. The most effective way to use
 this chapter is interactively: execute each example in the Julia REPL, inspect
-the result, and then modify one part of the example to observe how the behaviour
+the result, and then modify one part of the example to observe how the behavior
 changes.
 
 ::: {.callout-important title="Bare-minimum learning path"}
@@ -23,9 +23,9 @@ The essential path is:
 When you reach the Bare-minimum checkpoint, you have the Julia background needed
 for the first MiniFEM implementation.
 
-Part II is a reference section for Julia concepts used in later MiniFEM
-snapshots. It is not required for the first `two_springs.jl` implementation and
-can be revisited when those features first appear.
+Part II introduces additional Julia concepts used in subsequent MiniFEM
+snapshots. These concepts are not required for the first `two_springs.jl`
+implementation and can be revisited when they first become relevant.
 :::
 
 ## Core programming constructs
@@ -652,7 +652,7 @@ println(B)
 For an ordinary numerical matrix such as `Matrix{Float64}`, `copy` is sufficient
 to preserve the original entries.
 
-The distinction can be summarised as:
+The distinction can be summarized as:
 
 ```text
 B = A        same matrix, two names
@@ -890,7 +890,7 @@ Transpose and a quadratic form:
 q = transpose(x) * A * x
 ```
 
-Recognise tuples, destructuring, and output:
+Recognize tuples, destructuring, and output:
 
 ```julia
 entries = [(1, 10.0), (3, -2.0)]
@@ -911,13 +911,13 @@ section below as needed when later MiniFEM examples introduce additional
 programming concepts.
 :::
 
-## Part II --- Reference: Julia concepts used later in MiniFEM
+## Part II --- Additional Julia concepts for MiniFEM
 
 ### Learning objectives
 
-This reference section will help you to:
+This section will help you to:
 
-- read basic control flow and simple Julia functions used in later MiniFEM code;
+- read basic control flow and simple Julia functions used in MiniFEM code;
 - apply appropriate checks for floating-point results and invalid program
   states;
 - understand at a high level how Julia solves linear systems;
@@ -1168,7 +1168,7 @@ A useful distinction is:
 When Julia reports an error, first read the main error message and then use the
 stack trace to identify where the problem occurred.
 
-### Defining functions
+### Defining functions {#sec-julia-defining-functions}
 
 Recurring operations become easier to reuse and test when they are placed in
 functions.
@@ -1189,6 +1189,50 @@ The function is called with:
 y = scale_value(4.0, 2.5)
 ```
 
+Here, `value` and `factor` are the function arguments. They provide the
+information required by the function, while `result` is a variable created
+inside the function.
+
+#### Local variables
+
+A function introduces a local scope. Variables created inside the function are
+local to that function and are not automatically available in the surrounding
+top-level code.
+
+For example:
+
+```julia
+function scale_value(value, factor)
+    result = factor * value
+    return result
+end
+
+y = scale_value(4.0, 2.5)
+```
+
+After the function call, `y` contains the returned value, whereas `result`
+belongs to the local scope of `scale_value`.
+
+This separation is useful because a function can perform intermediate
+calculations without introducing additional variables into the surrounding code.
+
+#### Returning a result
+
+The `return` statement leaves the function and supplies a result to the caller:
+
+```julia
+function scale_value(value, factor)
+    result = factor * value
+    return result
+end
+```
+
+The returned value can then be assigned to a variable:
+
+```julia
+y = scale_value(4.0, 2.5)
+```
+
 Julia also permits compact one-line definitions:
 
 ```julia
@@ -1196,8 +1240,67 @@ scale_value(value, factor) = factor * value
 ```
 
 If no explicit `return` is written, Julia returns the value of the final
-expression. In teaching code, an explicit `return` can nevertheless make the
-function interface easier to identify.
+expression. An explicit `return` can nevertheless make the function interface
+easier to identify.
+
+#### Modifying an argument
+
+A function does not always need to create and return a new result. Mutable
+objects such as arrays can also be modified inside a function.
+
+For example:
+
+```julia
+function add_value!(values, i, value)
+    values[i] += value
+end
+```
+
+Calling
+
+```julia
+values = [1.0, 2.0, 3.0]
+add_value!(values, 2, 5.0)
+```
+
+modifies the existing array, giving
+
+```julia
+[1.0, 7.0, 3.0]
+```
+
+The array is not automatically copied when it is passed to the function.
+Consequently, modifying one of its entries inside the function changes the array
+seen by the caller.
+
+This type of function is commonly called a *mutating* or *in-place* function.
+
+#### The `!` convention
+
+By convention, Julia function names that modify one or more of their arguments
+often end with `!`:
+
+```julia
+add_value!(values, i, value)
+```
+
+The exclamation mark does not itself perform the modification. It is part of the
+function name and signals to the reader that calling the function may change one
+or more supplied arguments.
+
+A useful distinction is therefore:
+
+```julia
+y = scale_value(value, factor)
+```
+
+where the function computes and returns a result, and
+
+```julia
+add_value!(values, i, value)
+```
+
+where the function modifies an existing mutable object.
 
 Functions become more important as programs begin to separate recurring
 operations from problem-specific input data.
