@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; From continuous systems to discrete models – An Introduction to the Finite Element Method</title>
+<title>7&nbsp; Making the two-spring analysis callable – An Introduction to the Finite Element Method</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -36,8 +71,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../chapters/two-springs-direct-stiffness.html" rel="next">
-<link href="../chapters/julia-essentials.html" rel="prev">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/two-springs-functions.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -127,7 +162,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-callable-analysis.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -192,7 +227,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link active">
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
   </div>
 </li>
@@ -216,7 +251,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
   </div>
 </li>
@@ -244,18 +279,24 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#a-continuous-system-a-one-dimensional-bar" id="toc-a-continuous-system-a-one-dimensional-bar" class="nav-link active" data-scroll-target="#a-continuous-system-a-one-dimensional-bar"><span class="header-section-number">3.1</span> A continuous system: a one-dimensional bar</a></li>
-  <li><a href="#a-discrete-system-a-one-dimensional-spring" id="toc-a-discrete-system-a-one-dimensional-spring" class="nav-link" data-scroll-target="#a-discrete-system-a-one-dimensional-spring"><span class="header-section-number">3.2</span> A discrete system: a one-dimensional spring</a></li>
-  <li><a href="#continuous-and-discrete-descriptions" id="toc-continuous-and-discrete-descriptions" class="nav-link" data-scroll-target="#continuous-and-discrete-descriptions"><span class="header-section-number">3.3</span> Continuous and discrete descriptions</a></li>
+  <li><a href="#starting-point" id="toc-starting-point" class="nav-link active" data-scroll-target="#starting-point"><span class="header-section-number">7.1</span> Starting point</a></li>
+  <li><a href="#why-make-the-complete-analysis-callable" id="toc-why-make-the-complete-analysis-callable" class="nav-link" data-scroll-target="#why-make-the-complete-analysis-callable"><span class="header-section-number">7.2</span> Why make the complete analysis callable?</a></li>
+  <li><a href="#what-varies-and-what-remains-fixed" id="toc-what-varies-and-what-remains-fixed" class="nav-link" data-scroll-target="#what-varies-and-what-remains-fixed"><span class="header-section-number">7.3</span> What varies and what remains fixed</a></li>
+  <li><a href="#introducing-solve_two_springs" id="toc-introducing-solve_two_springs" class="nav-link" data-scroll-target="#introducing-solve_two_springs"><span class="header-section-number">7.4</span> Introducing <code>solve_two_springs</code></a></li>
+  <li><a href="#returning-the-displacement-vector-and-strain-energy" id="toc-returning-the-displacement-vector-and-strain-energy" class="nav-link" data-scroll-target="#returning-the-displacement-vector-and-strain-energy"><span class="header-section-number">7.5</span> Returning the displacement vector and strain energy</a></li>
+  <li><a href="#separate-calculation-from-presentation" id="toc-separate-calculation-from-presentation" class="nav-link" data-scroll-target="#separate-calculation-from-presentation"><span class="header-section-number">7.6</span> Separate calculation from presentation</a></li>
+  <li><a href="#the-canonical-benchmark" id="toc-the-canonical-benchmark" class="nav-link" data-scroll-target="#the-canonical-benchmark"><span class="header-section-number">7.7</span> The canonical benchmark</a></li>
+  <li><a href="#analytical-verification" id="toc-analytical-verification" class="nav-link" data-scroll-target="#analytical-verification"><span class="header-section-number">7.8</span> Analytical verification</a></li>
+  <li><a href="#what-the-new-organization-enables" id="toc-what-the-new-organization-enables" class="nav-link" data-scroll-target="#what-the-new-organization-enables"><span class="header-section-number">7.9</span> What the new organization enables</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-callable-analysis.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span id="sec-discrete-continuous" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></h1>
+<h1 class="title"><span id="sec-two-springs-callable-analysis" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></h1>
 </div>
 
 
@@ -272,101 +313,186 @@ window.Quarto = {
 </header>
 
 
-<p>In a discrete system, the state is described by a finite set of variables. In a continuous system, the state is described by one or more fields defined over the entire domain.</p>
-<section id="a-continuous-system-a-one-dimensional-bar" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="a-continuous-system-a-one-dimensional-bar"><span class="header-section-number">3.1</span> A continuous system: a one-dimensional bar</h2>
-<div id="fig-bar-1d" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-bar-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/bar_in_tension-1d.png" class="img-fluid figure-img" style="width:30.0%">
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.1: One-dimensional bar fixed at the left end, with end force <span class="math inline">\(F\)</span>, coordinate <span class="math inline">\(x\)</span>, cross-sectional area <span class="math inline">\(A\)</span>, Young’s modulus <span class="math inline">\(E\)</span>, and axial displacement field <span class="math inline">\(u(x)\)</span>.
-</figcaption>
-</figure>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Repository snapshot
 </div>
-<p>A one-dimensional bar is a continuous body. Its axial displacement <span class="math inline">\(u\)</span> can be evaluated at every point of the bar and is represented by a function,</p>
-<p><span class="math display">\[
-  u=u(x).
-\]</span></p>
-<p>The state of the bar is therefore described by the continuous displacement field <span class="math inline">\(u(x)\)</span>, which assigns a displacement value to every point along the bar.</p>
-<p>The displacement field is the primary variable of the problem. Its variation along the bar determines the axial strain. Under the small-strain assumption, the axial strain is defined by</p>
-<p><span class="math display">\[
-  \varepsilon(x)=\frac{du}{dx}=u'(x).
-\]</span></p>
-<p>For a linearly elastic material, the axial stress is related to the strain by</p>
-<p><span class="math display">\[
-  \sigma(x)=E\varepsilon(x).
-\]</span></p>
-<p>The corresponding internal axial force is</p>
-<p><span class="math display">\[
-  N(x)=\int_A \sigma\,dA.
-\]</span></p>
-<p>For a homogeneous bar with constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>,</p>
-<p><span class="math display">\[
-  N=EA\frac{du}{dx}.
-\]</span></p>
-<div id="fig-bar-cross-section" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-bar-cross-section-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/bar-cross-section.png" class="img-fluid figure-img" style="width:27.0%">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-cross-section-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.2: Cross-section <span class="math inline">\(A\)</span> with axial stress <span class="math inline">\(\sigma_x\)</span>, represented equivalently by the internal axial force <span class="math inline">\(N\)</span>. A positive internal force corresponds to tension.
-</figcaption>
-</figure>
+<div class="callout-body-container callout-body">
+<p><strong>Course edition:</strong> 2026–27<br>
+<strong>Starting snapshot:</strong> <code>2026-27/S02-functions</code><br>
+<strong>Target snapshot:</strong> <code>2026-27/S03-callable-analysis</code></p>
 </div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Task: Make the complete two-spring analysis callable
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Refactor the complete two-spring finite element analysis into a single, problem-specific callable function. Preserve the mechanical model, finite element formulation, and numerical results exactly.</p>
+</div>
+</div>
+<section id="starting-point" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="starting-point"><span class="header-section-number">7.1</span> Starting point</h2>
+<p>In <a href="two-springs-functions.html" class="quarto-xref"><span>Chapter 6</span></a>, the operations used by the two-spring finite element calculation were organized into functions. The script can now assemble the stiffness matrix, assemble forces, apply the homogeneous displacement constraint, and compute strain energy through named operations.</p>
+<p>The complete analysis, however, is still performed by top-level statements. To solve the same problem with different spring stiffnesses or applied forces, a program would need to duplicate or manually edit that whole top-level workflow.</p>
+<p>This snapshot addresses that remaining limitation. We will keep the established finite element operations and organize the complete two-spring calculation into one callable analysis.</p>
 </section>
-<section id="a-discrete-system-a-one-dimensional-spring" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="a-discrete-system-a-one-dimensional-spring"><span class="header-section-number">3.2</span> A discrete system: a one-dimensional spring</h2>
-<p>A spring is already a discrete mechanical system. Its state can be described by quantities defined only at its end points.</p>
-<div id="fig-spring-1d" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-spring-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/spring-1d.png" class="img-fluid figure-img" style="width:27.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.3: One-dimensional spring of stiffness <span class="math inline">\(k_s\)</span> between end points 1 and 2. The end displacements <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span> are referred to the positive <span class="math inline">\(x\)</span> direction.
-</figcaption>
-</figure>
-</div>
-<p>The spring elongation or spring stretch is a measure of the spring deformation and is defined as</p>
-<p><span class="math display">\[
-  \delta=u_2-u_1.
-\]</span></p>
-<p>A positive elongation corresponds to a stretched spring. The internal spring force is related to the elongation by</p>
-<p><span class="math display">\[
-  F_s=k_s\delta=k_s(u_2-u_1),
-\]</span></p>
-<p>where <span class="math inline">\(k_s\)</span> is the spring stiffness.</p>
-<div id="fig-spring-1d-convention" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-spring-1d-convention-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/spring-1d-convention.png" class="img-fluid figure-img" style="width:27.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spring-1d-convention-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.4: Positive sign convention for the internal spring force <span class="math inline">\(F_s\)</span>: outward forces at the two sides of a cut spring indicate tension.
-</figcaption>
-</figure>
-</div>
+<section id="why-make-the-complete-analysis-callable" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="why-make-the-complete-analysis-callable"><span class="header-section-number">7.2</span> Why make the complete analysis callable?</h2>
+<p>Calling a complete analysis makes it possible to request results for new physical input values without repeating the finite element workflow at every call site. The analysis remains visible in the code, but it is now grouped together as one operation with a defined interface.</p>
+<p>This organization will also be useful later. A repeated study, such as a parametric study, can call the same analysis many times, and automated regression tests can request meaningful numerical results directly.</p>
 </section>
-<section id="continuous-and-discrete-descriptions" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="continuous-and-discrete-descriptions"><span class="header-section-number">3.3</span> Continuous and discrete descriptions</h2>
-<p>The bar is described by the continuous displacement field <span class="math inline">\(u(x)\)</span>, defined at every point along its length, whereas the spring is described by the two discrete displacement values <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span>. The continuous description is therefore richer: it provides the displacement at every point, whereas the discrete description contains only a finite number of displacement values.</p>
-<p>This distinction is also reflected in the internal-force relations. For the homogeneous bar,</p>
+<section id="what-varies-and-what-remains-fixed" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="what-varies-and-what-remains-fixed"><span class="header-section-number">7.3</span> What varies and what remains fixed</h2>
+<p>For this two-spring benchmark, three physical quantities vary:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>k_1</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>k_2</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>applied_force</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The topology remains fixed: the physical nodes are numbered <code>2</code>, <code>3</code>, and <code>1</code> from left to right; the spring connectivity is <code>(2, 3)</code> and <code>(3, 1)</code>; and node 2 has a homogeneous prescribed displacement. These choices belong to this particular benchmark, so they remain inside the callable analysis.</p>
+<p>The result is deliberately not a generic MiniFEM solver. It is a reusable analysis for one specific, already-understood two-spring problem.</p>
+</section>
+<section id="introducing-solve_two_springs" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="introducing-solve_two_springs"><span class="header-section-number">7.4</span> Introducing <code>solve_two_springs</code></h2>
+<p>The callable analysis receives the three varying physical quantities:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Inside the function, the existing finite element workflow is preserved: problem definition, assembly, application of boundary conditions, solution, and post-processing remain in the same order as before.</p>
+<p>The corresponding function is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fixed topology: physical nodes are labeled [2, 3, 1] from left to right.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    num_nodes <span class="op">=</span> <span class="fl">3</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    dofs_per_node <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    element_connectivity <span class="op">=</span> [</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="fl">2</span> <span class="fl">3</span>;</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="fl">3</span> <span class="fl">1</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    constrained_dofs <span class="op">=</span> [<span class="fl">2</span>]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    element_stiffness <span class="op">=</span> [k_1, k_2]</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    applied_forces <span class="op">=</span> [(<span class="fl">1</span>, applied_force)]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    total_dofs <span class="op">=</span> num_nodes <span class="op">*</span> dofs_per_node</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> <span class="fu">zeros</span>(total_dofs, total_dofs)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">zeros</span>(total_dofs)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assemble_stiffness!</span>(K, element_connectivity, element_stiffness)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Preserve the physical stiffness matrix before Dirichlet modification.</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    K_original <span class="op">=</span> <span class="fu">copy</span>(K)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assemble_forces!</span>(f, applied_forces)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">apply_homogeneous_constraints!</span>(K, f, constrained_dofs)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> K <span class="op">\</span> f</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    strain_energy_global <span class="op">=</span> <span class="fu">strain_energy</span>(K_original, u)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u, strain_energy_global</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The copy of <code>K</code> is needed because applying the homogeneous constraint modifies the system matrix, while the strain energy must be computed using the original assembled stiffness matrix.</p>
+</section>
+<section id="returning-the-displacement-vector-and-strain-energy" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="returning-the-displacement-vector-and-strain-energy"><span class="header-section-number">7.5</span> Returning the displacement vector and strain energy</h2>
+<p>The analysis returns two quantities:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> u, strain_energy_global</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Here <code>u</code> is the complete global displacement vector, and <code>strain_energy_global</code> is the total internal strain energy. The Julia variable <code>strain_energy_global</code> corresponds to the mathematical total strain energy denoted by <span class="math inline">\(U\)</span>. The returned tuple can be destructured using the syntax introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>u, strain_energy_global <span class="op">=</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The complete vector <code>u</code> is returned rather than only one selected displacement. The vector is the finite element solution of the global system, and later analyses may require different displacement components. A selected physical response can always be extracted from the complete result when needed.</p>
+</section>
+<section id="separate-calculation-from-presentation" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="separate-calculation-from-presentation"><span class="header-section-number">7.6</span> Separate calculation from presentation</h2>
+<p>The helper functions and <code>solve_two_springs</code> perform only the numerical analysis and do not print intermediate results. Any presentation of the results remains at top level, after the analysis has returned. This keeps the numerical function reusable and its outputs explicit.</p>
+</section>
+<section id="the-canonical-benchmark" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="the-canonical-benchmark"><span class="header-section-number">7.7</span> The canonical benchmark</h2>
+<p>The top-level script still defines the canonical physical inputs:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>k_1 <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>k_2 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>applied_force <span class="op">=</span> <span class="fl">10.0</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>u, strain_energy_global <span class="op">=</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>It can then display the final displacement vector and total strain energy. The same canonical problem therefore remains visible at the end of the script, while the complete finite element workflow is now callable.</p>
+</section>
+<section id="analytical-verification" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="analytical-verification"><span class="header-section-number">7.8</span> Analytical verification</h2>
+<p>The analytical comparison remains outside <code>solve_two_springs</code> because it is used only to check the numerical result for this benchmark.</p>
+<p>For the canonical inputs, the displacement vector remains</p>
 <p><span class="math display">\[
-  N=EA\frac{du}{dx},
+  \mathbf{u}=
+  \begin{bmatrix}
+  15\\
+  0\\
+  10
+  \end{bmatrix}
+  \ \mathrm{mm},
 \]</span></p>
-<p>so the internal axial force depends on the spatial variation of the continuous displacement field. For the spring,</p>
+<p>in global-vector order <code>[u_1, u_2, u_3]</code>, and the total strain energy remains</p>
 <p><span class="math display">\[
-  F_s=k_s(u_2-u_1),
+  U=75\ \mathrm{N\,mm}.
 \]</span></p>
-<p>so the internal spring force depends on the difference between two discrete displacement values.</p>
-<p>The finite element method will later approximate a continuous field using a finite set of unknowns. Before introducing that approximation, we begin with springs, which are already discrete, and use them to develop the fundamental algebraic ingredients of the method: equilibrium, element stiffness matrices, assembly, boundary conditions, and the global system of equations.</p>
-<p>The next chapter applies these ideas to two springs in series and derives the direct stiffness system</p>
+</section>
+<section id="what-the-new-organization-enables" class="level2" data-number="7.9">
+<h2 data-number="7.9" class="anchored" data-anchor-id="what-the-new-organization-enables"><span class="header-section-number">7.9</span> What the new organization enables</h2>
+<p>The refactoring changes only the organization of the program. The mechanical model and numerical results remain unchanged. The callable analysis can now be invoked repeatedly with different values of <code>k_1</code>, <code>k_2</code>, and <code>applied_force</code>. The exercise below uses this ability for a small parameter study. In the next implementation snapshot, the returned quantities <code>u</code> and <code>strain_energy_global</code> will also provide meaningful targets for automated regression tests.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise — A stiffness-allocation study
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <code>solve_two_springs</code> to study how the response changes when the total spring stiffness remains fixed:</p>
 <p><span class="math display">\[
-  \mathbf{K}\mathbf{u}=\mathbf{f}.
+  k_1+k_2=k_{\mathrm{total}},
 \]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+  k_1=\alpha k_{\mathrm{total}},
+  \qquad
+  k_2=(1-\alpha)k_{\mathrm{total}},
+  \qquad
+  0&lt;\alpha&lt;1.
+\]</span></p>
+<p>Use the following study inputs:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>k_total <span class="op">=</span> <span class="fl">3.0</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>applied_force <span class="op">=</span> <span class="fl">10.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Study values of <span class="math inline">\(\alpha\)</span> from <code>0.1</code> to <code>0.9</code> in increments of <code>0.1</code>. Create a variable named <code>alpha_values</code> yourself using one of the range constructions introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
+<p>Work through the following steps.</p>
+<ol type="1">
+<li><p>Confirm that <code>alpha_values</code> contains values strictly between <code>0</code> and <code>1</code>.</p></li>
+<li><p>Use <code>length(alpha_values)</code> to determine the number of analyses.</p></li>
+<li><p>Preallocate a numerical matrix named <code>results</code> with one row per value of <code>alpha</code> and three columns using <code>zeros</code>. Use the columns in this order:</p>
+<pre class="text"><code>alpha | u_loaded | U</code></pre></li>
+<li><p>Use an indexed <code>for</code> loop of the form <code>for i in 1:length(alpha_values)</code> to call <code>solve_two_springs</code> once for each value of <code>alpha</code>. Keep the parameter study outside <code>solve_two_springs</code>.</p></li>
+<li><p>Within each iteration, obtain <code>alpha</code> from <code>alpha_values[i]</code>, compute <code>k_1</code> and <code>k_2</code>, call <code>solve_two_springs(k_1, k_2, applied_force)</code>, and assign the two returned values to <code>u</code> and <code>strain_energy_global</code>.</p></li>
+<li><p>The physical displacement of interest is the displacement at the loaded end. Call it <code>u_loaded</code>. Because this benchmark uses the deliberately nonsequential physical node ordering <code>[2, 3, 1]</code>, the loaded node is global DOF 1. Extract it from the returned vector as <code>u_loaded = u[1]</code>.</p></li>
+<li><p>Store the Julia variables <code>alpha</code>, <code>u_loaded</code>, and the returned <code>strain_energy_global</code> in row <code>i</code> of <code>results</code>. When the loop is complete, display that matrix.</p></li>
+<li><p>Verify the computed entries against the analytical solution. For a force <span class="math inline">\(F\)</span>, the two springs in series give</p>
+<p><span class="math display">\[
+  u_{\mathrm{loaded}}
+  = F\left(\frac{1}{k_1}+\frac{1}{k_2}\right),
+  \qquad
+  U
+  = \frac{F^2}{2}\left(\frac{1}{k_1}+\frac{1}{k_2}\right).
+\]</span></p>
+<p>In these equations, <span class="math inline">\(U\)</span> is the mathematical strain-energy symbol. In the Julia code, the corresponding returned value is <code>strain_energy_global</code>; use <code>applied_force</code> for the quantity denoted by <span class="math inline">\(F\)</span>.</p></li>
+<li><p>Interpret the results. At which value of <span class="math inline">\(\alpha\)</span> are the loaded displacement and strain energy smallest? Is the response symmetric about <span class="math inline">\(\alpha=0.5\)</span>? What happens as <span class="math inline">\(\alpha\)</span> approaches <code>0</code> or <code>1</code>, and why must those endpoint values be excluded from the numerical study?</p></li>
+</ol>
+<p>No plot is required for this exercise.</p>
+</div>
+</div>
 
 
 </section>
@@ -774,13 +900,13 @@ Figure&nbsp;3.4: Positive sign convention for the internal spring force <span cl
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/julia-essentials.html" class="pagination-link" aria-label="The bare minimum: Julia essentials for MiniFEM">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span>
+      <a href="../chapters/two-springs-functions.html" class="pagination-link" aria-label="Organizing finite element operations with functions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../chapters/two-springs-direct-stiffness.html" class="pagination-link" aria-label="Two springs in series: the direct stiffness method">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
