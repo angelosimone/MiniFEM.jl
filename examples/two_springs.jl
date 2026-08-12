@@ -79,7 +79,7 @@ end
 # -------------------------------
 
 # Number of nodes and displacement DOFs per node
-num_nodes = 3  # physical nodes: labelled [2, 3, 1] from left to right
+num_nodes = 3  # physical nodes: labeled [2, 3, 1] from left to right
 dofs_per_node = 1  # one displacement DOF per node
 
 # Connectivity matrix defining which nodes belong to each element

@@ -14,7 +14,7 @@ book:
       chapters:
         - chapters/julia-installation.qmd
         - chapters/julia-essentials.qmd
-    - part: "The direct stiffness method"
+    - part: "Discrete systems and the direct stiffness method"
       chapters:
         - chapters/continuous-and-discrete-models.qmd
         - chapters/two-springs-direct-stiffness.qmd
