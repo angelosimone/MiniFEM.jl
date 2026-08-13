@@ -423,8 +423,8 @@ A range can also specify a start value, an increment, and a stop value:
 0.1:0.1:0.9
 ```
 
-This is the form `start:step:stop`. It begins at `0.1`, increases by `0.1`,
-and ends at `0.9`.
+This is the form `start:step:stop`. It begins at `0.1`, increases by `0.1`, and
+ends at `0.9`.
 
 The function `range` provides two useful explicit forms:
 
@@ -1340,6 +1340,22 @@ where the function modifies an existing mutable object.
 
 Functions become more important as programs begin to separate recurring
 operations from problem-specific input data.
+
+### Including code from another file
+
+The function `include` evaluates a Julia source file, making the definitions in
+that file available to the current code:
+
+```julia
+include("some_file.jl")
+```
+
+For example, a program can place reusable function definitions in one file and
+include that file before calling the functions in another file.
+
+MiniFEM uses this mechanism in S04 so that the same two-spring analysis
+definitions can be used by both the executable benchmark and the regression
+tests.
 
 ### What the backslash operator does internally
 

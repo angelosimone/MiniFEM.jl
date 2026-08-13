@@ -21,6 +21,7 @@ book:
         - chapters/two-springs-julia.qmd
         - chapters/two-springs-functions.qmd
         - chapters/two-springs-callable-analysis.qmd
+        - chapters/two-springs-regression-tests.qmd
     - glossary.qmd
     - references.qmd
 

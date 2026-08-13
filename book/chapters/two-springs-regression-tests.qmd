@@ -1,0 +1,220 @@
+# From analytical verification to regression testing {#sec-two-springs-regression-tests}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S03-callable-analysis`\
+**Target snapshot:** `2026-27/S04-regression-tests`
+:::
+
+::: {.callout-important}
+## Task: Add automated regression tests
+
+Use Julia's `Test` standard library to check that the previously verified
+two-spring results remain unchanged as the implementation evolves.
+:::
+
+## Starting point
+
+In @sec-two-springs-callable-analysis, the complete two-spring analysis became
+callable through `solve_two_springs`. The executable benchmark still presents
+its final results and compares them with analytical reference values.
+
+That analytical comparison is a manual verification step. The example is run,
+the result is inspected, and a judgement is made about whether it agrees with
+the independent reference. S04 keeps that verification in the executable
+benchmark and adds automated regression tests alongside it.
+
+## Verification, validation, and regression testing
+
+Verification and validation answer different questions. *Verification* asks
+whether the numerical implementation correctly solves the mathematical model.
+*Validation* asks whether that mathematical model represents the physical system
+sufficiently well for its intended use.
+
+The analytical two-spring solution used here provides a verification reference:
+it checks the finite element result against an independently derived solution of
+the same idealized spring model. Agreement establishes confidence in the
+formulation and implementation for this problem, but it does not validate the
+spring model against physical behavior.
+
+Regression testing asks a different question: does previously verified behavior
+still agree with the established reference after later changes? A passing
+regression test does not prove that every FEM formulation is generally correct.
+A failing test means that protected behavior no longer matches its reference; it
+does not by itself identify the cause or decide which version is correct.
+
+## Separating the FEM implementation from the benchmark
+
+In S03, the reusable finite element functions, `solve_two_springs`, and the
+executable canonical benchmark all lived in `examples/two_springs.jl`. This was
+appropriate while the file was used only as an executable example.
+
+Regression testing creates a new requirement. The tests need to call
+`solve_two_springs` without also executing the benchmark presentation and
+analytical verification contained in `two_springs.jl`.
+
+S04 therefore separates the reusable finite element implementation from the
+executable benchmark:
+
+```text
+two_springs_fem.jl
+    reusable finite element definitions
+
+two_springs.jl
+    executable benchmark, presentation, and analytical verification
+
+test/runtests.jl
+    automated regression checks
+```
+
+Both the executable benchmark and the tests include `two_springs_fem.jl`. The
+same finite element implementation can therefore be used in both contexts
+without duplicating the code or executing benchmark output during the tests.
+
+## Introducing Test
+
+The test file begins with:
+
+```julia
+using Test
+```
+
+A `@testset` groups related checks, and `@test` checks one expected condition.
+The two-spring results use floating-point arithmetic, so S04 uses `isapprox`
+with explicit absolute and relative tolerances:
+
+```julia
+atol = 1.0e-12
+rtol = 1.0e-12
+```
+
+The roles of absolute and relative tolerance were introduced in
+@sec-julia-essentials. Here they make the intended numerical comparison explicit
+rather than relying on a default tolerance.
+
+The function `isapprox` can also compare numerical arrays, so the complete
+displacement vector can be checked in one assertion.
+
+## The regression tests
+
+The complete test file is:
+
+```julia
+using Test
+
+include("../examples/two_springs_fem.jl")
+
+@testset "Two-spring regression tests" begin
+    atol = 1.0e-12
+    rtol = 1.0e-12
+
+    # Canonical two-spring benchmark
+    k_1 = 1.0
+    k_2 = 2.0
+    applied_force = 10.0
+    u_expected = [15.0, 0.0, 10.0]
+    strain_energy_expected = 75.0
+
+    u, strain_energy_global = solve_two_springs(k_1, k_2, applied_force)
+
+    @test isapprox(u, u_expected; atol=atol, rtol=rtol)
+    @test isapprox(
+        strain_energy_global,
+        strain_energy_expected;
+        atol=atol,
+        rtol=rtol,
+    )
+
+    # Noncanonical two-spring benchmark
+    k_1 = 2.0
+    k_2 = 3.0
+    applied_force = 12.0
+    u_expected = [10.0, 0.0, 6.0]
+    strain_energy_expected = 60.0
+
+    u, strain_energy_global = solve_two_springs(k_1, k_2, applied_force)
+
+    @test isapprox(u, u_expected; atol=atol, rtol=rtol)
+    @test isapprox(
+        strain_energy_global,
+        strain_energy_expected;
+        atol=atol,
+        rtol=rtol,
+    )
+end
+```
+
+### Canonical regression case
+
+The first case protects the established two-spring benchmark. It tests both the
+complete displacement vector `u` and `strain_energy_global`.
+
+The displacement-vector test covers the assembled and constrained solution. The
+strain-energy test additionally covers the preservation and use of `K_original`
+before the constraint modification.
+
+### Noncanonical regression case
+
+The second case calls:
+
+```julia
+solve_two_springs(2.0, 3.0, 12.0)
+```
+
+Before using its results as regression references, establish them independently
+from the analytical two-spring solution. With $F=12\ \mathrm{N}$,
+$k_1=2\ \mathrm{N/mm}$, and $k_2=3\ \mathrm{N/mm}$,
+
+$$
+  u_3=\frac{F}{k_1}=6\ \mathrm{mm}
+$$
+
+and
+
+$$
+  u_1=\frac{F}{k_1}+\frac{F}{k_2}=10\ \mathrm{mm}.
+$$
+
+Therefore, in global-vector order,
+
+$$
+  \mathbf{u}=
+  \begin{bmatrix}
+  10\\
+  0\\
+  6
+  \end{bmatrix}
+  \ \mathrm{mm}.
+$$
+
+The corresponding total internal strain energy is
+
+$$
+  U=\frac{F^2}{2}\left(\frac{1}{k_1}+\frac{1}{k_2}\right)
+   =60\ \mathrm{N\,mm}.
+$$
+
+These independently established values are stored in the test file as the
+expected regression references. The case then checks that the callable analysis
+works for physical inputs other than the historical canonical benchmark.
+
+## Running the tests
+
+From the repository root, run:
+
+```text
+julia test/runtests.jl
+```
+
+Julia reports a summary for the test set. When all assertions pass, the
+protected numerical behavior agrees with its established references. When an
+assertion fails, inspect the failing value, the relevant code change, and the
+independent reference before deciding how to proceed.
+
+## What changed?
+
+The two-spring model and its numerical results are unchanged. S04 separates the
+reusable FEM implementation from the executable benchmark and adds regression
+tests that protect the established reference results.
