@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>7&nbsp; Making the two-spring analysis callable – An Introduction to the Finite Element Method</title>
+<title>8&nbsp; From analytical verification to regression testing – An Introduction to the Finite Element Method</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -71,8 +71,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../chapters/two-springs-regression-tests.html" rel="next">
-<link href="../chapters/two-springs-functions.html" rel="prev">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/two-springs-callable-analysis.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -162,7 +162,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-callable-analysis.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-regression-tests.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -251,13 +251,13 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link active">
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
   </div>
 </li>
@@ -285,24 +285,26 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#starting-point" id="toc-starting-point" class="nav-link active" data-scroll-target="#starting-point"><span class="header-section-number">7.1</span> Starting point</a></li>
-  <li><a href="#why-make-the-complete-analysis-callable" id="toc-why-make-the-complete-analysis-callable" class="nav-link" data-scroll-target="#why-make-the-complete-analysis-callable"><span class="header-section-number">7.2</span> Why make the complete analysis callable?</a></li>
-  <li><a href="#what-varies-and-what-remains-fixed" id="toc-what-varies-and-what-remains-fixed" class="nav-link" data-scroll-target="#what-varies-and-what-remains-fixed"><span class="header-section-number">7.3</span> What varies and what remains fixed</a></li>
-  <li><a href="#introducing-solve_two_springs" id="toc-introducing-solve_two_springs" class="nav-link" data-scroll-target="#introducing-solve_two_springs"><span class="header-section-number">7.4</span> Introducing <code>solve_two_springs</code></a></li>
-  <li><a href="#returning-the-displacement-vector-and-strain-energy" id="toc-returning-the-displacement-vector-and-strain-energy" class="nav-link" data-scroll-target="#returning-the-displacement-vector-and-strain-energy"><span class="header-section-number">7.5</span> Returning the displacement vector and strain energy</a></li>
-  <li><a href="#separate-calculation-from-presentation" id="toc-separate-calculation-from-presentation" class="nav-link" data-scroll-target="#separate-calculation-from-presentation"><span class="header-section-number">7.6</span> Separate calculation from presentation</a></li>
-  <li><a href="#the-canonical-benchmark" id="toc-the-canonical-benchmark" class="nav-link" data-scroll-target="#the-canonical-benchmark"><span class="header-section-number">7.7</span> The canonical benchmark</a></li>
-  <li><a href="#analytical-verification" id="toc-analytical-verification" class="nav-link" data-scroll-target="#analytical-verification"><span class="header-section-number">7.8</span> Analytical verification</a></li>
-  <li><a href="#what-the-new-organization-enables" id="toc-what-the-new-organization-enables" class="nav-link" data-scroll-target="#what-the-new-organization-enables"><span class="header-section-number">7.9</span> What the new organization enables</a></li>
+  <li><a href="#starting-point" id="toc-starting-point" class="nav-link active" data-scroll-target="#starting-point"><span class="header-section-number">8.1</span> Starting point</a></li>
+  <li><a href="#verification-validation-and-regression-testing" id="toc-verification-validation-and-regression-testing" class="nav-link" data-scroll-target="#verification-validation-and-regression-testing"><span class="header-section-number">8.2</span> Verification, validation, and regression testing</a></li>
+  <li><a href="#separating-the-fem-implementation-from-the-benchmark" id="toc-separating-the-fem-implementation-from-the-benchmark" class="nav-link" data-scroll-target="#separating-the-fem-implementation-from-the-benchmark"><span class="header-section-number">8.3</span> Separating the FEM implementation from the benchmark</a></li>
+  <li><a href="#introducing-test" id="toc-introducing-test" class="nav-link" data-scroll-target="#introducing-test"><span class="header-section-number">8.4</span> Introducing Test</a></li>
+  <li><a href="#the-regression-tests" id="toc-the-regression-tests" class="nav-link" data-scroll-target="#the-regression-tests"><span class="header-section-number">8.5</span> The regression tests</a>
+  <ul class="collapse">
+  <li><a href="#canonical-regression-case" id="toc-canonical-regression-case" class="nav-link" data-scroll-target="#canonical-regression-case"><span class="header-section-number">8.5.1</span> Canonical regression case</a></li>
+  <li><a href="#noncanonical-regression-case" id="toc-noncanonical-regression-case" class="nav-link" data-scroll-target="#noncanonical-regression-case"><span class="header-section-number">8.5.2</span> Noncanonical regression case</a></li>
+  </ul></li>
+  <li><a href="#running-the-tests" id="toc-running-the-tests" class="nav-link" data-scroll-target="#running-the-tests"><span class="header-section-number">8.6</span> Running the tests</a></li>
+  <li><a href="#what-changed" id="toc-what-changed" class="nav-link" data-scroll-target="#what-changed"><span class="header-section-number">8.7</span> What changed?</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-callable-analysis.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/continuous-and-discrete-models.html">Discrete systems and the direct stiffness method</a></li><li class="breadcrumb-item"><a href="../chapters/two-springs-regression-tests.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span id="sec-two-springs-callable-analysis" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></h1>
+<h1 class="title"><span id="sec-two-springs-regression-tests" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></h1>
 </div>
 
 
@@ -330,8 +332,8 @@ window.Quarto = {
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Course edition:</strong> 2026–27<br>
-<strong>Starting snapshot:</strong> <code>2026-27/S02-functions</code><br>
-<strong>Target snapshot:</strong> <code>2026-27/S03-callable-analysis</code></p>
+<strong>Starting snapshot:</strong> <code>2026-27/S03-callable-analysis</code><br>
+<strong>Target snapshot:</strong> <code>2026-27/S04-regression-tests</code></p>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -340,165 +342,138 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Task: Make the complete two-spring analysis callable
+<span class="screen-reader-only">Important</span>Task: Add automated regression tests
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Refactor the complete two-spring finite element analysis into a single, problem-specific callable function. Preserve the mechanical model, finite element formulation, and numerical results exactly.</p>
+<p>Use Julia’s <code>Test</code> standard library to check that the previously verified two-spring results remain unchanged as the implementation evolves.</p>
 </div>
 </div>
-<section id="starting-point" class="level2" data-number="7.1">
-<h2 data-number="7.1" class="anchored" data-anchor-id="starting-point"><span class="header-section-number">7.1</span> Starting point</h2>
-<p>In <a href="two-springs-functions.html" class="quarto-xref"><span>Chapter 6</span></a>, the operations used by the two-spring finite element calculation were organized into functions. The script can now assemble the stiffness matrix, assemble forces, apply the homogeneous displacement constraint, and compute strain energy through named operations.</p>
-<p>The complete analysis, however, is still performed by top-level statements. To solve the same problem with different spring stiffnesses or applied forces, a program would need to duplicate or manually edit that whole top-level workflow.</p>
-<p>This snapshot addresses that remaining limitation. We will keep the established finite element operations and organize the complete two-spring calculation into one callable analysis.</p>
+<section id="starting-point" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="starting-point"><span class="header-section-number">8.1</span> Starting point</h2>
+<p>In <a href="two-springs-callable-analysis.html" class="quarto-xref"><span>Chapter 7</span></a>, the complete two-spring analysis became callable through <code>solve_two_springs</code>. The executable benchmark still presents its final results and compares them with analytical reference values.</p>
+<p>That analytical comparison is a manual verification step. The example is run, the result is inspected, and a judgement is made about whether it agrees with the independent reference. S04 keeps that verification in the executable benchmark and adds automated regression tests alongside it.</p>
 </section>
-<section id="why-make-the-complete-analysis-callable" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="why-make-the-complete-analysis-callable"><span class="header-section-number">7.2</span> Why make the complete analysis callable?</h2>
-<p>Calling a complete analysis makes it possible to request results for new physical input values without repeating the finite element workflow at every call site. The analysis remains visible in the code, but it is now grouped together as one operation with a defined interface.</p>
-<p>This organization will also be useful later. A repeated study, such as a parametric study, can call the same analysis many times, and automated regression tests can request meaningful numerical results directly.</p>
+<section id="verification-validation-and-regression-testing" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="verification-validation-and-regression-testing"><span class="header-section-number">8.2</span> Verification, validation, and regression testing</h2>
+<p>Verification and validation answer different questions. <em>Verification</em> asks whether the numerical implementation correctly solves the mathematical model. <em>Validation</em> asks whether that mathematical model represents the physical system sufficiently well for its intended use.</p>
+<p>The analytical two-spring solution used here provides a verification reference: it checks the finite element result against an independently derived solution of the same idealized spring model. Agreement establishes confidence in the formulation and implementation for this problem, but it does not validate the spring model against physical behavior.</p>
+<p>Regression testing asks a different question: does previously verified behavior still agree with the established reference after later changes? A passing regression test does not prove that every FEM formulation is generally correct. A failing test means that protected behavior no longer matches its reference; it does not by itself identify the cause or decide which version is correct.</p>
 </section>
-<section id="what-varies-and-what-remains-fixed" class="level2" data-number="7.3">
-<h2 data-number="7.3" class="anchored" data-anchor-id="what-varies-and-what-remains-fixed"><span class="header-section-number">7.3</span> What varies and what remains fixed</h2>
-<p>For this two-spring benchmark, three physical quantities vary:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>k_1</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>k_2</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>applied_force</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The topology remains fixed: the physical nodes are numbered <code>2</code>, <code>3</code>, and <code>1</code> from left to right; the spring connectivity is <code>(2, 3)</code> and <code>(3, 1)</code>; and node 2 has a homogeneous prescribed displacement. These choices belong to this particular benchmark, so they remain inside the callable analysis.</p>
-<p>The result is deliberately not a generic MiniFEM solver. It is a reusable analysis for one specific, already-understood two-spring problem.</p>
+<section id="separating-the-fem-implementation-from-the-benchmark" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="separating-the-fem-implementation-from-the-benchmark"><span class="header-section-number">8.3</span> Separating the FEM implementation from the benchmark</h2>
+<p>In S03, the reusable finite element functions, <code>solve_two_springs</code>, and the executable canonical benchmark all lived in <code>examples/two_springs.jl</code>. This was appropriate while the file was used only as an executable example.</p>
+<p>Regression testing creates a new requirement. The tests need to call <code>solve_two_springs</code> without also executing the benchmark presentation and analytical verification contained in <code>two_springs.jl</code>.</p>
+<p>S04 therefore separates the reusable finite element implementation from the executable benchmark:</p>
+<pre class="text"><code>two_springs_fem.jl
+    reusable finite element definitions
+
+two_springs.jl
+    executable benchmark, presentation, and analytical verification
+
+test/runtests.jl
+    automated regression checks</code></pre>
+<p>Both the executable benchmark and the tests include <code>two_springs_fem.jl</code>. The same finite element implementation can therefore be used in both contexts without duplicating the code or executing benchmark output during the tests.</p>
 </section>
-<section id="introducing-solve_two_springs" class="level2" data-number="7.4">
-<h2 data-number="7.4" class="anchored" data-anchor-id="introducing-solve_two_springs"><span class="header-section-number">7.4</span> Introducing <code>solve_two_springs</code></h2>
-<p>The callable analysis receives the three varying physical quantities:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Inside the function, the existing finite element workflow is preserved: problem definition, assembly, application of boundary conditions, solution, and post-processing remain in the same order as before.</p>
-<p>The corresponding function is:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fixed topology: physical nodes are labeled [2, 3, 1] from left to right.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    num_nodes <span class="op">=</span> <span class="fl">3</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    dofs_per_node <span class="op">=</span> <span class="fl">1</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    element_connectivity <span class="op">=</span> [</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="fl">2</span> <span class="fl">3</span>;</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="fl">3</span> <span class="fl">1</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    constrained_dofs <span class="op">=</span> [<span class="fl">2</span>]</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    element_stiffness <span class="op">=</span> [k_1, k_2]</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    applied_forces <span class="op">=</span> [(<span class="fl">1</span>, applied_force)]</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    total_dofs <span class="op">=</span> num_nodes <span class="op">*</span> dofs_per_node</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> <span class="fu">zeros</span>(total_dofs, total_dofs)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">zeros</span>(total_dofs)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assemble_stiffness!</span>(K, element_connectivity, element_stiffness)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Preserve the physical stiffness matrix before Dirichlet modification.</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    K_original <span class="op">=</span> <span class="fu">copy</span>(K)</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assemble_forces!</span>(f, applied_forces)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">apply_homogeneous_constraints!</span>(K, f, constrained_dofs)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> K <span class="op">\</span> f</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    strain_energy_global <span class="op">=</span> <span class="fu">strain_energy</span>(K_original, u)</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u, strain_energy_global</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The copy of <code>K</code> is needed because applying the homogeneous constraint modifies the system matrix, while the strain energy must be computed using the original assembled stiffness matrix.</p>
+<section id="introducing-test" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="introducing-test"><span class="header-section-number">8.4</span> Introducing Test</h2>
+<p>The test file begins with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Test</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A <code>@testset</code> groups related checks, and <code>@test</code> checks one expected condition. The two-spring results use floating-point arithmetic, so S04 uses <code>isapprox</code> with explicit absolute and relative tolerances:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>atol <span class="op">=</span> <span class="fl">1.0e-12</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>rtol <span class="op">=</span> <span class="fl">1.0e-12</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The roles of absolute and relative tolerance were introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>. Here they make the intended numerical comparison explicit rather than relying on a default tolerance.</p>
+<p>The function <code>isapprox</code> can also compare numerical arrays, so the complete displacement vector can be checked in one assertion.</p>
 </section>
-<section id="returning-the-displacement-vector-and-strain-energy" class="level2" data-number="7.5">
-<h2 data-number="7.5" class="anchored" data-anchor-id="returning-the-displacement-vector-and-strain-energy"><span class="header-section-number">7.5</span> Returning the displacement vector and strain energy</h2>
-<p>The analysis returns two quantities:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> u, strain_energy_global</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Here <code>u</code> is the complete global displacement vector, and <code>strain_energy_global</code> is the total internal strain energy. The Julia variable <code>strain_energy_global</code> corresponds to the mathematical total strain energy denoted by <span class="math inline">\(U\)</span>. The returned tuple can be destructured using the syntax introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>u, strain_energy_global <span class="op">=</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The complete vector <code>u</code> is returned rather than only one selected displacement. The vector is the finite element solution of the global system, and later analyses may require different displacement components. A selected physical response can always be extracted from the complete result when needed.</p>
+<section id="the-regression-tests" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="the-regression-tests"><span class="header-section-number">8.5</span> The regression tests</h2>
+<p>The complete test file is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Test</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"../examples/two_springs_fem.jl"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="pp">@testset</span> <span class="st">"Two-spring regression tests"</span> <span class="cf">begin</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    atol <span class="op">=</span> <span class="fl">1.0e-12</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    rtol <span class="op">=</span> <span class="fl">1.0e-12</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Canonical two-spring benchmark</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    k_1 <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    k_2 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    applied_force <span class="op">=</span> <span class="fl">10.0</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    u_expected <span class="op">=</span> [<span class="fl">15.0</span>, <span class="fl">0.0</span>, <span class="fl">10.0</span>]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    strain_energy_expected <span class="op">=</span> <span class="fl">75.0</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    u, strain_energy_global <span class="op">=</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@test</span> <span class="fu">isapprox</span>(u, u_expected; atol<span class="op">=</span>atol, rtol<span class="op">=</span>rtol)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@test</span> <span class="fu">isapprox</span>(</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        strain_energy_global,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        strain_energy_expected;</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        atol<span class="op">=</span>atol,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        rtol<span class="op">=</span>rtol,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Noncanonical two-spring benchmark</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    k_1 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    k_2 <span class="op">=</span> <span class="fl">3.0</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    applied_force <span class="op">=</span> <span class="fl">12.0</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    u_expected <span class="op">=</span> [<span class="fl">10.0</span>, <span class="fl">0.0</span>, <span class="fl">6.0</span>]</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    strain_energy_expected <span class="op">=</span> <span class="fl">60.0</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    u, strain_energy_global <span class="op">=</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@test</span> <span class="fu">isapprox</span>(u, u_expected; atol<span class="op">=</span>atol, rtol<span class="op">=</span>rtol)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@test</span> <span class="fu">isapprox</span>(</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>        strain_energy_global,</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        strain_energy_expected;</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        atol<span class="op">=</span>atol,</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        rtol<span class="op">=</span>rtol,</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="canonical-regression-case" class="level3" data-number="8.5.1">
+<h3 data-number="8.5.1" class="anchored" data-anchor-id="canonical-regression-case"><span class="header-section-number">8.5.1</span> Canonical regression case</h3>
+<p>The first case protects the established two-spring benchmark. It tests both the complete displacement vector <code>u</code> and <code>strain_energy_global</code>.</p>
+<p>The displacement-vector test covers the assembled and constrained solution. The strain-energy test additionally covers the preservation and use of <code>K_original</code> before the constraint modification.</p>
 </section>
-<section id="separate-calculation-from-presentation" class="level2" data-number="7.6">
-<h2 data-number="7.6" class="anchored" data-anchor-id="separate-calculation-from-presentation"><span class="header-section-number">7.6</span> Separate calculation from presentation</h2>
-<p>The helper functions and <code>solve_two_springs</code> perform only the numerical analysis and do not print intermediate results. Any presentation of the results remains at top level, after the analysis has returned. This keeps the numerical function reusable and its outputs explicit.</p>
-</section>
-<section id="the-canonical-benchmark" class="level2" data-number="7.7">
-<h2 data-number="7.7" class="anchored" data-anchor-id="the-canonical-benchmark"><span class="header-section-number">7.7</span> The canonical benchmark</h2>
-<p>The top-level script still defines the canonical physical inputs:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>k_1 <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>k_2 <span class="op">=</span> <span class="fl">2.0</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>applied_force <span class="op">=</span> <span class="fl">10.0</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>u, strain_energy_global <span class="op">=</span> <span class="fu">solve_two_springs</span>(k_1, k_2, applied_force)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>It can then display the final displacement vector and total strain energy. The same canonical problem therefore remains visible at the end of the script, while the complete finite element workflow is now callable.</p>
-</section>
-<section id="analytical-verification" class="level2" data-number="7.8">
-<h2 data-number="7.8" class="anchored" data-anchor-id="analytical-verification"><span class="header-section-number">7.8</span> Analytical verification</h2>
-<p>The analytical comparison remains outside <code>solve_two_springs</code> because it is used only to check the numerical result for this benchmark.</p>
-<p>For the canonical inputs, the displacement vector remains</p>
+<section id="noncanonical-regression-case" class="level3" data-number="8.5.2">
+<h3 data-number="8.5.2" class="anchored" data-anchor-id="noncanonical-regression-case"><span class="header-section-number">8.5.2</span> Noncanonical regression case</h3>
+<p>The second case calls:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_two_springs</span>(<span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">12.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Before using its results as regression references, establish them independently from the analytical two-spring solution. With <span class="math inline">\(F=12\ \mathrm{N}\)</span>, <span class="math inline">\(k_1=2\ \mathrm{N/mm}\)</span>, and <span class="math inline">\(k_2=3\ \mathrm{N/mm}\)</span>,</p>
+<p><span class="math display">\[
+  u_3=\frac{F}{k_1}=6\ \mathrm{mm}
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  u_1=\frac{F}{k_1}+\frac{F}{k_2}=10\ \mathrm{mm}.
+\]</span></p>
+<p>Therefore, in global-vector order,</p>
 <p><span class="math display">\[
   \mathbf{u}=
   \begin{bmatrix}
-  15\\
+  10\\
   0\\
-  10
+  6
   \end{bmatrix}
-  \ \mathrm{mm},
+  \ \mathrm{mm}.
 \]</span></p>
-<p>in global-vector order <code>[u_1, u_2, u_3]</code>, and the total strain energy remains</p>
+<p>The corresponding total internal strain energy is</p>
 <p><span class="math display">\[
-  U=75\ \mathrm{N\,mm}.
+  U=\frac{F^2}{2}\left(\frac{1}{k_1}+\frac{1}{k_2}\right)
+   =60\ \mathrm{N\,mm}.
 \]</span></p>
+<p>These independently established values are stored in the test file as the expected regression references. The case then checks that the callable analysis works for physical inputs other than the historical canonical benchmark.</p>
 </section>
-<section id="what-the-new-organization-enables" class="level2" data-number="7.9">
-<h2 data-number="7.9" class="anchored" data-anchor-id="what-the-new-organization-enables"><span class="header-section-number">7.9</span> What the new organization enables</h2>
-<p>The refactoring changes only the organization of the program. The mechanical model and numerical results remain unchanged. The callable analysis can now be invoked repeatedly with different values of <code>k_1</code>, <code>k_2</code>, and <code>applied_force</code>. The exercise below uses this ability for a small parameter study. In the next implementation snapshot, the returned quantities <code>u</code> and <code>strain_energy_global</code> will also provide meaningful targets for automated regression tests.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Exercise — A stiffness-allocation study
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Use <code>solve_two_springs</code> to study how the response changes when the total spring stiffness remains fixed:</p>
-<p><span class="math display">\[
-  k_1+k_2=k_{\mathrm{total}},
-\]</span></p>
-<p>with</p>
-<p><span class="math display">\[
-  k_1=\alpha k_{\mathrm{total}},
-  \qquad
-  k_2=(1-\alpha)k_{\mathrm{total}},
-  \qquad
-  0&lt;\alpha&lt;1.
-\]</span></p>
-<p>Use the following study inputs:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>k_total <span class="op">=</span> <span class="fl">3.0</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>applied_force <span class="op">=</span> <span class="fl">10.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Study values of <span class="math inline">\(\alpha\)</span> from <code>0.1</code> to <code>0.9</code> in increments of <code>0.1</code>. Create a variable named <code>alpha_values</code> yourself using one of the range constructions introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
-<p>Work through the following steps.</p>
-<ol type="1">
-<li><p>Confirm that <code>alpha_values</code> contains values strictly between <code>0</code> and <code>1</code>.</p></li>
-<li><p>Use <code>length(alpha_values)</code> to determine the number of analyses.</p></li>
-<li><p>Preallocate a numerical matrix named <code>results</code> with one row per value of <code>alpha</code> and three columns using <code>zeros</code>. Use the columns in this order:</p>
-<pre class="text"><code>alpha | u_loaded | U</code></pre></li>
-<li><p>Use an indexed <code>for</code> loop of the form <code>for i in 1:length(alpha_values)</code> to call <code>solve_two_springs</code> once for each value of <code>alpha</code>. Keep the parameter study outside <code>solve_two_springs</code>.</p></li>
-<li><p>Within each iteration, obtain <code>alpha</code> from <code>alpha_values[i]</code>, compute <code>k_1</code> and <code>k_2</code>, call <code>solve_two_springs(k_1, k_2, applied_force)</code>, and assign the two returned values to <code>u</code> and <code>strain_energy_global</code>.</p></li>
-<li><p>The physical displacement of interest is the displacement at the loaded end. Call it <code>u_loaded</code>. Because this benchmark uses the deliberately nonsequential physical node ordering <code>[2, 3, 1]</code>, the loaded node is global DOF 1. Extract it from the returned vector as <code>u_loaded = u[1]</code>.</p></li>
-<li><p>Store the Julia variables <code>alpha</code>, <code>u_loaded</code>, and the returned <code>strain_energy_global</code> in row <code>i</code> of <code>results</code>. When the loop is complete, display that matrix.</p></li>
-<li><p>Verify the computed entries against the analytical solution. For a force <span class="math inline">\(F\)</span>, the two springs in series give</p>
-<p><span class="math display">\[
-  u_{\mathrm{loaded}}
-  = F\left(\frac{1}{k_1}+\frac{1}{k_2}\right),
-  \qquad
-  U
-  = \frac{F^2}{2}\left(\frac{1}{k_1}+\frac{1}{k_2}\right).
-\]</span></p>
-<p>In these equations, <span class="math inline">\(U\)</span> is the mathematical strain-energy symbol. In the Julia code, the corresponding returned value is <code>strain_energy_global</code>; use <code>applied_force</code> for the quantity denoted by <span class="math inline">\(F\)</span>.</p></li>
-<li><p>Interpret the results. At which value of <span class="math inline">\(\alpha\)</span> are the loaded displacement and strain energy smallest? Is the response symmetric about <span class="math inline">\(\alpha=0.5\)</span>? What happens as <span class="math inline">\(\alpha\)</span> approaches <code>0</code> or <code>1</code>, and why must those endpoint values be excluded from the numerical study?</p></li>
-</ol>
-<p>No plot is required for this exercise.</p>
-</div>
-</div>
+</section>
+<section id="running-the-tests" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="running-the-tests"><span class="header-section-number">8.6</span> Running the tests</h2>
+<p>From the repository root, run:</p>
+<pre class="text"><code>julia test/runtests.jl</code></pre>
+<p>Julia reports a summary for the test set. When all assertions pass, the protected numerical behavior agrees with its established references. When an assertion fails, inspect the failing value, the relevant code change, and the independent reference before deciding how to proceed.</p>
+</section>
+<section id="what-changed" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="what-changed"><span class="header-section-number">8.7</span> What changed?</h2>
+<p>The two-spring model and its numerical results are unchanged. S04 separates the reusable FEM implementation from the executable benchmark and adds regression tests that protect the established reference results.</p>
 
 
 </section>
@@ -906,13 +881,13 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/two-springs-functions.html" class="pagination-link" aria-label="Organizing finite element operations with functions">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span>
+      <a href="../chapters/two-springs-callable-analysis.html" class="pagination-link" aria-label="Making the two-spring analysis callable">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../chapters/two-springs-regression-tests.html" class="pagination-link" aria-label="From analytical verification to regression testing">
-        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

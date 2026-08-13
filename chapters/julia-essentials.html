@@ -255,12 +255,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../glossary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -317,13 +323,14 @@ window.Quarto = {
   <li><a href="#floating-point-arithmetic-and-tolerance-checks" id="toc-floating-point-arithmetic-and-tolerance-checks" class="nav-link" data-scroll-target="#floating-point-arithmetic-and-tolerance-checks"><span class="header-section-number">2.3.4</span> Floating-point arithmetic and tolerance checks</a></li>
   <li><a href="#basic-errors-and-assertions" id="toc-basic-errors-and-assertions" class="nav-link" data-scroll-target="#basic-errors-and-assertions"><span class="header-section-number">2.3.5</span> Basic errors and assertions</a></li>
   <li><a href="#sec-julia-defining-functions" id="toc-sec-julia-defining-functions" class="nav-link" data-scroll-target="#sec-julia-defining-functions"><span class="header-section-number">2.3.6</span> Defining functions</a></li>
-  <li><a href="#what-the-backslash-operator-does-internally" id="toc-what-the-backslash-operator-does-internally" class="nav-link" data-scroll-target="#what-the-backslash-operator-does-internally"><span class="header-section-number">2.3.7</span> What the backslash operator does internally</a></li>
-  <li><a href="#whole-row-and-whole-column-indexing-with" id="toc-whole-row-and-whole-column-indexing-with" class="nav-link" data-scroll-target="#whole-row-and-whole-column-indexing-with"><span class="header-section-number">2.3.8</span> Whole-row and whole-column indexing with <code>:</code></a></li>
-  <li><a href="#arrays-of-arrays" id="toc-arrays-of-arrays" class="nav-link" data-scroll-target="#arrays-of-arrays"><span class="header-section-number">2.3.9</span> Arrays of arrays</a></li>
-  <li><a href="#shallow-and-deep-copies-of-nested-mutable-data" id="toc-shallow-and-deep-copies-of-nested-mutable-data" class="nav-link" data-scroll-target="#shallow-and-deep-copies-of-nested-mutable-data"><span class="header-section-number">2.3.10</span> Shallow and deep copies of nested mutable data</a></li>
-  <li><a href="#more-general-iteration-with-axes" id="toc-more-general-iteration-with-axes" class="nav-link" data-scroll-target="#more-general-iteration-with-axes"><span class="header-section-number">2.3.11</span> More general iteration with <code>axes</code></a></li>
-  <li><a href="#a-note-on-column-major-storage" id="toc-a-note-on-column-major-storage" class="nav-link" data-scroll-target="#a-note-on-column-major-storage"><span class="header-section-number">2.3.12</span> A note on column-major storage</a></li>
-  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">2.3.13</span> Further reading</a></li>
+  <li><a href="#including-code-from-another-file" id="toc-including-code-from-another-file" class="nav-link" data-scroll-target="#including-code-from-another-file"><span class="header-section-number">2.3.7</span> Including code from another file</a></li>
+  <li><a href="#what-the-backslash-operator-does-internally" id="toc-what-the-backslash-operator-does-internally" class="nav-link" data-scroll-target="#what-the-backslash-operator-does-internally"><span class="header-section-number">2.3.8</span> What the backslash operator does internally</a></li>
+  <li><a href="#whole-row-and-whole-column-indexing-with" id="toc-whole-row-and-whole-column-indexing-with" class="nav-link" data-scroll-target="#whole-row-and-whole-column-indexing-with"><span class="header-section-number">2.3.9</span> Whole-row and whole-column indexing with <code>:</code></a></li>
+  <li><a href="#arrays-of-arrays" id="toc-arrays-of-arrays" class="nav-link" data-scroll-target="#arrays-of-arrays"><span class="header-section-number">2.3.10</span> Arrays of arrays</a></li>
+  <li><a href="#shallow-and-deep-copies-of-nested-mutable-data" id="toc-shallow-and-deep-copies-of-nested-mutable-data" class="nav-link" data-scroll-target="#shallow-and-deep-copies-of-nested-mutable-data"><span class="header-section-number">2.3.11</span> Shallow and deep copies of nested mutable data</a></li>
+  <li><a href="#more-general-iteration-with-axes" id="toc-more-general-iteration-with-axes" class="nav-link" data-scroll-target="#more-general-iteration-with-axes"><span class="header-section-number">2.3.12</span> More general iteration with <code>axes</code></a></li>
+  <li><a href="#a-note-on-column-major-storage" id="toc-a-note-on-column-major-storage" class="nav-link" data-scroll-target="#a-note-on-column-major-storage"><span class="header-section-number">2.3.13</span> A note on column-major storage</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">2.3.14</span> Further reading</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1166,64 +1173,71 @@ B = copy(A)  independent numerical matrix</code></pre>
 <p>Functions become more important as programs begin to separate recurring operations from problem-specific input data.</p>
 </section>
 </section>
-<section id="what-the-backslash-operator-does-internally" class="level3" data-number="2.3.7">
-<h3 data-number="2.3.7" class="anchored" data-anchor-id="what-the-backslash-operator-does-internally"><span class="header-section-number">2.3.7</span> What the backslash operator does internally</h3>
+<section id="including-code-from-another-file" class="level3" data-number="2.3.7">
+<h3 data-number="2.3.7" class="anchored" data-anchor-id="including-code-from-another-file"><span class="header-section-number">2.3.7</span> Including code from another file</h3>
+<p>The function <code>include</code> evaluates a Julia source file, making the definitions in that file available to the current code:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb106"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"some_file.jl"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For example, a program can place reusable function definitions in one file and include that file before calling the functions in another file.</p>
+<p>MiniFEM uses this mechanism in S04 so that the same two-spring analysis definitions can be used by both the executable benchmark and the regression tests.</p>
+</section>
+<section id="what-the-backslash-operator-does-internally" class="level3" data-number="2.3.8">
+<h3 data-number="2.3.8" class="anchored" data-anchor-id="what-the-backslash-operator-does-internally"><span class="header-section-number">2.3.8</span> What the backslash operator does internally</h3>
 <p>Earlier in this chapter, the expression</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb106"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> A <span class="op">\</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb107"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> A <span class="op">\</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>was introduced as the standard way to solve the linear system <span class="math inline">\(A x = b\)</span>. At a higher level, Julia selects a suitable linear algebra algorithm based on the matrix and then solves the resulting system. For a general dense square matrix, this is commonly based on an LU factorization,</p>
 <p><span class="math display">\[
   A = LU,
 \]</span></p>
 <p>followed by forward and backward substitution.</p>
 <p>This is preferable to explicitly forming the inverse,</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb107"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">inv</span>(A) <span class="op">*</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb108"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">inv</span>(A) <span class="op">*</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>because computing the complete inverse requires more work than is needed to solve a single linear system. The entries of the inverse must also be represented in floating-point arithmetic before the approximate inverse is multiplied by <code>b</code>, creating an unnecessary intermediate numerical calculation.</p>
 <p>By solving the factorized system directly, <code>\</code> avoids forming this intermediate inverse. It is therefore the clearer and generally more efficient and numerically preferable expression for solving a linear system.</p>
 </section>
-<section id="whole-row-and-whole-column-indexing-with" class="level3" data-number="2.3.8">
-<h3 data-number="2.3.8" class="anchored" data-anchor-id="whole-row-and-whole-column-indexing-with"><span class="header-section-number">2.3.8</span> Whole-row and whole-column indexing with <code>:</code></h3>
+<section id="whole-row-and-whole-column-indexing-with" class="level3" data-number="2.3.9">
+<h3 data-number="2.3.9" class="anchored" data-anchor-id="whole-row-and-whole-column-indexing-with"><span class="header-section-number">2.3.9</span> Whole-row and whole-column indexing with <code>:</code></h3>
 <p>Julia uses <code>:</code> in an array index to mean all valid indices along that dimension. For a matrix <code>A</code>,</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb108"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>A[<span class="fl">2</span>, <span class="op">:</span>]       <span class="co"># second row</span></span>
-<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>A[<span class="op">:</span>, <span class="fl">2</span>]       <span class="co"># second column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb109"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>A[<span class="fl">2</span>, <span class="op">:</span>]       <span class="co"># second row</span></span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>A[<span class="op">:</span>, <span class="fl">2</span>]       <span class="co"># second column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>selects the complete second row or complete second column, respectively. This is useful for concise matrix operations.</p>
 </section>
-<section id="arrays-of-arrays" class="level3" data-number="2.3.9">
-<h3 data-number="2.3.9" class="anchored" data-anchor-id="arrays-of-arrays"><span class="header-section-number">2.3.9</span> Arrays of arrays</h3>
+<section id="arrays-of-arrays" class="level3" data-number="2.3.10">
+<h3 data-number="2.3.10" class="anchored" data-anchor-id="arrays-of-arrays"><span class="header-section-number">2.3.10</span> Arrays of arrays</h3>
 <p>A matrix and an array of arrays are different data structures.</p>
 <p>The expression:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb109"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>matrix <span class="op">=</span> [<span class="fl">1</span> <span class="fl">2</span>; <span class="fl">3</span> <span class="fl">4</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb110"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>matrix <span class="op">=</span> [<span class="fl">1</span> <span class="fl">2</span>; <span class="fl">3</span> <span class="fl">4</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>creates a true two-dimensional array. By contrast:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb110"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> [</span>
-<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1</span>, <span class="fl">2</span>],</span>
-<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">3</span>, <span class="fl">4</span>],</span>
-<span id="cb110-4"><a href="#cb110-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb111"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> [</span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1</span>, <span class="fl">2</span>],</span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">3</span>, <span class="fl">4</span>],</span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>creates a one-dimensional array whose entries are themselves vectors.</p>
 <p>The two structures are indexed differently:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb111"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>matrix[<span class="fl">1</span>, <span class="fl">2</span>]      <span class="co"># two-dimensional indexing</span></span>
-<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>rows[<span class="fl">1</span>][<span class="fl">2</span>]        <span class="co"># first select a vector, then an entry in that vector</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb112"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>matrix[<span class="fl">1</span>, <span class="fl">2</span>]      <span class="co"># two-dimensional indexing</span></span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>rows[<span class="fl">1</span>][<span class="fl">2</span>]        <span class="co"># first select a vector, then an entry in that vector</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Arrays of arrays are useful when the inner collections may have different lengths:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb112"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>ragged <span class="op">=</span> [</span>
-<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1</span>, <span class="fl">2</span>],</span>
-<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>],</span>
-<span id="cb112-4"><a href="#cb112-4" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">6</span>],</span>
-<span id="cb112-5"><a href="#cb112-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb113"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>ragged <span class="op">=</span> [</span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1</span>, <span class="fl">2</span>],</span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>],</span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">6</span>],</span>
+<span id="cb113-5"><a href="#cb113-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="shallow-and-deep-copies-of-nested-mutable-data" class="level3" data-number="2.3.10">
-<h3 data-number="2.3.10" class="anchored" data-anchor-id="shallow-and-deep-copies-of-nested-mutable-data"><span class="header-section-number">2.3.10</span> Shallow and deep copies of nested mutable data</h3>
+<section id="shallow-and-deep-copies-of-nested-mutable-data" class="level3" data-number="2.3.11">
+<h3 data-number="2.3.11" class="anchored" data-anchor-id="shallow-and-deep-copies-of-nested-mutable-data"><span class="header-section-number">2.3.11</span> Shallow and deep copies of nested mutable data</h3>
 <p>For ordinary numerical matrices such as <code>Matrix{Float64}</code>, <code>copy</code> is sufficient. A deeper distinction appears when an array stores other mutable arrays.</p>
 <p>Consider:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb113"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [[<span class="fl">1</span>, <span class="fl">2</span>], [<span class="fl">3</span>, <span class="fl">4</span>]]</span>
-<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="fu">copy</span>(A)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb114"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [[<span class="fl">1</span>, <span class="fl">2</span>], [<span class="fl">3</span>, <span class="fl">4</span>]]</span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="fu">copy</span>(A)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>A</code> and <code>B</code> are different outer arrays, but corresponding entries still refer to the same inner vectors. Therefore:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb114"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>B[<span class="fl">1</span>][<span class="fl">1</span>] <span class="op">=</span> <span class="fl">99</span></span>
-<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(A)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb115"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>B[<span class="fl">1</span>][<span class="fl">1</span>] <span class="op">=</span> <span class="fl">99</span></span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(A)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>also changes the first inner vector visible through <code>A</code>.</p>
 <p>A <em>deep copy</em> recursively copies nested mutable data:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb115"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [[<span class="fl">1</span>, <span class="fl">2</span>], [<span class="fl">3</span>, <span class="fl">4</span>]]</span>
-<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="fu">deepcopy</span>(A)</span>
-<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb115-4"><a href="#cb115-4" aria-hidden="true" tabindex="-1"></a>B[<span class="fl">1</span>][<span class="fl">1</span>] <span class="op">=</span> <span class="fl">99</span></span>
-<span id="cb115-5"><a href="#cb115-5" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(A)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb116"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [[<span class="fl">1</span>, <span class="fl">2</span>], [<span class="fl">3</span>, <span class="fl">4</span>]]</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="fu">deepcopy</span>(A)</span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>B[<span class="fl">1</span>][<span class="fl">1</span>] <span class="op">=</span> <span class="fl">99</span></span>
+<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(A)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Now the inner vectors are independent as well.</p>
 <p>The distinction is:</p>
 <ul>
@@ -1233,35 +1247,35 @@ B = copy(A)  independent numerical matrix</code></pre>
 </ul>
 <p>For ordinary numerical matrices such as <code>Matrix{Float64}</code>, <code>deepcopy</code> is unnecessary.</p>
 </section>
-<section id="more-general-iteration-with-axes" class="level3" data-number="2.3.11">
-<h3 data-number="2.3.11" class="anchored" data-anchor-id="more-general-iteration-with-axes"><span class="header-section-number">2.3.11</span> More general iteration with <code>axes</code></h3>
+<section id="more-general-iteration-with-axes" class="level3" data-number="2.3.12">
+<h3 data-number="2.3.12" class="anchored" data-anchor-id="more-general-iteration-with-axes"><span class="header-section-number">2.3.12</span> More general iteration with <code>axes</code></h3>
 <p>The first examples use explicit ranges such as:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb116"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb117"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>because the dimensions of these small matrices are deliberately visible. For more general code, Julia can obtain valid index ranges from the array itself:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb117"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">axes</span>(A, <span class="fl">1</span>)    <span class="co"># valid row indices</span></span>
-<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a><span class="fu">axes</span>(A, <span class="fl">2</span>)    <span class="co"># valid column indices</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb118"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="fu">axes</span>(A, <span class="fl">1</span>)    <span class="co"># valid row indices</span></span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a><span class="fu">axes</span>(A, <span class="fl">2</span>)    <span class="co"># valid column indices</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb118"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">1</span>)</span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">println</span>(i)</span>
-<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb119"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">1</span>)</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">println</span>(i)</span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This avoids hard-coding the number of rows and becomes more useful when array dimensions are no longer fixed in advance.</p>
 </section>
-<section id="a-note-on-column-major-storage" class="level3" data-number="2.3.12">
-<h3 data-number="2.3.12" class="anchored" data-anchor-id="a-note-on-column-major-storage"><span class="header-section-number">2.3.12</span> A note on column-major storage</h3>
+<section id="a-note-on-column-major-storage" class="level3" data-number="2.3.13">
+<h3 data-number="2.3.13" class="anchored" data-anchor-id="a-note-on-column-major-storage"><span class="header-section-number">2.3.13</span> A note on column-major storage</h3>
 <p>Julia stores dense multidimensional arrays in column-major order: entries in the first column are stored consecutively in memory, followed by entries in the second column, and so on.</p>
 <p>For example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb119"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [</span>
-<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="fl">2</span>;</span>
-<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>    <span class="fl">3</span> <span class="fl">4</span></span>
-<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb120"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [</span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="fl">2</span>;</span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>    <span class="fl">3</span> <span class="fl">4</span></span>
+<span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>is stored in the order:</p>
 <pre class="text"><code>1, 3, 2, 4</code></pre>
 <p>Consequently, the loop order</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb121"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">2</span>)</span>
-<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">1</span>)</span>
-<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>        value <span class="op">=</span> A[i, j]</span>
-<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb122"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">2</span>)</span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">1</span>)</span>
+<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>        value <span class="op">=</span> A[i, j]</span>
+<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb122-5"><a href="#cb122-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>traverses consecutive entries in storage order: the first index <code>i</code> changes inside the innermost loop.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Performance note">
 <div class="callout-header d-flex align-content-center">
@@ -1287,21 +1301,21 @@ B = copy(A)  independent numerical matrix</code></pre>
 </div>
 <div class="callout-body-container callout-body">
 <p>For the matrix</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb122"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [</span>
-<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="fl">2</span> <span class="fl">3</span>;</span>
-<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>    <span class="fl">4</span> <span class="fl">5</span> <span class="fl">6</span></span>
-<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb123"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> [</span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="fl">2</span> <span class="fl">3</span>;</span>
+<span id="cb123-3"><a href="#cb123-3" aria-hidden="true" tabindex="-1"></a>    <span class="fl">4</span> <span class="fl">5</span> <span class="fl">6</span></span>
+<span id="cb123-4"><a href="#cb123-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>write down the order in which its six entries are stored in column-major order. Then compare that order with the values visited by:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb123"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">2</span>)</span>
-<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">1</span>)</span>
-<span id="cb123-3"><a href="#cb123-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">println</span>(A[i, j])</span>
-<span id="cb123-4"><a href="#cb123-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb123-5"><a href="#cb123-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb124"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">2</span>)</span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(A, <span class="fl">1</span>)</span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">println</span>(A[i, j])</span>
+<span id="cb124-4"><a href="#cb124-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb124-5"><a href="#cb124-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
-<section id="further-reading" class="level3" data-number="2.3.13">
-<h3 data-number="2.3.13" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">2.3.13</span> Further reading</h3>
+<section id="further-reading" class="level3" data-number="2.3.14">
+<h3 data-number="2.3.14" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">2.3.14</span> Further reading</h3>
 <p>The Julia manual provides more extensive treatments of the topics introduced in this chapter:</p>
 <ul>
 <li><a href="https://docs.julialang.org/en/v1/manual/getting-started/">Getting started</a></li>
