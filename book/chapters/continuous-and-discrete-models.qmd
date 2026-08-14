@@ -35,19 +35,29 @@ $$
 For a linearly elastic material, the axial stress is related to the strain by
 
 $$
-  \sigma(x)=E\varepsilon(x).
+  \sigma(x)=E(x)\varepsilon(x).
 $$
 
-The corresponding internal axial force is
+The corresponding axial resultant force is
 
 $$
   N(x)=\int_A \sigma\,dA.
 $$
 
-For a homogeneous bar with constant $E$ and $A$,
+Under the one-dimensional bar assumption that the axial stress is uniform over
+the cross-section,
 
 $$
-  N=EA\frac{du}{dx}.
+  N(x)=A(x)\sigma(x).
+$$
+
+Using the linear elastic constitutive relation and the small-strain kinematic
+relation,
+
+$$
+  \boxed{
+  N(x)=E(x)A(x)\frac{du}{dx}.
+  }
 $$
 
 ![Cross-section $A$ with axial stress $\sigma_x$, represented equivalently by
@@ -101,10 +111,10 @@ therefore richer: it provides the displacement at every point, whereas the
 discrete description contains only a finite number of displacement values.
 
 This distinction is also reflected in the internal-force relations. For the
-homogeneous bar,
+one-dimensional bar,
 
 $$
-  N=EA\frac{du}{dx},
+  N(x)=E(x)A(x)\frac{du}{dx},
 $$
 
 so the internal axial force depends on the spatial variation of the continuous
