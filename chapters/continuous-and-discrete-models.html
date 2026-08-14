@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-454b4600761cc82732fe8dee668ec0e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c72bfcf2850aa2268dce9df1d5752dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -302,15 +302,21 @@ Figure&nbsp;3.1: One-dimensional bar fixed at the left end, with end force <span
 \]</span></p>
 <p>For a linearly elastic material, the axial stress is related to the strain by</p>
 <p><span class="math display">\[
-  \sigma(x)=E\varepsilon(x).
+  \sigma(x)=E(x)\varepsilon(x).
 \]</span></p>
-<p>The corresponding internal axial force is</p>
+<p>The corresponding axial resultant force is</p>
 <p><span class="math display">\[
   N(x)=\int_A \sigma\,dA.
 \]</span></p>
-<p>For a homogeneous bar with constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>,</p>
+<p>Under the one-dimensional bar assumption that the axial stress is uniform over the cross-section,</p>
 <p><span class="math display">\[
-  N=EA\frac{du}{dx}.
+  N(x)=A(x)\sigma(x).
+\]</span></p>
+<p>Using the linear elastic constitutive relation and the small-strain kinematic relation,</p>
+<p><span class="math display">\[
+  \boxed{
+  N(x)=E(x)A(x)\frac{du}{dx}.
+  }
 \]</span></p>
 <div id="fig-bar-cross-section" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -359,9 +365,9 @@ Figure&nbsp;3.4: Positive sign convention for the internal spring force <span cl
 <section id="continuous-and-discrete-descriptions" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="continuous-and-discrete-descriptions"><span class="header-section-number">3.3</span> Continuous and discrete descriptions</h2>
 <p>The bar is described by the continuous displacement field <span class="math inline">\(u(x)\)</span>, defined at every point along its length, whereas the spring is described by the two discrete displacement values <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span>. The continuous description is therefore richer: it provides the displacement at every point, whereas the discrete description contains only a finite number of displacement values.</p>
-<p>This distinction is also reflected in the internal-force relations. For the homogeneous bar,</p>
+<p>This distinction is also reflected in the internal-force relations. For the one-dimensional bar,</p>
 <p><span class="math display">\[
-  N=EA\frac{du}{dx},
+  N(x)=E(x)A(x)\frac{du}{dx},
 \]</span></p>
 <p>so the internal axial force depends on the spatial variation of the continuous displacement field. For the spring,</p>
 <p><span class="math display">\[
