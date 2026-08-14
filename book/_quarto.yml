@@ -22,6 +22,9 @@ book:
         - chapters/two-springs-functions.qmd
         - chapters/two-springs-callable-analysis.qmd
         - chapters/two-springs-regression-tests.qmd
+    - part: "One-dimensional continuum finite elements"
+      chapters:
+        - chapters/one-dimensional-axial-bar-weak-form.qmd
     - glossary.qmd
     - references.qmd
 
