@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; The weak form of the one-dimensional axial bar” – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/two-springs-regression-tests.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c72bfcf2850aa2268dce9df1d5752dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar”</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Discrete systems and the direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">One-dimensional continuum finite elements</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar”</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-three-dimensional-equilibrium-to-a-one-dimensional-model" id="toc-from-three-dimensional-equilibrium-to-a-one-dimensional-model" class="nav-link active" data-scroll-target="#from-three-dimensional-equilibrium-to-a-one-dimensional-model"><span class="header-section-number">9.1</span> From three-dimensional equilibrium to a one-dimensional model</a></li>
+  <li><a href="#equilibrium-and-the-strong-form" id="toc-equilibrium-and-the-strong-form" class="nav-link" data-scroll-target="#equilibrium-and-the-strong-form"><span class="header-section-number">9.2</span> Equilibrium and the strong form</a></li>
+  <li><a href="#why-introduce-a-weak-form" id="toc-why-introduce-a-weak-form" class="nav-link" data-scroll-target="#why-introduce-a-weak-form"><span class="header-section-number">9.3</span> Why introduce a weak form?</a></li>
+  <li><a href="#the-weighted-residual-statement" id="toc-the-weighted-residual-statement" class="nav-link" data-scroll-target="#the-weighted-residual-statement"><span class="header-section-number">9.4</span> The weighted residual statement</a></li>
+  <li><a href="#integration-by-parts" id="toc-integration-by-parts" class="nav-link" data-scroll-target="#integration-by-parts"><span class="header-section-number">9.5</span> Integration by parts</a></li>
+  <li><a href="#essential-and-natural-boundary-conditions" id="toc-essential-and-natural-boundary-conditions" class="nav-link" data-scroll-target="#essential-and-natural-boundary-conditions"><span class="header-section-number">9.6</span> Essential and natural boundary conditions</a></li>
+  <li><a href="#regularity-and-admissible-functions" id="toc-regularity-and-admissible-functions" class="nav-link" data-scroll-target="#regularity-and-admissible-functions"><span class="header-section-number">9.7</span> Regularity and admissible functions</a></li>
+  <li><a href="#the-weak-form" id="toc-the-weak-form" class="nav-link" data-scroll-target="#the-weak-form"><span class="header-section-number">9.8</span> The weak form</a></li>
+  <li><a href="#from-the-weak-problem-to-a-finite-dimensional-problem" id="toc-from-the-weak-problem-to-a-finite-dimensional-problem" class="nav-link" data-scroll-target="#from-the-weak-problem-to-a-finite-dimensional-problem"><span class="header-section-number">9.9</span> From the weak problem to a finite-dimensional problem</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar”</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar”</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Part II introduced the finite element assembly process through discrete spring systems. For those systems, the element force–displacement relations followed directly from spring kinematics, the constitutive law, and equilibrium. Part III moves to continuum problems, where the unknown is a field governed by a differential equation. Before the familiar finite element assembly process can be used, the continuum problem must therefore be reformulated in a form suitable for numerical approximation.</p>
+<p>The familiar algebraic system <span class="math inline">\(\mathbf{K}\mathbf{u}=\mathbf{f}\)</span> will eventually reappear, but the path to it is now different: the governing differential equation is first reformulated in weak form and only then restricted to a finite-dimensional approximation. This formulation provides a systematic basis for handling spatially varying properties, distributed loads, natural boundary conditions, and finite element approximations of different orders. It therefore provides the bridge between the continuum model and the finite element equations that will ultimately be assembled.</p>
+<section id="from-three-dimensional-equilibrium-to-a-one-dimensional-model" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="from-three-dimensional-equilibrium-to-a-one-dimensional-model"><span class="header-section-number">9.1</span> From three-dimensional equilibrium to a one-dimensional model</h2>
+<p>In a general three-dimensional continuum, whether the deformation is small or finite and whether the material response is linear or nonlinear, the quasi-static equilibrium equation in the current configuration can be written as <span class="math display">\[
+  \nabla\cdot\boldsymbol{\sigma}+\mathbf{b}=\mathbf{0},
+\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{\sigma}\)</span> is the Cauchy stress tensor and <span class="math inline">\(\mathbf{b}\)</span> is the body-force vector per unit current volume. The assumptions of small deformation and linear elasticity will be introduced later through the kinematic and constitutive relations. Throughout this book, the first stress index identifies the normal to the plane on which the stress acts, while the second identifies the direction of the stress component. With this convention, the Cartesian equilibrium equations are <span class="math display">\[
+  \begin{aligned}
+  \frac{\partial \sigma_{xx}}{\partial x}
+  +\frac{\partial \sigma_{yx}}{\partial y}
+  +\frac{\partial \sigma_{zx}}{\partial z}
+  +b_x &amp;= 0,\\[4pt]
+  \frac{\partial \sigma_{xy}}{\partial x}
+  +\frac{\partial \sigma_{yy}}{\partial y}
+  +\frac{\partial \sigma_{zy}}{\partial z}
+  +b_y &amp;= 0,\\[4pt]
+  \frac{\partial \sigma_{xz}}{\partial x}
+  +\frac{\partial \sigma_{yz}}{\partial y}
+  +\frac{\partial \sigma_{zz}}{\partial z}
+  +b_z &amp;= 0.
+  \end{aligned}
+\]</span> For the continuum model considered here, balance of angular momentum implies that the Cauchy stress tensor is symmetric (<span class="math inline">\(\boldsymbol{\sigma}=\boldsymbol{\sigma}^{\mathsf T}\)</span> or <span class="math inline">\(\sigma_{ij}=\sigma_{ji}\)</span>). Together with kinematic relations, a constitutive law, and appropriate boundary conditions, the equilibrium equations define a boundary-value problem.</p>
+<p>We now introduce a one-dimensional idealization of a slender three-dimensional body: the axial bar model. The bar is assumed to be slender, aligned with the <span class="math inline">\(x\)</span> axis, and subjected to axial loading, as shown in <a href="#fig-bar-1d-boundary-value-problem" class="quarto-xref">Figure&nbsp;<span>9.1</span></a>. Its deformation is described by an axial displacement field <span class="math inline">\(u(x)\)</span>, while the stress distribution over each cross-section is represented by the axial resultant <span class="math inline">\(N(x)\)</span>.</p>
+<div id="fig-bar-1d-boundary-value-problem" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-1d-boundary-value-problem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/bar-1d-boundary-value-problem.png" class="img-fluid figure-img" style="width:30.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-1d-boundary-value-problem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.1: One-dimensional axial bar of length <span class="math inline">\(L\)</span>, fixed at <span class="math inline">\(x=0\)</span> and subject to a distributed axial load <span class="math inline">\(q(x)\)</span> and an end force <span class="math inline">\(\bar F\)</span>. The quantity <span class="math inline">\(A(x)\)</span> denotes the cross-sectional area at position <span class="math inline">\(x\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>As discussed in <a href="continuous-and-discrete-models.html" class="quarto-xref"><span>Chapter 3</span></a>, the one-dimensional bar model is based on a kinematic idealization: only the axial displacement is retained, and it is assumed to be uniform over each cross-section and to vary only along the bar axis. Lateral deformation, including effects such as Poisson contraction, is not represented by the one-dimensional model. The displacement field is therefore described by the scalar function</p>
+<p><span class="math display">\[
+  u=u(x).
+\]</span></p>
+<p>Under the small-strain assumption, the axial strain retained by the model is</p>
+<p><span class="math display">\[
+  \varepsilon(x)
+  =
+  \varepsilon_{xx}(x)
+  =
+  \frac{du}{dx}
+  =
+  u'(x).
+\]</span></p>
+<p>For a linearly elastic material,</p>
+<p><span class="math display">\[
+  \sigma(x)=E(x)\varepsilon(x).
+\]</span></p>
+<p>The internal axial force is obtained by integrating the axial stress over the cross-section,</p>
+<p><span class="math display">\[
+  N(x)=\int_{A(x)} \sigma\,dA.
+\]</span></p>
+<p>For the one-dimensional bar model, the axial stress is assumed to be uniform over each cross-section. The resultant therefore reduces to</p>
+<p><span class="math display">\[
+  N(x)=A(x)\sigma(x).
+\]</span></p>
+<p>Using the linear elastic constitutive relation <span class="math inline">\(\sigma(x)=E(x)\varepsilon(x)\)</span> together with <span class="math inline">\(\varepsilon(x)=u'(x)\)</span> gives</p>
+<p><span class="math display">\[
+  \boxed{
+  N(x)=E(x)A(x)u'(x)
+  }.
+\]</span></p>
+<p>Correspondingly, the distributed axial load <span class="math inline">\(q(x)\)</span> represents the external load resultant per unit length of the bar. It may include contributions from body forces acting over the cross-section and from tractions applied to the lateral surface. We may therefore write</p>
+<p><span class="math display">\[
+  q(x)
+  =
+  \int_{A(x)} b_x\,dA
+  +
+  q_s(x),
+\]</span></p>
+<p>where <span class="math inline">\(q_s(x)\)</span> denotes the axial load per unit length resulting from lateral surface tractions.</p>
+<p>If the body-force density <span class="math inline">\(b_x(x)\)</span> is uniform over the cross-section and no lateral traction is present, this reduces to</p>
+<p><span class="math display">\[
+  q(x)=A(x)b_x(x).
+\]</span></p>
+<p>Loads applied to the end cross-sections are treated separately as boundary forces.</p>
+</section>
+<section id="equilibrium-and-the-strong-form" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="equilibrium-and-the-strong-form"><span class="header-section-number">9.2</span> Equilibrium and the strong form</h2>
+<p>Consider the equilibrium of an infinitesimal segment of the bar.</p>
+<div id="fig-bar-1d-infinitesimal-equilibrium" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-1d-infinitesimal-equilibrium-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/bar-1d-infinitesimal-equilibrium.png" class="img-fluid figure-img" style="width:39.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-1d-infinitesimal-equilibrium-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.2: Equilibrium of an infinitesimal segment of the one-dimensional bar.
+</figcaption>
+</figure>
+</div>
+<p>The quantity <span class="math inline">\(q(x)\,dx\)</span> shown in <a href="#fig-bar-1d-infinitesimal-equilibrium" class="quarto-xref">Figure&nbsp;<span>9.2</span></a> represents the leading-order resultant of the distributed load over the infinitesimal segment. In the equilibrium equation below, we retain the exact resultant <span class="math inline">\(\int_x^{x+dx}q(s)\,ds\)</span> before taking the limit <span class="math inline">\(dx\to0\)</span>.</p>
+<p>We take <span class="math inline">\(N&gt;0\)</span> in tension and <span class="math inline">\(q&gt;0\)</span> when the distributed load acts in the positive <span class="math inline">\(x\)</span> direction. With this sign convention, axial force equilibrium over the segment <span class="math inline">\([x,x+dx]\)</span> gives</p>
+<p><span class="math display">\[
+  -N(x)+N(x+dx)+\int_x^{x+dx} q(s)\,ds=0.
+\]</span></p>
+<p>Dividing by <span class="math inline">\(dx\)</span>,</p>
+<p><span class="math display">\[
+  \frac{N(x+dx)-N(x)}{dx}
+  +
+  \frac{1}{dx}\int_x^{x+dx} q(s)\,ds
+  =0.
+\]</span></p>
+<p>Taking the limit as <span class="math inline">\(dx\to0\)</span> gives the local equilibrium equation</p>
+<p><span class="math display">\[
+  \boxed{
+  \frac{dN}{dx}+q=0
+  }.
+\]</span></p>
+<p>Using</p>
+<p><span class="math display">\[
+  N(x)=E(x)A(x)u'(x),
+\]</span></p>
+<p>we obtain the governing differential equation</p>
+<p><span class="math display">\[
+  \boxed{
+  \frac{d}{dx}\left(EA\,u'\right)+q=0
+  \qquad \text{in }\Omega=(0,L).
+  }
+\]</span></p>
+<p>This form remains valid when <span class="math inline">\(E\)</span>, <span class="math inline">\(A\)</span>, or both vary along the bar. Only when <span class="math inline">\(EA\)</span> is constant can it be reduced to</p>
+<p><span class="math display">\[
+  EA\,u''+q=0 \qquad \text{in }\Omega=(0,L).
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled" title="Elliptic character of the bar problem">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Elliptic character of the bar problem
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The governing bar equation is the one-dimensional counterpart of the elliptic equations that arise in static elasticity.</p>
+<p>In two and three dimensions, combining equilibrium, kinematics, and a stable elastic constitutive law leads to a coupled system of second-order elliptic partial differential equations for the displacement field. In the present one-dimensional setting, the corresponding problem reduces to a second-order ordinary differential equation.</p>
+<p>For positive axial rigidity <span class="math inline">\(E(x)A(x)&gt;0\)</span> throughout the bar, the differential operator <span class="math display">\[
+  -\frac{d}{dx}
+  \left(
+  EA\,\frac{d}{dx}
+  \right)
+\]</span></p>
+<p>is the one-dimensional analogue of an elliptic operator.</p>
+</div>
+</div>
+<p>A differential equation alone does not define the problem completely. Boundary conditions are also required.</p>
+<p>For the bar considered here, the left end is fixed,</p>
+<p><span class="math display">\[
+  u(0)=0,
+\]</span></p>
+<p>while the axial force prescribed at the right end is</p>
+<p><span class="math display">\[
+  N(L)=E(L)A(L)u'(L)=\bar F,
+\]</span></p>
+<p>with <span class="math inline">\(\bar F&gt;0\)</span> acting in the positive <span class="math inline">\(x\)</span> direction.</p>
+<p>The displacement condition is a <strong>Dirichlet</strong>, or <strong>essential</strong>, boundary condition. The force condition is a <strong>Neumann</strong>, or <strong>natural</strong>, boundary condition.</p>
+<p>In general, the boundary <span class="math inline">\(\Gamma\)</span> is partitioned into a displacement part <span class="math inline">\(\Gamma_u\)</span> and a traction part <span class="math inline">\(\Gamma_t\)</span>. For the present one-dimensional problem,</p>
+<p><span class="math display">\[
+  \Gamma_u=\{0\},
+  \qquad
+  \Gamma_t=\{L\}.
+\]</span></p>
+<p>The prescribed displacement on <span class="math inline">\(\Gamma_u\)</span> is <span class="math inline">\(u=0\)</span>, while the prescribed traction resultant on <span class="math inline">\(\Gamma_t\)</span> is <span class="math inline">\(N=\bar F\)</span>.</p>
+<p>The governing differential equation, together with the associated boundary conditions, constitutes the <strong>strong form</strong> of the boundary-value problem.</p>
+</section>
+<section id="why-introduce-a-weak-form" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="why-introduce-a-weak-form"><span class="header-section-number">9.3</span> Why introduce a weak form?</h2>
+<p>The strong form imposes the governing differential equation pointwise and therefore places relatively strong smoothness requirements on the displacement field.</p>
+<p>As an example, consider a perfectly bonded bar made of two materials. If the axial rigidity <span class="math inline">\(EA\)</span> changes abruptly across the material interface, equilibrium requires the axial force</p>
+<p><span class="math display">\[
+  N=EA\,u'
+\]</span></p>
+<p>to remain continuous in the absence of an interface load. Because perfect bonding also requires the displacement <span class="math inline">\(u\)</span> to remain continuous, a nonzero transmitted axial force produces different displacement gradients on the two sides of the interface whenever the values of <span class="math inline">\(EA\)</span> differ. Thus, <span class="math inline">\(u\)</span> remains continuous while <span class="math inline">\(u'\)</span> is generally discontinuous across the interface, as illustrated in <a href="#fig-bar-1d-bimaterial-displacement-gradient" class="quarto-xref">Figure&nbsp;<span>9.3</span></a>.</p>
+<div id="fig-bar-1d-bimaterial-displacement-gradient" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-1d-bimaterial-displacement-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/bar-1d-bimaterial-displacement-gradient.png" class="img-fluid figure-img" style="width:36.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-1d-bimaterial-displacement-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.3: Bimaterial axial bar with <span class="math inline">\(q=0\)</span>, piecewise-constant axial rigidities, and <span class="math inline">\(E_2A_2&gt;E_1A_1\)</span>. Perfect bonding keeps the displacement <span class="math inline">\(u\)</span> continuous, while equilibrium requires the transmitted axial force <span class="math inline">\(N=EA\,u'\)</span> to remain continuous. The region with greater axial rigidity therefore has the smaller displacement gradient, so <span class="math inline">\(u'\)</span> jumps across the material interface.
+</figcaption>
+</figure>
+</div>
+<p>The appropriate divergence form of the equilibrium equation is</p>
+<p><span class="math display">\[
+  \frac{d}{dx}\left(EA\,u'\right)+q=0,
+\]</span></p>
+<p>rather than the expanded form <span class="math inline">\(EA\,u''+q=0\)</span>, which is valid only where <span class="math inline">\(EA\)</span> is constant.</p>
+<p>In this example, the physical equilibrium condition remains perfectly valid: the axial force <span class="math inline">\(N=EA\,u'\)</span> is continuous across the interface. What changes is the regularity of the displacement field. Because <span class="math inline">\(u'\)</span> is discontinuous across the material interface, the displacement field <span class="math inline">\(u\)</span> does not have a classical second derivative at the interface.</p>
+<p>The difficulty is therefore related to the smoothness required to enforce the strong form pointwise. A weak formulation expresses the same equilibrium problem while requiring fewer derivatives of the displacement field. As we will see shortly, equilibrium is no longer enforced pointwise; instead, it is imposed in a weighted, integral sense over the domain. In the standard displacement-based finite element formulation used here, this allows the displacement approximation to remain continuous while its derivatives may be discontinuous across material interfaces or element boundaries. The first step toward this formulation is to replace pointwise enforcement of the differential equation by a weighted integral statement.</p>
+</section>
+<section id="the-weighted-residual-statement" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="the-weighted-residual-statement"><span class="header-section-number">9.4</span> The weighted residual statement</h2>
+<p>Define the residual of the governing equation as</p>
+<p><span class="math display">\[
+  r(u)
+  =
+  \frac{d}{dx}\left(EA\,u'\right)+q.
+\]</span></p>
+<p>The strong form requires</p>
+<p><span class="math display">\[
+  r(u)=0
+  \qquad
+  \text{at every point in }\Omega.
+\]</span></p>
+<p>Rather than requiring the strong form to hold pointwise, we introduce a test, or weight, function <span class="math inline">\(w(x)\)</span> and require the weighted residual to vanish for every admissible test function: <span class="math display">\[
+  \boxed{
+  \int_0^L w\,r(u)\,dx=0
+  \qquad
+  \forall\,w\in V.
+  }
+\]</span></p>
+<p>Here, admissible means that the function has the regularity required by the formulation and satisfies the relevant essential boundary conditions; the precise test space will be defined below.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Trial, test, and admissible functions">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Trial, test, and admissible functions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>trial field</strong> is a candidate for the unknown displacement field <span class="math inline">\(u\)</span>.</p>
+<p>A <strong>test function</strong>, also called a <strong>weight function</strong>, is used to test the equilibrium statement through the weighted residual or weak form.</p>
+<p>A function is <strong>admissible</strong> when it has the required regularity and satisfies the appropriate essential boundary conditions. For trial fields this means <span class="math inline">\(u=\bar u\)</span> on <span class="math inline">\(\Gamma_u\)</span>, where <span class="math inline">\(\bar u\)</span> denotes the prescribed displacement; for test functions it means the corresponding homogeneous condition <span class="math inline">\(w=0\)</span> on <span class="math inline">\(\Gamma_u\)</span>.</p>
+<p>The same test function <span class="math inline">\(w\)</span> appearing in the weighted residual statement may also be interpreted as an <strong>admissible variation</strong> of the displacement field: a perturbation that does not violate the prescribed displacement.</p>
+<p>More specifically, let <span class="math inline">\(u\)</span> be an admissible displacement field satisfying</p>
+<p><span class="math display">\[
+  u=\bar u
+  \qquad \text{on }\Gamma_u.
+\]</span></p>
+<p>A perturbed field can be written as</p>
+<p><span class="math display">\[
+  u+\eta w,
+\]</span></p>
+<p>where <span class="math inline">\(\eta\)</span> is an arbitrary scalar. For the perturbed field to satisfy the same prescribed displacement, we must also have</p>
+<p><span class="math display">\[
+  u+\eta w=\bar u
+  \qquad \text{on }\Gamma_u.
+\]</span></p>
+<p>Since <span class="math inline">\(u=\bar u\)</span> on <span class="math inline">\(\Gamma_u\)</span>, this condition reduces to</p>
+<p><span class="math display">\[
+  \eta w=0
+  \qquad \text{on }\Gamma_u.
+\]</span></p>
+<p>Because <span class="math inline">\(\eta\)</span> is arbitrary, the test function must therefore satisfy</p>
+<p><span class="math display">\[
+  w=0
+  \qquad \text{on }\Gamma_u.
+\]</span></p>
+<p>Thus, trial fields satisfy the prescribed essential boundary condition, whereas test functions satisfy the corresponding homogeneous condition.</p>
+</div>
+</div>
+<p>Here <span class="math inline">\(V\)</span> denotes the set of admissible test functions; it will be defined precisely below. For the axial bar,</p>
+<p><span class="math display">\[
+  \int_0^L
+  w
+  \left[
+  \frac{d}{dx}\left(EA\,u'\right)+q
+  \right]
+  dx
+  =0
+  \qquad
+  \forall\,w\in V.
+\]</span></p>
+<p>It is not enough for one weighted average of the residual to vanish. The integral relation must hold for every admissible test function. Before discretization, this is still an infinite family of conditions.</p>
+<p>At this stage the derivative order acting on <span class="math inline">\(u\)</span> has not changed. The next step is what makes the formulation useful for standard displacement-based finite elements.</p>
+</section>
+<section id="integration-by-parts" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="integration-by-parts"><span class="header-section-number">9.5</span> Integration by parts</h2>
+<p>Integration by parts transfers one derivative from the equilibrium term to the test function:</p>
+<p><span class="math display">\[
+  \int_0^L
+  w\,\frac{d}{dx}\left(EA\,u'\right)dx
+  =
+  \left[wEAu'\right]_0^L
+  -
+  \int_0^L
+  w'EAu'\,dx.
+\]</span></p>
+<p>The weighted residual statement therefore becomes</p>
+<p><span class="math display">\[
+  -\int_0^L
+  w'EAu'\,dx
+  +
+  \int_0^L
+  wq\,dx
+  +
+  \left[wEAu'\right]_0^L
+  =0,
+\]</span></p>
+<p>or, equivalently,</p>
+<p><span class="math display">\[
+  \int_0^L
+  w'EAu'\,dx
+  =
+  \int_0^L
+  wq\,dx
+  +
+  \left[wEAu'\right]_0^L.
+\]</span></p>
+<p>This step has two consequences that are central to the finite element method:</p>
+<ol type="1">
+<li>the highest derivative acting on the displacement field has been reduced from second order to first order;</li>
+<li>the boundary-force contribution has appeared explicitly.</li>
+</ol>
+<p>No finite element approximation has yet been introduced: the weighted residual statement and the integration-by-parts step reformulate the continuum problem before any discretization is chosen.</p>
+</section>
+<section id="essential-and-natural-boundary-conditions" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="essential-and-natural-boundary-conditions"><span class="header-section-number">9.6</span> Essential and natural boundary conditions</h2>
+<p>The trial displacement field must satisfy the prescribed displacement condition</p>
+<p><span class="math display">\[
+  u(0)=0.
+\]</span></p>
+<p>Test functions represent admissible variations of the trial field. They must therefore leave the prescribed displacement unchanged and satisfy the corresponding homogeneous condition. For the present problem,</p>
+<p><span class="math display">\[
+  w(0)=0.
+\]</span></p>
+<p>The boundary term generated by integration by parts then becomes</p>
+<p><span class="math display">\[
+  \left[wEAu'\right]_0^L
+  =
+  w(L)EAu'(L)-w(0)EAu'(0)
+  =
+  w(L)EAu'(L).
+\]</span></p>
+<p>Using the prescribed axial force</p>
+<p><span class="math display">\[
+  E(L)A(L)u'(L)=\bar F,
+\]</span></p>
+<p>we obtain</p>
+<p><span class="math display">\[
+  \boxed{
+  \int_0^L
+  w'EAu'\,dx
+  =
+  \int_0^L
+  wq\,dx
+  +
+  w(L)\bar F
+  \qquad
+  \forall\,w\in V.
+  }
+\]</span></p>
+<p>The distinction between the two boundary-condition types is now explicit. The essential condition constrains the admissible displacement field and therefore the admissible test functions. The natural condition enters the formulation through the boundary term generated by integration by parts.</p>
+<p>This distinction also explains the terminology: essential conditions must be imposed on the admissible displacement space, whereas natural conditions arise naturally through the boundary term of the weak formulation.</p>
+</section>
+<section id="regularity-and-admissible-functions" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="regularity-and-admissible-functions"><span class="header-section-number">9.7</span> Regularity and admissible functions</h2>
+<p>The strong form requires the differential equation to hold pointwise. In a region where <span class="math inline">\(EA\)</span> is differentiable and <span class="math inline">\(u\)</span> is twice differentiable, the product rule gives</p>
+<p><span class="math display">\[
+  (EA)'u' + EA\,u'' + q = 0,
+\]</span></p>
+<p>which explicitly involves the second derivative of the displacement. More generally, a classical strong formulation requires <span class="math inline">\((EAu')'\)</span> to exist pointwise. After integration by parts, the weak form contains only first derivatives of the trial and test functions.</p>
+<p>For the present problem, the natural regularity space is the Sobolev space <span class="math inline">\(H^1(\Omega)\)</span>. Informally, a function belongs to <span class="math inline">\(H^1(\Omega)\)</span> when both the function and its first weak derivative are square integrable. For the displacement field, with <span class="math inline">\(u'\)</span> understood in the weak sense, this means</p>
+<p><span class="math display">\[
+  \int_\Omega
+  \left(
+  u^2+(u')^2
+  \right)dx
+  &lt;\infty.
+\]</span></p>
+<p>A weak derivative generalizes the classical derivative by allowing differentiation to be defined in an integral sense rather than pointwise everywhere. This is important for finite elements: a continuous piecewise-linear displacement field belongs to <span class="math inline">\(H^1(\Omega)\)</span> even though its derivative may jump at element boundaries.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="What is a weak derivative?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What is a weak derivative?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A classical derivative is defined pointwise. At a point where the slope is discontinuous, the classical derivative does not exist.</p>
+<p>A weak derivative is defined instead through an integral relation. A function <span class="math inline">\(g\)</span> is the weak derivative of <span class="math inline">\(u\)</span> if</p>
+<p><span class="math display">\[
+  \int_\Omega u\,\varphi'\,dx
+  =
+  -\int_\Omega g\,\varphi\,dx
+\]</span></p>
+<p>for every smooth auxiliary function <span class="math inline">\(\varphi\)</span> with compact support in <span class="math inline">\(\Omega\)</span>, meaning that <span class="math inline">\(\varphi\)</span> vanishes in a neighborhood of the boundary.</p>
+<p>The function <span class="math inline">\(\varphi\)</span> used here is only an auxiliary function in the definition of the weak derivative; it should not be confused with the finite element test function <span class="math inline">\(w\)</span> used in the weak formulation.</p>
+<p>Consider a continuous piecewise-linear function with an interior point <span class="math inline">\(x_i\)</span>:</p>
+<p><span class="math display">\[
+  u(x)=
+  \begin{cases}
+  a_1x+b_1, &amp; x&lt;x_i,\\
+  a_2x+b_2, &amp; x&gt;x_i
+  \end{cases}
+\]</span></p>
+<p>with the coefficients chosen so that the two branches meet continuously at <span class="math inline">\(x_i\)</span>:</p>
+<p><span class="math display">\[
+  a_1x_i+b_1=a_2x_i+b_2.
+\]</span></p>
+<p>If <span class="math inline">\(a_1\neq a_2\)</span>, the classical derivative is not defined at <span class="math inline">\(x_i\)</span>. Away from that point,</p>
+<p><span class="math display">\[
+  g(x)=
+  \begin{cases}
+  a_1, &amp; x&lt;x_i,\\
+  a_2, &amp; x&gt;x_i.
+  \end{cases}
+\]</span></p>
+<p>This piecewise-constant function is nevertheless the weak derivative of <span class="math inline">\(u\)</span>. The value assigned to the derivative at the single point <span class="math inline">\(x_i\)</span> does not affect the integrals appearing in the weak formulation.</p>
+<p>This is why a continuous finite element displacement field may belong to <span class="math inline">\(H^1(\Omega)\)</span> even though its derivative is discontinuous at element boundaries.</p>
+</div>
+</div>
+<p>The standard displacement-based finite element approximations considered here are constructed to satisfy <span class="math inline">\(C^0\)</span> continuity as the minimum interelement continuity requirement: the displacement field itself is continuous across element boundaries, whereas continuity of its derivatives is not imposed.</p>
+<p>The superscript <span class="math inline">\(h\)</span> will denote quantities associated with the finite-dimensional discretization. The symbol <span class="math inline">\(h\)</span> is conventionally related to a characteristic element size; its precise meaning will become clear once the bar is partitioned into finite elements.</p>
+<p>Thus,</p>
+<p><span class="math display">\[
+  u^h\in C^0(\Omega),
+\]</span></p>
+<p>while</p>
+<p><span class="math display">\[
+  \frac{du^h}{dx}
+\]</span></p>
+<p>may be discontinuous from one element to the next. As will be shown later, the weak form therefore admits the <span class="math inline">\(C^0\)</span> piecewise-polynomial displacement fields used in standard finite elements, without requiring a classical second derivative to exist at element boundaries.</p>
+<p>We can now define the admissible trial and test sets precisely. For the present problem, the prescribed displacement is homogeneous, so</p>
+<p><span class="math display">\[
+  S=
+  \left\{
+  u\in H^1(\Omega):
+  u=0\text{ on }\Gamma_u
+  \right\},
+\]</span></p>
+<p>while</p>
+<p><span class="math display">\[
+  V=
+  \left\{
+  w\in H^1(\Omega):
+  w=0\text{ on }\Gamma_u
+  \right\}.
+\]</span></p>
+<p>More generally, if a nonzero displacement <span class="math inline">\(u=\bar u\)</span> is prescribed on <span class="math inline">\(\Gamma_u\)</span>, the trial set becomes</p>
+<p><span class="math display">\[
+  S=
+  \left\{
+  u\in H^1(\Omega):
+  u=\bar u\text{ on }\Gamma_u
+  \right\},
+\]</span></p>
+<p>while the test space <span class="math inline">\(V\)</span> contains the corresponding homogeneous variations.</p>
+</section>
+<section id="the-weak-form" class="level2" data-number="9.8">
+<h2 data-number="9.8" class="anchored" data-anchor-id="the-weak-form"><span class="header-section-number">9.8</span> The weak form</h2>
+<p>Define the bilinear form</p>
+<p><span class="math display">\[
+  a(w,u)
+  =
+  \int_0^L
+  w'EAu'\,dx
+\]</span></p>
+<p>and the linear form</p>
+<p><span class="math display">\[
+  \ell(w)
+  =
+  \int_0^L
+  wq\,dx
+  +
+  w(L)\bar F.
+\]</span></p>
+<p>The weak problem is therefore</p>
+<p><span class="math display">\[
+  \boxed{
+  \text{Find }u\in S
+  \text{ such that }
+  a(w,u)=\ell(w)
+  \qquad
+  \forall\,w\in V.
+  }
+\]</span></p>
+<p>The weak form expresses the same equilibrium problem as the strong form, but with lower regularity requirements. The natural boundary condition enters naturally through the load functional, or linear functional, <span class="math inline">\(\ell(w)\)</span>.</p>
+</section>
+<section id="from-the-weak-problem-to-a-finite-dimensional-problem" class="level2" data-number="9.9">
+<h2 data-number="9.9" class="anchored" data-anchor-id="from-the-weak-problem-to-a-finite-dimensional-problem"><span class="header-section-number">9.9</span> From the weak problem to a finite-dimensional problem</h2>
+<p>The weak problem is still infinite-dimensional because the admissible trial and test sets contain infinitely many functions.</p>
+<p>The conforming finite element method used here replaces these sets by finite-dimensional approximations,</p>
+<p><span class="math display">\[
+  S^h\subset S,
+  \qquad
+  V^h\subset V.
+\]</span></p>
+<p>Informally, a finite-dimensional approximation is described by a finite number of coefficients. For the present bar problem, whose prescribed displacement is zero, the approximate displacement can be written as</p>
+<p><span class="math display">\[
+  u^h(x)
+  =
+  \sum_{i=1}^{n} c_i\,\phi_i(x),
+\]</span></p>
+<p>where the finite set of functions <span class="math inline">\(\phi_i(x)\)</span> defines the approximation and the coefficients <span class="math inline">\(c_i\)</span> are the unknowns.</p>
+<p>For nonhomogeneous essential boundary conditions, the approximate field is written as the sum of a part satisfying the prescribed displacement and a homogeneous expansion for the remaining unknown part.</p>
+<p>The choice of the functions <span class="math inline">\(\phi_i\)</span> is part of the approximation. In the finite element method, they are typically constructed from piecewise polynomials defined over the elements. Other numerical methods may use different finite-dimensional spaces, for example spaces generated by trigonometric functions or global polynomials.</p>
+<p>The finite-dimensional weak problem is obtained by seeking</p>
+<p><span class="math display">\[
+  u^h\in S^h
+\]</span></p>
+<p>such that</p>
+<p><span class="math display">\[
+  a(w^h,u^h)=\ell(w^h)
+  \qquad
+  \forall\,w^h\in V^h.
+\]</span></p>
+<p>This is a Galerkin approximation. In the standard displacement-based finite element method used here, the trial and test functions are constructed from the same finite-dimensional family of basis functions, after accounting for the essential boundary conditions. This choice is known as the <strong>Bubnov–Galerkin method</strong>.</p>
+<p>Other formulations may use different approximation spaces for the trial and test functions; these are generally referred to as <strong>Petrov–Galerkin methods</strong>.</p>
+<p>The remaining question is how those finite-dimensional spaces should be constructed so that the weak problem becomes a computable finite element model.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/two-springs-regression-tests.html" class="pagination-link" aria-label="From analytical verification to regression testing">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
