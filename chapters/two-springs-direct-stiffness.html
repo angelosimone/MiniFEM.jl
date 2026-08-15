@@ -351,7 +351,7 @@ Figure&nbsp;4.2: Idealized one-dimensional model of the spring-and-cart system.
 <p>After completing this chapter, you should be able to:</p>
 <ul>
 <li>derive the stiffness relation for a one-dimensional spring;</li>
-<li>formulate and assemble the global stiffness system for a spring model;</li>
+<li>formulate the element stiffness relations and assemble them into the global system using local-to-global degree-of-freedom maps;</li>
 <li>apply displacement boundary conditions and solve for the unknown nodal displacements;</li>
 <li>recover and verify quantities such as spring forces and reactions.</li>
 </ul>
@@ -569,11 +569,11 @@ Figure&nbsp;4.4: Element free-body diagrams for the spring-and-cart system showi
 <section id="solution-using-the-direct-stiffness-method" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="solution-using-the-direct-stiffness-method"><span class="header-section-number">4.3</span> Solution using the direct stiffness method</h2>
 <p>The systematic equilibrium formulation discussed above produced a displacement system by writing the spring relations, enforcing equilibrium, and eliminating the spring-end forces. The direct stiffness method organizes these same mechanical operations into a standard procedure that can be applied systematically to larger assemblies and automated.</p>
-<p>The method constructs the global system of equations</p>
+<p>The direct stiffness method constructs the global stiffness relation by assembling the contributions of the individual elements according to their connectivity. After the displacement constraints have been accounted for, the equations for the unknown displacement degrees of freedom take the familiar form</p>
 <p><span class="math display">\[
-  \mathbf{K}\mathbf{u}=\mathbf{f}
+  \mathbf{K}\mathbf{u}=\mathbf{f}.
 \]</span></p>
-<p>from the stiffness relations of the individual elements and their connectivity. We begin by deriving the nodal force–displacement relation for a single spring.</p>
+<p>We begin by deriving the nodal force–displacement relation for a single spring.</p>
 <section id="nodal-equilibrium-relation-for-a-spring" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="nodal-equilibrium-relation-for-a-spring"><span class="header-section-number">4.3.1</span> Nodal equilibrium relation for a spring</h3>
 <p>Consider a spring of stiffness <span class="math inline">\(k_s\)</span> connecting nodes <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, as shown in <a href="#fig-spring-1d-element" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>. The nodal displacements <span class="math inline">\(u_a\)</span> and <span class="math inline">\(u_b\)</span> are measured along the <span class="math inline">\(x\)</span> direction, while <span class="math inline">\(F_a\)</span> and <span class="math inline">\(F_b\)</span> denote the corresponding nodal force components acting on the spring, taken as positive in the positive <span class="math inline">\(x\)</span> direction.</p>
@@ -639,7 +639,7 @@ Figure&nbsp;4.6: Equilibrium of a spring is expressed by considering the two par
   \end{bmatrix}
   }_{\mathbf{f}_s}.
 \]</span></p>
-<p>Here, <span class="math inline">\(\mathbf{u}_s\)</span> is the vector of nodal displacements, <span class="math inline">\(\mathbf{f}_s\)</span> is the vector of nodal forces, and <span class="math inline">\(\mathbf{K}_s\)</span> is the spring stiffness matrix.</p>
+<p>Here, <span class="math inline">\(\mathbf{u}_s\)</span> is the vector of nodal displacements, <span class="math inline">\(\mathbf{f}_s\)</span> is the vector of nodal forces acting at the ends of the individual spring, and <span class="math inline">\(\mathbf{K}_s\)</span> is the spring stiffness matrix. These element-end forces should not be confused with the prescribed global load vector of the complete assembly, which is introduced later.</p>
 </section>
 <section id="pre-processing-nodes-elements-and-model-data" class="level3" data-number="4.3.2">
 <h3 data-number="4.3.2" class="anchored" data-anchor-id="pre-processing-nodes-elements-and-model-data"><span class="header-section-number">4.3.2</span> Pre-processing: nodes, elements, and model data</h3>
@@ -716,7 +716,7 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
 <div class="callout-body-container callout-body">
 <p>All quantities must be expressed in a consistent system of units. This requirement applies even though the matrices in this example are initially written symbolically and can be solved by hand. In larger systems, numerical values are normally supplied to linear-algebra software, which usually stores matrix entries as numbers without interpreting their physical units. The input values must therefore already belong to one coherent system of units.</p>
 <p>Here, forces are expressed in newtons, displacements in millimeters, spring stiffnesses in newtons per millimeter, and strain energy in newton millimeters. With these choices, solving the numerical system returns displacements in millimeters. For the same reason, a bar element with axial stiffness <span class="math inline">\(EA/L\)</span> would require Young’s modulus <span class="math inline">\(E\)</span> in newtons per square millimeter, the cross-sectional area <span class="math inline">\(A\)</span> in square millimeters, and the bar length <span class="math inline">\(L\)</span> in millimeters.</p>
-<p>Alternatively, forces may be expressed in newtons and lengths in metres. In that case, spring stiffnesses must be expressed in newtons per metre, <span class="math inline">\(E\)</span> in newtons per square metre, <span class="math inline">\(A\)</span> in square metres, and the computed displacements will be in metres. Any consistent system of units may be used, but all input quantities must be expressed using the same system.</p>
+<p>Alternatively, forces may be expressed in newtons and lengths in meters. In that case, spring stiffnesses must be expressed in newtons per meter, <span class="math inline">\(E\)</span> in newtons per square meter, <span class="math inline">\(A\)</span> in square meters, and the computed displacements will be in meters. Any consistent system of units may be used, but all input quantities must be expressed using the same system.</p>
 </div>
 </div>
 </section>
@@ -802,6 +802,64 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
 </ul>
 <p>A different degree-of-freedom numbering changes the ordering of the global arrays but not the physical solution.</p>
 <p>When a node carries more than one degree of freedom, node numbers and degree-of-freedom numbers no longer have a one-to-one numerical correspondence. For example, in two-dimensional elasticity each node typically carries two displacement degrees of freedom, <span class="math inline">\(u_x\)</span> and <span class="math inline">\(u_y\)</span>.</p>
+<p>The local-to-global degree-of-freedom map can also be represented algebraically. For each element, define an <strong>element extraction matrix</strong> <span class="math inline">\(\mathbf{C}_e\)</span> such that</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{u}_e
+  =
+  \mathbf{C}_e\mathbf{u}.
+  }
+\]</span></p>
+<p>The degree-of-freedom map records which global degree of freedom corresponds to each local degree of freedom. The extraction matrix uses this information to perform the reverse algebraic operation: it <strong>extracts</strong> the required entries from the global displacement vector and places them in the element’s local ordering.</p>
+<p>For element 1, the local-to-global map is</p>
+<p><span class="math display">\[
+  [1,2]_{\mathrm{local}}
+  \longrightarrow
+  [2,3]_{\mathrm{global}},
+\]</span></p>
+<p>so</p>
+<p><span class="math display">\[
+  \mathbf{C}_1
+  =
+  \begin{bmatrix}
+  0 &amp; 1 &amp; 0\\
+  0 &amp; 0 &amp; 1
+  \end{bmatrix},
+\]</span></p>
+<p>and therefore</p>
+<p><span class="math display">\[
+  \mathbf{C}_1\mathbf{u}
+  =
+  \begin{bmatrix}
+  u_2\\
+  u_3
+  \end{bmatrix}.
+\]</span></p>
+<p>For element 2,</p>
+<p><span class="math display">\[
+  [1,2]_{\mathrm{local}}
+  \longrightarrow
+  [3,1]_{\mathrm{global}},
+\]</span></p>
+<p>which gives</p>
+<p><span class="math display">\[
+  \mathbf{C}_2
+  =
+  \begin{bmatrix}
+  0 &amp; 0 &amp; 1\\
+  1 &amp; 0 &amp; 0
+  \end{bmatrix},
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  \mathbf{C}_2\mathbf{u}
+  =
+  \begin{bmatrix}
+  u_3\\
+  u_1
+  \end{bmatrix}.
+\]</span></p>
+<p>The matrices <span class="math inline">\(\mathbf{C}_1\)</span> and <span class="math inline">\(\mathbf{C}_2\)</span> are therefore algebraic representations of the corresponding degree-of-freedom maps. Multiplying a global vector by <span class="math inline">\(\mathbf{C}_e\)</span> performs the <strong>extract</strong> operation: the entries required by element <span class="math inline">\(e\)</span> are selected from the global vector and ordered locally.</p>
 </section>
 <section id="global-equilibrium-system" class="level3" data-number="4.3.4">
 <h3 data-number="4.3.4" class="anchored" data-anchor-id="global-equilibrium-system"><span class="header-section-number">4.3.4</span> Global equilibrium system</h3>
@@ -811,7 +869,7 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
   \mathbf{u},\mathbf{f}\in\mathbb{R}^{3}.
 \]</span></p>
 <p>For each spring element <span class="math inline">\(e\)</span>, <span class="math display">\[
-  \mathbf{K}^{(e)}
+  \mathbf{K}_e
   =
   k_e
   \begin{bmatrix}
@@ -820,14 +878,84 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
   \end{bmatrix}.
 \]</span> Each element relation is written in terms of its two local degrees of freedom. To obtain equilibrium equations for the complete model, the element contributions must be expressed in the global degree-of-freedom ordering.</p>
 <p>The local-to-global degree-of-freedom map tells us where the rows and columns of each element stiffness matrix belong in the global matrix. If more than one element contributes to the same global matrix entry, those contributions are added. This process is called <strong>assembly</strong>.</p>
-<p>The addition of contributions at shared degrees of freedom has a direct mechanical meaning: it sums the signed element-end force contributions associated with the same global degree of freedom. At an internal node with no applied load, these contributions sum to zero. At a loaded or constrained node, their sum equals the corresponding applied nodal load or reaction.</p>
-<p>We now perform this operation explicitly for the two spring elements.</p>
+<p>The <strong>assembly</strong> process can now be expressed algebraically. Two complementary operations make the local-to-global transfer explicit: <strong>extract</strong> and <strong>scatter</strong>.</p>
+<p>For element <span class="math inline">\(e\)</span>, the local displacement vector is first extracted from the global displacement vector:</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{u}_e
+  =
+  \mathbf{C}_e\mathbf{u}.
+  }
+\]</span></p>
+<p>The element stiffness matrix then acts on this local vector,</p>
+<p><span class="math display">\[
+  \mathbf{K}_e\mathbf{u}_e
+  =
+  \mathbf{K}_e\mathbf{C}_e\mathbf{u},
+\]</span></p>
+<p>producing the signed element-end force contributions in the element’s local degree-of-freedom ordering.</p>
+<p>These local contributions must next be returned to their corresponding global positions. This operation is called <strong>scatter</strong> and is performed by the transpose of the extraction matrix:</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{C}_e^{\mathsf T}
+  \mathbf{K}_e
+  \mathbf{u}_e
+  }
+  =
+  \mathbf{C}_e^{\mathsf T}
+  \mathbf{K}_e
+  \mathbf{C}_e
+  \mathbf{u}.
+\]</span></p>
+<p>Thus, for each element,</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{u}
+  \;\xrightarrow{\text{extract }\,\mathbf{C}_e}\;
+  \mathbf{u}_e
+  \;\xrightarrow{\mathbf{K}_e}\;
+  \mathbf{K}_e\mathbf{u}_e
+  \;\xrightarrow{\text{scatter }\,\mathbf{C}_e^{\mathsf T}}\;
+  \mathbf{C}_e^{\mathsf T}\mathbf{K}_e\mathbf{u}_e.
+  }
+\]</span></p>
+<p>A single scatter operation places one element contribution in the appropriate global positions. Repeating this operation for all elements and adding contributions that map to the same global entries constitutes the <strong>assembly</strong> of the global system. In computational terms, this repeated placement and accumulation is often described as <strong>scatter-add</strong>.</p>
+<p>For the complete model,</p>
+<p><span class="math display">\[
+  \sum_{e=1}^{n_e}
+  \mathbf{C}_e^{\mathsf T}
+  \mathbf{K}_e
+  \mathbf{C}_e
+  \mathbf{u}
+  =
+  \left(
+  \sum_{e=1}^{n_e}
+  \mathbf{C}_e^{\mathsf T}
+  \mathbf{K}_e
+  \mathbf{C}_e
+  \right)
+  \mathbf{u}.
+\]</span></p>
+<p>The assembled global stiffness matrix is therefore</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{K}
+  =
+  \sum_{e=1}^{n_e}
+  \mathbf{C}_e^{\mathsf T}
+  \mathbf{K}_e
+  \mathbf{C}_e.
+  }
+\]</span></p>
+<p>The vector and matrix forms express the same local-to-global mapping. For a vector contribution, <span class="math inline">\(\mathbf{C}_e^{\mathsf T}\)</span> scatters the local entries to their global positions. For a matrix contribution, the corresponding operation acts on both the local row and column indices, giving <span class="math inline">\(\mathbf{C}_e^{\mathsf T}\mathbf{K}_e\mathbf{C}_e\)</span>.</p>
+<p>The following explicit assembly of the two springs shows, entry by entry, how the degree-of-freedom map and the corresponding scatter operation place and combine the element stiffness contributions in the global matrix.</p>
+<p>The assembly operation also has a direct mechanical meaning. When several elements share a global degree of freedom, their signed element-end force contributions are scattered to the same global entry and added. At a free degree of freedom, their assembled value must equal the corresponding applied nodal load. At a constrained degree of freedom, the displacement is prescribed, and the reaction required to satisfy equilibrium is recovered after the displacement solution has been obtained.</p>
 </section>
 <section id="assembly-of-element-1" class="level3" data-number="4.3.5">
 <h3 data-number="4.3.5" class="anchored" data-anchor-id="assembly-of-element-1"><span class="header-section-number">4.3.5</span> Assembly of element 1</h3>
 <p>For element 1,</p>
 <p><span class="math display">\[
-  \mathbf{K}^{(1)}=
+  \mathbf{K}_1=
   k_1
   \begin{bmatrix}
   1 &amp; -1\\
@@ -857,6 +985,14 @@ Figure&nbsp;4.7: The physical nodes are ordered geometrically from left to right
   0 &amp; -k_1 &amp; k_1
   \end{bmatrix}.
 \]</span></p>
+<p>Equivalently, using the extraction matrix,</p>
+<p><span class="math display">\[
+  \mathbf{K}_{\mathrm{from\ element\ 1}}
+  =
+  \mathbf{C}_1^{\mathsf T}
+  \mathbf{K}_1
+  \mathbf{C}_1.
+\]</span></p>
 <div id="fig-local-global-mapping" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-local-global-mapping-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -872,7 +1008,7 @@ Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom
 <h3 data-number="4.3.6" class="anchored" data-anchor-id="assembly-of-element-2"><span class="header-section-number">4.3.6</span> Assembly of element 2</h3>
 <p>For element 2,</p>
 <p><span class="math display">\[
-  \mathbf{K}^{(2)}=
+  \mathbf{K}_2=
   k_2
   \begin{bmatrix}
   1 &amp; -1\\
@@ -898,10 +1034,26 @@ Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom
   -k_2 &amp; 0 &amp; k_2
   \end{bmatrix}.
 \]</span></p>
+<p>Equivalently,</p>
+<p><span class="math display">\[
+  \mathbf{K}_{\mathrm{from\ element\ 2}}
+  =
+  \mathbf{C}_2^{\mathsf T}
+  \mathbf{K}_2
+  \mathbf{C}_2.
+\]</span></p>
 </section>
 <section id="assembled-stiffness-matrix" class="level3" data-number="4.3.7">
 <h3 data-number="4.3.7" class="anchored" data-anchor-id="assembled-stiffness-matrix"><span class="header-section-number">4.3.7</span> Assembled stiffness matrix</h3>
 <p>Adding both element contributions gives</p>
+<p><span class="math display">\[
+  \mathbf{K}
+  =
+  \mathbf{C}_1^{\mathsf T}\mathbf{K}_1\mathbf{C}_1
+  +
+  \mathbf{C}_2^{\mathsf T}\mathbf{K}_2\mathbf{C}_2,
+\]</span></p>
+<p>or, explicitly,</p>
 <p><span class="math display">\[
   \mathbf{K}=
   \begin{bmatrix}
@@ -952,6 +1104,7 @@ Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom
   F\\0\\0
   \end{bmatrix}.
 \]</span></p>
+<p>Because <span class="math inline">\(F\)</span> is already prescribed as a nodal load of the global model, no element load vector needs to be constructed or assembled in this example.</p>
 <p>The fixed left end imposes</p>
 <p><span class="math display">\[
   u_2=0.
@@ -1249,8 +1402,8 @@ Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom
 <p>The direct stiffness calculation can now be automated. In general, a finite element program must perform the following stages:</p>
 <ol type="1">
 <li>represent the model data, including elements, connectivity, loads, and constraints;</li>
-<li>evaluate the contribution of each element;</li>
-<li>assemble the element contributions into a global algebraic system;</li>
+<li>use the local-to-global degree-of-freedom map to extract the quantities required by each element and evaluate its contribution;</li>
+<li>assemble the element contributions into the global algebraic system by scattering them to their global positions and adding overlapping contributions;</li>
 <li>impose the prescribed boundary conditions;</li>
 <li>solve for the unknown degrees of freedom;</li>
 <li>post-process the solution to obtain relevant mechanical quantities;</li>
