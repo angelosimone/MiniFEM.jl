@@ -25,6 +25,7 @@ book:
     - part: "One-dimensional continuum finite elements"
       chapters:
         - chapters/one-dimensional-axial-bar-weak-form.qmd
+        - chapters/two-node-linear-bar-element.qmd
     - glossary.qmd
     - references.qmd
 
