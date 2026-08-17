@@ -37,8 +37,8 @@ code.
 
 MiniFEM relies on several broad categories of these constructs. The overview
 below serves as a map of the chapter. Some concepts are needed immediately for
-the first script; others become relevant only in later MiniFEM snapshots and are
-collected in the reference section.
+the first script; others become relevant only in subsequent MiniFEM snapshots
+and are collected in Part II.
 
 ### Data representation constructs
 
@@ -928,9 +928,9 @@ uses the same Julia constructs with application-specific names and meanings.
 ::: {.callout-note title="You may stop here"}
 You can now proceed to the direct-stiffness chapters, starting with
 @sec-discrete-continuous. The Julia concepts introduced here will be used when
-the mechanical formulation is translated into code. Return to the reference
-section below as needed when later MiniFEM examples introduce additional
-programming concepts.
+the mechanical formulation is translated into code. Return to Part II below as
+needed when subsequent MiniFEM examples introduce additional programming
+concepts.
 :::
 
 ## Part II --- Additional Julia concepts for MiniFEM
@@ -1403,6 +1403,61 @@ A[:, 2]       # second column
 
 selects the complete second row or complete second column, respectively. This is
 useful for concise matrix operations.
+
+### Selecting and assigning entries with index lists
+
+An index does not have to be a single integer. A vector or range of indices can
+select several entries at once. For example:
+
+```julia
+all_indices = 1:6
+selected_indices = [1, 4]
+remaining_indices = setdiff(all_indices, selected_indices)
+```
+
+`setdiff` returns the elements present in the first collection but not in the
+second. Here, those elements are indices, so `remaining_indices` contains
+`[2, 3, 5, 6]`.
+
+The same kind of index list can select entries from a vector:
+
+```julia
+b = [10.0, 20.0, 30.0, 40.0]
+indices = [1, 3]
+
+b[indices]
+```
+
+It can also select a submatrix. When both row and column lists are supplied,
+Julia selects every indicated row-column combination:
+
+```julia
+A = [
+    1.0  2.0  3.0  4.0
+    5.0  6.0  7.0  8.0
+    9.0 10.0 11.0 12.0
+]
+
+rows = [1, 3]
+cols = [2, 4]
+
+A[rows, cols]
+```
+
+Finally, selected entries can be assigned at once when the right-hand side has
+the corresponding number of values:
+
+```julia
+x = zeros(4)
+indices = [1, 3]
+values = [1.5, 2.5]
+
+x[indices] = values
+```
+
+After this assignment, `x` is `[1.5, 0.0, 2.5, 0.0]`. These operations are
+useful whenever a program separates a collection into selected and remaining
+entries.
 
 ### Arrays of arrays
 
