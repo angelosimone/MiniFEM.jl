@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./references.html" rel="next">
-<link href="./chapters/four-element-axial-bar-analysis.html" rel="prev">
+<link href="./chapters/shared-fem-assembly.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -133,7 +133,7 @@ window.MathJax = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -261,12 +261,18 @@ window.MathJax = {
  <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./glossary.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -285,9 +291,19 @@ window.MathJax = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#d" id="toc-d" class="nav-link active" data-scroll-target="#d">D</a>
+  <li><a href="#a" id="toc-a" class="nav-link active" data-scroll-target="#a">A</a>
+  <ul class="collapse">
+  <li><a href="#gls-abstraction" id="toc-gls-abstraction" class="nav-link" data-scroll-target="#gls-abstraction">Abstraction</a></li>
+  </ul></li>
+  <li><a href="#c" id="toc-c" class="nav-link" data-scroll-target="#c">C</a>
+  <ul class="collapse">
+  <li><a href="#gls-cohesion" id="toc-gls-cohesion" class="nav-link" data-scroll-target="#gls-cohesion">Cohesion</a></li>
+  <li><a href="#gls-coupling" id="toc-gls-coupling" class="nav-link" data-scroll-target="#gls-coupling">Coupling</a></li>
+  </ul></li>
+  <li><a href="#d" id="toc-d" class="nav-link" data-scroll-target="#d">D</a>
   <ul class="collapse">
   <li><a href="#gls-declarative-programming" id="toc-gls-declarative-programming" class="nav-link" data-scroll-target="#gls-declarative-programming">Declarative programming</a></li>
+  <li><a href="#gls-dry" id="toc-gls-dry" class="nav-link" data-scroll-target="#gls-dry">Don’t Repeat Yourself (DRY)</a></li>
   </ul></li>
   <li><a href="#i" id="toc-i" class="nav-link" data-scroll-target="#i">I</a>
   <ul class="collapse">
@@ -306,6 +322,7 @@ window.MathJax = {
   <li><a href="#s" id="toc-s" class="nav-link" data-scroll-target="#s">S</a>
   <ul class="collapse">
   <li><a href="#gls-separation-of-concerns" id="toc-gls-separation-of-concerns" class="nav-link" data-scroll-target="#gls-separation-of-concerns">Separation of concerns</a></li>
+  <li><a href="#gls-single-responsibility-principle" id="toc-gls-single-responsibility-principle" class="nav-link" data-scroll-target="#gls-single-responsibility-principle">Single Responsibility Principle</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -332,12 +349,39 @@ window.MathJax = {
 </header>
 
 
+<section id="a" class="level2">
+<h2 class="anchored" data-anchor-id="a">A</h2>
+<section id="gls-abstraction" class="level3">
+<h3 class="anchored" data-anchor-id="gls-abstraction">Abstraction</h3>
+<p>In programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.</p>
+<p>Similar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.</p>
+<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Abstraction_(computer_science)">Wikipedia — Abstraction (computer science)</a>.</p>
+</section>
+</section>
+<section id="c" class="level2">
+<h2 class="anchored" data-anchor-id="c">C</h2>
+<section id="gls-cohesion" class="level3">
+<h3 class="anchored" data-anchor-id="gls-cohesion">Cohesion</h3>
+<p>The degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in <a href="chapters/shared-fem-assembly.html" class="quarto-xref"><span>12&nbsp; From repeated assembly to shared FEM operations</span></a>.</p>
+<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Cohesion_%28computer_science%29">Wikipedia — Cohesion (computer science)</a>.</p>
+</section>
+<section id="gls-coupling" class="level3">
+<h3 class="anchored" data-anchor-id="gls-coupling">Coupling</h3>
+<p>The degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.</p>
+<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29">Wikipedia — Coupling (computer programming)</a>.</p>
+</section>
+</section>
 <section id="d" class="level2">
 <h2 class="anchored" data-anchor-id="d">D</h2>
 <section id="gls-declarative-programming" class="level3">
 <h3 class="anchored" data-anchor-id="gls-declarative-programming">Declarative programming</h3>
 <p>A programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on <strong>what</strong> should be achieved, while the underlying implementation determines <strong>how</strong> to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.</p>
 <p><strong>See also:</strong> <a href="#gls-imperative-programming">Imperative programming</a>. <strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Declarative_programming">Wikipedia — Declarative programming</a>.</p>
+</section>
+<section id="gls-dry" class="level3">
+<h3 class="anchored" data-anchor-id="gls-dry">Don’t Repeat Yourself (DRY)</h3>
+<p>A design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in <a href="chapters/shared-fem-assembly.html" class="quarto-xref"><span>12&nbsp; From repeated assembly to shared FEM operations</span></a>.</p>
+<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">Wikipedia — Don’t repeat yourself</a>.</p>
 </section>
 </section>
 <section id="i" class="level2">
@@ -387,6 +431,11 @@ window.MathJax = {
 <h3 class="anchored" data-anchor-id="gls-separation-of-concerns">Separation of concerns</h3>
 <p>A software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.</p>
 <p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Separation_of_concerns">Wikipedia — Separation of concerns</a>.</p>
+</section>
+<section id="gls-single-responsibility-principle" class="level3">
+<h3 class="anchored" data-anchor-id="gls-single-responsibility-principle">Single Responsibility Principle</h3>
+<p>A design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in <a href="chapters/shared-fem-assembly.html" class="quarto-xref"><span>12&nbsp; From repeated assembly to shared FEM operations</span></a>.</p>
+<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Single-responsibility_principle">Wikipedia — Single-responsibility principle</a>.</p>
 
 
 </section>
@@ -795,8 +844,8 @@ window.MathJax = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./chapters/four-element-axial-bar-analysis.html" class="pagination-link" aria-label="Implementing a finite element analysis of a one-dimensional axial bar">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span>
+      <a href="./chapters/shared-fem-assembly.html" class="pagination-link" aria-label="From repeated assembly to shared FEM operations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

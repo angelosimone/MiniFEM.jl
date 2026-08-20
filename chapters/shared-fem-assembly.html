@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>12&nbsp; From repeated assembly to shared FEM operations – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/four-element-axial-bar-analysis.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c72bfcf2850aa2268dce9df1d5752dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/shared-fem-assembly.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Discrete systems and the direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">One-dimensional continuum finite elements</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-node-linear-bar-element.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The two-node linear bar element</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/four-element-axial-bar-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#establish-the-verified-baseline" id="toc-establish-the-verified-baseline" class="nav-link active" data-scroll-target="#establish-the-verified-baseline"><span class="header-section-number">12.1</span> Establish the verified baseline</a></li>
+  <li><a href="#compare-the-s05-element-loops" id="toc-compare-the-s05-element-loops" class="nav-link" data-scroll-target="#compare-the-s05-element-loops"><span class="header-section-number">12.2</span> Compare the S05 element loops</a></li>
+  <li><a href="#decide-what-should-be-shared" id="toc-decide-what-should-be-shared" class="nav-link" data-scroll-target="#decide-what-should-be-shared"><span class="header-section-number">12.3</span> Decide what should be shared</a></li>
+  <li><a href="#first-guided-implementation-matrix-assembly" id="toc-first-guided-implementation-matrix-assembly" class="nav-link" data-scroll-target="#first-guided-implementation-matrix-assembly"><span class="header-section-number">12.4</span> First guided implementation: matrix assembly</a></li>
+  <li><a href="#decide-where-the-shared-file-is-loaded" id="toc-decide-where-the-shared-file-is-loaded" class="nav-link" data-scroll-target="#decide-where-the-shared-file-is-loaded"><span class="header-section-number">12.5</span> Decide where the shared file is loaded</a></li>
+  <li><a href="#refactor-the-spring-implementation-first" id="toc-refactor-the-spring-implementation-first" class="nav-link" data-scroll-target="#refactor-the-spring-implementation-first"><span class="header-section-number">12.6</span> Refactor the spring implementation first</a></li>
+  <li><a href="#second-guided-implementation-vector-assembly" id="toc-second-guided-implementation-vector-assembly" class="nav-link" data-scroll-target="#second-guided-implementation-vector-assembly"><span class="header-section-number">12.7</span> Second guided implementation: vector assembly</a></li>
+  <li><a href="#why-not-combine-matrix-and-vector-assembly" id="toc-why-not-combine-matrix-and-vector-assembly" class="nav-link" data-scroll-target="#why-not-combine-matrix-and-vector-assembly"><span class="header-section-number">12.8</span> Why not combine matrix and vector assembly?</a></li>
+  <li><a href="#third-guided-implementation-nodal-loads" id="toc-third-guided-implementation-nodal-loads" class="nav-link" data-scroll-target="#third-guided-implementation-nodal-loads"><span class="header-section-number">12.9</span> Third guided implementation: nodal loads</a></li>
+  <li><a href="#inspect-the-result" id="toc-inspect-the-result" class="nav-link" data-scroll-target="#inspect-the-result"><span class="header-section-number">12.10</span> Inspect the result</a></li>
+  <li><a href="#reflect-on-the-programming-principles" id="toc-reflect-on-the-programming-principles" class="nav-link" data-scroll-target="#reflect-on-the-programming-principles"><span class="header-section-number">12.11</span> Reflect on the programming principles</a>
+  <ul class="collapse">
+  <li><a href="#single-responsibility-principle" id="toc-single-responsibility-principle" class="nav-link" data-scroll-target="#single-responsibility-principle"><span class="header-section-number">12.11.1</span> Single Responsibility Principle</a></li>
+  <li><a href="#cohesion" id="toc-cohesion" class="nav-link" data-scroll-target="#cohesion"><span class="header-section-number">12.11.2</span> Cohesion</a></li>
+  <li><a href="#coupling-and-interface-design" id="toc-coupling-and-interface-design" class="nav-link" data-scroll-target="#coupling-and-interface-design"><span class="header-section-number">12.11.3</span> Coupling and interface design</a></li>
+  <li><a href="#dont-repeat-yourself-without-dogmatism" id="toc-dont-repeat-yourself-without-dogmatism" class="nav-link" data-scroll-target="#dont-repeat-yourself-without-dogmatism"><span class="header-section-number">12.11.4</span> Don’t Repeat Yourself without dogmatism</a></li>
+  </ul></li>
+  <li><a href="#what-s06-deliberately-does-not-refactor" id="toc-what-s06-deliberately-does-not-refactor" class="nav-link" data-scroll-target="#what-s06-deliberately-does-not-refactor"><span class="header-section-number">12.12</span> What S06 deliberately does not refactor</a></li>
+  <li><a href="#final-regression-checkpoint" id="toc-final-regression-checkpoint" class="nav-link" data-scroll-target="#final-regression-checkpoint"><span class="header-section-number">12.13</span> Final regression checkpoint</a></li>
+  <li><a href="#what-comes-next" id="toc-what-comes-next" class="nav-link" data-scroll-target="#what-comes-next"><span class="header-section-number">12.14</span> What comes next</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/shared-fem-assembly.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-shared-fem-assembly" class="quarto-section-identifier"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Repository snapshot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Course edition:</strong> 2026–27<br>
+<strong>Starting snapshot:</strong> <code>2026-27/S05-four-element-bar-analysis</code><br>
+<strong>Target snapshot:</strong> <code>2026-27/S06-shared-fem-assembly</code></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Task: Identify and share element-independent FEM assembly operations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare the verified spring and axial-bar implementations. Identify the assembly operations that are sufficiently independent of the element formulation to justify a shared implementation, while keeping the element-specific finite element formulation visible.</p>
+</div>
+</div>
+<section id="establish-the-verified-baseline" class="level2" data-number="12.1">
+<h2 data-number="12.1" class="anchored" data-anchor-id="establish-the-verified-baseline"><span class="header-section-number">12.1</span> Establish the verified baseline</h2>
+<p>The two-spring and four-element axial-bar analyses have already been formulated, implemented, and independently verified. Their accepted numerical results are also checked by the regression tests introduced in <a href="two-springs-regression-tests.html" class="quarto-xref"><span>Chapter 8</span></a>. S06 therefore focuses on <a href="../glossary.html#gls-refactoring"><em>refactoring</em></a>: the code organization will change, but the mathematical problems and accepted numerical behavior must remain unchanged.</p>
+<p>Before proceeding, run the regression tests:</p>
+<pre class="text"><code>julia test/runtests.jl</code></pre>
+<p>The expected baseline results are:</p>
+<pre class="text"><code>Two-spring regression tests: 4 pass
+Four-element axial-bar regression tests: 2 pass</code></pre>
+<p>This checkpoint is important before refactoring because the regression tests provide a reliable reference against which to check that the numerical behavior remains unchanged as the code is reorganized.</p>
+<p>The aim of S06 is therefore not to eliminate every instance of repeated code, but to use the repeated assembly patterns to identify FEM operations that are stable and sufficiently independent of the element formulation to justify a shared implementation.</p>
+<p>S06 starts from the completed S05 state. Begin by comparing the two existing finite element implementations and the regression tests that establish their accepted numerical behavior:</p>
+<pre class="text"><code>two_springs_fem.jl
+    spring-specific element formulation and analysis
+
+axial_bar_fem.jl
+    two-node axial-bar formulation and analysis
+
+test/runtests.jl
+    regression tests for both analyses</code></pre>
+<p>The first implementation step in S06 is to create <code>examples/fem_assembly.jl</code>; this file will contain the FEM assembly operations that the comparison shows are appropriate to share.</p>
+</section>
+<section id="compare-the-s05-element-loops" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="compare-the-s05-element-loops"><span class="header-section-number">12.2</span> Compare the S05 element loops</h2>
+<p>Before making any changes, compare the S05 spring and axial-bar element loops. The code snippets below are sufficient to identify what is common and what remains element-specific; there is no need to compare the complete files line by line.</p>
+<p>The essential part of the spring loop is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>k_e <span class="op">=</span> element_stiffness[<span class="cn">e</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>K_e <span class="op">=</span> <span class="fu">spring_stiffness</span>(k_e)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dof_map <span class="op">=</span> [element_connectivity[<span class="cn">e</span>, <span class="fl">1</span>], element_connectivity[<span class="cn">e</span>, <span class="fl">2</span>]]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> dof_map[i]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        J <span class="op">=</span> dof_map[j]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        K[I, J] <span class="op">+=</span> K_e[i, j]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The axial-bar loop performs additional element-specific operations and assembles both a matrix and a consistent element load vector:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x_e <span class="op">=</span> node_coordinates[element_nodes]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>E_e <span class="op">=</span> element_E[<span class="cn">e</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>A_e <span class="op">=</span> element_A[<span class="cn">e</span>]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>q_e <span class="op">=</span> element_q[<span class="cn">e</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>L_e <span class="op">=</span> x_e[<span class="fl">2</span>] <span class="op">-</span> x_e[<span class="fl">1</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>K_e <span class="op">=</span> <span class="fu">bar_stiffness</span>(E_e, A_e, L_e)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>f_e <span class="op">=</span> <span class="fu">bar_distributed_load</span>(q_e, L_e)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>dof_map <span class="op">=</span> [element_connectivity[<span class="cn">e</span>, <span class="fl">1</span>], element_connectivity[<span class="cn">e</span>, <span class="fl">2</span>]]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> dof_map[i]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    f[I] <span class="op">+=</span> f_e[i]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        J <span class="op">=</span> dof_map[j]</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        K[I, J] <span class="op">+=</span> K_e[i, j]</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Before continuing, classify the following operations. For each one, ask whether it depends on a particular element formulation, whether the operation itself is element-independent, and whether the current examples provide enough evidence to justify sharing its implementation in S06.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 24%">
+<col style="width: 21%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>operation</th>
+<th style="text-align: center;">depends on the element formulation?</th>
+<th style="text-align: center;">element-independent operation?</th>
+<th style="text-align: center;">enough evidence to share in S06?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>obtain <span class="math inline">\(k_e\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td>obtain <span class="math inline">\(E_e\)</span>, <span class="math inline">\(A_e\)</span>, and <span class="math inline">\(q_e\)</span>; compute <span class="math inline">\(L_e\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td>construct <span class="math inline">\(\mathbf K_e\)</span> or <span class="math inline">\(\mathbf f_e\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td>construct <code>dof_map</code></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td>scatter <span class="math inline">\(\mathbf K_e\)</span> into <span class="math inline">\(\mathbf K\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td>scatter <span class="math inline">\(\mathbf f_e\)</span> into <span class="math inline">\(\mathbf f\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p>Use the table to decide whether an operation should remain specific to an element formulation or whether it is sufficiently independent and established to justify a shared implementation. In particular, do not decide from similar syntax alone. Consider whether the operation represents the same conceptual task and serves the same <a href="../glossary.html#gls-abstraction">abstraction</a>.</p>
+</section>
+<section id="decide-what-should-be-shared" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="decide-what-should-be-shared"><span class="header-section-number">12.3</span> Decide what should be shared</h2>
+<p>Use the comparison to examine the operations according to the three categories described below: element-specific operations, assembly operations that are appropriate to share, and operations that only appear similar. Before extracting the first shared operation, make sure that the distinction between these categories is clear.</p>
+<p><strong>Element-specific operations</strong> remain in the source file associated with each element formulation. For the spring analysis, these are the spring stiffness calculation and the spring element loop. For the axial-bar analysis, they are <code>bar_stiffness</code>, <code>bar_distributed_load</code>, the axial-bar element loop, and <code>recover_axial_bar_response</code>. These operations depend on the particular element formulation and therefore change when that formulation changes. The axial-bar element loop, for example, must obtain the element coordinates, material properties, cross-sectional area, and distributed load before it can construct the local stiffness matrix and load vector.</p>
+<p><strong>Shared assembly operations</strong> are sufficiently independent of the element formulation to justify a common implementation. The local-to-global <strong>matrix</strong> scatter-add operation is clearly repeated in both analyses. Adding forces that are already specified at global DOFs is also common to both, although S05 implements this operation differently in the spring and axial-bar files. These two cases therefore provide direct evidence for shared functions.</p>
+<p>Element-vector scatter-add is different. It currently appears only in the axial-bar analysis because the spring example has no element load vector. Nevertheless, it is naturally part of the same small assembly layer: it is the vector form of the same local-to-global scatter operation, its responsibility is independent of the element formulation, and it requires only <code>f</code>, <code>f_e</code>, and <code>dof_map</code>. Keeping matrix and vector assembly as separate functions also preserves the distinction between the different mathematical objects being assembled.</p>
+<p>In each case, once the element formulation has produced a local matrix <span class="math inline">\(\mathbf K_e\)</span>, a local vector <span class="math inline">\(\mathbf f_e\)</span> when required, and the corresponding local-to-global DOF map, the assembly operation no longer needs to know how those quantities were obtained.</p>
+<p>Constructing <code>dof_map</code>, however, remains visible in each element loop. Although the spring and axial-bar examples currently construct it in a similar way, both have only one DOF per node. In more general finite element models, the DOF map depends on the element topology and on the number and arrangement of DOFs at each node. S06 therefore does not yet introduce a shared DOF-map construction function.</p>
+<p>This illustrates an important aspect of the <a href="../glossary.html#gls-dry">Don’t Repeat Yourself (DRY)</a> principle: similar-looking code should not be shared automatically; the repeated code must also represent the same stable responsibility.</p>
+<p><strong>Superficially similar operations</strong> may share syntax without having the same responsibility. The matrix and vector scatter loops share an outer loop and a DOF map, but they assemble different mathematical objects. This distinction will matter when deciding whether matrix and vector assembly should remain separate shared operations.</p>
+<p>The separation between element-specific formulation and shared assembly follows the finite element algorithm itself:</p>
+<pre class="text"><code>element-specific formulation
+        ↓
+local K_e and possibly f_e
+        ↓
+element-independent assembly
+        ↓
+global K and f</code></pre>
+<p>The element-specific part constructs the local contributions required by the chosen element formulation. Once those local quantities and their DOF map are known, assembly performs the same local-to-global scatter operation regardless of whether they came from a spring or an axial-bar element.</p>
+</section>
+<section id="first-guided-implementation-matrix-assembly" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="first-guided-implementation-matrix-assembly"><span class="header-section-number">12.4</span> First guided implementation: matrix assembly</h2>
+<p>Create <code>examples/fem_assembly.jl</code> and begin with this interface:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For local DOFs <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>, let <span class="math inline">\(I\)</span> and <span class="math inline">\(J\)</span> denote the corresponding global DOFs obtained from the local-to-global DOF map:</p>
+<p><span class="math display">\[
+  I = \texttt{dof\_map}[i],
+  \qquad
+  J = \texttt{dof\_map}[j].
+\]</span></p>
+<p>Matrix assembly then performs the scatter-add operation</p>
+<p><span class="math display">\[
+  K_{IJ} \mathrel{+}= K^e_{ij}.
+\]</span></p>
+<p>Implement it by following this procedure:</p>
+<ol type="1">
+<li>use <code>axes(K_e, 1)</code> to iterate over the local rows of <span class="math inline">\(\mathbf K_e\)</span>;</li>
+<li>map local row <span class="math inline">\(i\)</span> to global row <span class="math inline">\(I\)</span> through <code>dof_map</code>;</li>
+<li>use <code>axes(K_e, 2)</code> to iterate over the local columns of <span class="math inline">\(\mathbf K_e\)</span>;</li>
+<li>map local column <span class="math inline">\(j\)</span> to global column <span class="math inline">\(J\)</span>; and</li>
+<li>scatter-add <code>K_e[i, j]</code> into <code>K[I, J]</code>.</li>
+</ol>
+<p>The use of <code>axes</code> follows the Julia iteration tools introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>. In S05, both element loops used fixed <code>1:2</code> ranges because the spring and axial-bar elements each had two local displacement DOFs. The shared matrix assembly operation should no longer encode that assumption. By deriving the loop ranges from <code>K_e</code>, the operation is not tied to a local matrix with exactly two rows and two columns.</p>
+<p>This does not make the element formulations themselves generic. The appropriate element matrix <code>K_e</code> and local-to-global <code>dof_map</code> must still be supplied; only the scatter-add operation is being shared.</p>
+<p>After completing the task, compare your function with this short reference excerpt:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(K_e, <span class="fl">1</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        I <span class="op">=</span> dof_map[i]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="fu">axes</span>(K_e, <span class="fl">2</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            J <span class="op">=</span> dof_map[j]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            K[I, J] <span class="op">+=</span> K_e[i, j]</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The explicit loops are deliberately retained so that the local-to-global assembly operation remains visible in the code.</p>
+</section>
+<section id="decide-where-the-shared-file-is-loaded" class="level2" data-number="12.5">
+<h2 data-number="12.5" class="anchored" data-anchor-id="decide-where-the-shared-file-is-loaded"><span class="header-section-number">12.5</span> Decide where the shared file is loaded</h2>
+<p>Before modifying either source file, first make the new matrix assembly function available to both implementations. Should <code>fem_assembly.jl</code> be included directly inside <code>two_springs_fem.jl</code> and <code>axial_bar_fem.jl</code>, or should it instead be included by the scripts and tests that use those files?</p>
+<p>S06 keeps the file dependencies explicit. In the spring executable, load:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"fem_assembly.jl"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"two_springs_fem.jl"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In the axial-bar executable, load:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"fem_assembly.jl"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">include</span>(<span class="st">"axial_bar_fem.jl"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In <code>test/runtests.jl</code>, include <code>fem_assembly.jl</code> once before loading <code>two_springs_fem.jl</code> and <code>axial_bar_fem.jl</code>. Neither source file includes <code>fem_assembly.jl</code> itself, so the shared definitions are loaded only once in the same test process.</p>
+</section>
+<section id="refactor-the-spring-implementation-first" class="level2" data-number="12.6">
+<h2 data-number="12.6" class="anchored" data-anchor-id="refactor-the-spring-implementation-first"><span class="header-section-number">12.6</span> Refactor the spring implementation first</h2>
+<p>Use the new matrix function in <code>two_springs_fem.jl</code> before changing the bar implementation. Rename <code>assemble_stiffness!</code> to <code>assemble_springs!</code>. Retain the spring element loop, <code>spring_stiffness</code>, and construction of <code>dof_map</code>; replace only the nested local-to-global matrix scatter with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Do not change the homogeneous boundary-condition treatment, the strain-energy calculation, or the <code>solve_two_springs</code> return interface. Then run:</p>
+<pre class="text"><code>julia test/runtests.jl</code></pre>
+<p>At this intermediate checkpoint, all six existing regression checks must still pass.</p>
+<p>Compare the information required by <code>assemble_springs!</code> and <code>assemble_matrix!</code>. The spring function must know the spring stiffnesses and element connectivity, and it must use the spring-element formulation to construct each local matrix <code>K_e</code> and its <code>dof_map</code>. The shared matrix assembly function does not need any of this spring-specific information: it receives <code>K_e</code> and <code>dof_map</code> and only scatters the local matrix into the global matrix.</p>
+<p>The two functions therefore have different responsibilities: <code>assemble_springs!</code> forms the element contribution, while <code>assemble_matrix!</code> assembles that contribution into the global system.</p>
+</section>
+<section id="second-guided-implementation-vector-assembly" class="level2" data-number="12.7">
+<h2 data-number="12.7" class="anchored" data-anchor-id="second-guided-implementation-vector-assembly"><span class="header-section-number">12.7</span> Second guided implementation: vector assembly</h2>
+<p>Now turn to the axial-bar formulation. Add this second interface to <code>fem_assembly.jl</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_vector!</span>(f, f_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For local DOF <span class="math inline">\(i\)</span>, let <span class="math inline">\(I\)</span> denote the corresponding global DOF,</p>
+<p><span class="math display">\[
+  I = \texttt{dof\_map}[i].
+\]</span></p>
+<p>Vector assembly then performs</p>
+<p><span class="math display">\[
+  f_I \mathrel{+}= f^e_i.
+\]</span></p>
+<p>Write the function by using <code>axes(f_e, 1)</code> to iterate over the local entries of <span class="math inline">\(\mathbf f_e\)</span>, mapping local index <span class="math inline">\(i\)</span> to global index <span class="math inline">\(I\)</span>, and scatter-adding <code>f_e[i]</code> into <code>f[I]</code>. As in the matrix assembly function, deriving the iteration range from the supplied local quantity avoids encoding the two-DOF assumption. Only after implementing the function, compare it with this reference excerpt:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">assemble_vector!</span>(f, f_e, dof_map)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">axes</span>(f_e, <span class="fl">1</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        I <span class="op">=</span> dof_map[i]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        f[I] <span class="op">+=</span> f_e[i]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In <code>assemble_axial_bar!</code>, retain the element loop; extraction of nodes, coordinates, <span class="math inline">\(E_e\)</span>, <span class="math inline">\(A_e\)</span>, and <span class="math inline">\(q_e\)</span>; computation of <span class="math inline">\(L_e\)</span>; construction of <span class="math inline">\(\mathbf K_e\)</span> and <span class="math inline">\(\mathbf f_e\)</span>; and construction of <code>dof_map</code>. Replace only the scatter operations with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_vector!</span>(f, f_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run the regression suite again. The existing references must remain unchanged.</p>
+</section>
+<section id="why-not-combine-matrix-and-vector-assembly" class="level2" data-number="12.8">
+<h2 data-number="12.8" class="anchored" data-anchor-id="why-not-combine-matrix-and-vector-assembly"><span class="header-section-number">12.8</span> Why not combine matrix and vector assembly?</h2>
+<p>The former axial-bar scatter loop placed vector assembly inside the outer matrix loop:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> dof_map[i]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    f[I] <span class="op">+=</span> f_e[i]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        J <span class="op">=</span> dof_map[j]</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        K[I, J] <span class="op">+=</span> K_e[i, j]</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Since the two operations use the same <code>dof_map</code> and share the outer loop, why not extract them as one function?</p>
+<p>Before answering, consider these questions:</p>
+<ul>
+<li>Does every element that contributes a matrix necessarily contribute a vector?</li>
+<li>Can matrix and vector assembly occur independently?</li>
+<li>Is sharing control-flow structure the same as sharing a responsibility?</li>
+</ul>
+<p>The answer distinguishes <em>syntactic similarity</em> from <em>conceptual responsibility</em>. Matrix assembly and vector assembly are distinct finite element operations. An analysis may assemble a stiffness matrix without an element load vector, or it may assemble a vector independently of a matrix. Sharing part of their control flow is not sufficient reason to give them one responsibility.</p>
+<p>Similar code does not necessarily represent the same abstraction. A future higher-level operation could compose <code>assemble_matrix!</code> and <code>assemble_vector!</code> if a genuine repeated need for that composition emerges. For now, keeping them separate helps make clear that matrix assembly and vector assembly act on different mathematical objects and have different responsibilities. S06 therefore avoids combining them simply because parts of their code look similar.</p>
+</section>
+<section id="third-guided-implementation-nodal-loads" class="level2" data-number="12.9">
+<h2 data-number="12.9" class="anchored" data-anchor-id="third-guided-implementation-nodal-loads"><span class="header-section-number">12.9</span> Third guided implementation: nodal loads</h2>
+<p>Compare the two existing ways of adding forces that are already specified at global DOFs. At the S05 starting state, the spring implementation encapsulates the operation in:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_forces!</span>(f, applied_forces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The axial-bar solver instead contains the equivalent explicit loop:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dof, value) <span class="kw">in</span> applied_forces</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    f[dof] <span class="op">+=</span> value</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Both forms add the same kind of force to the global vector. Before naming a new function, decide whether this is the same operation as assembling an element vector:</p>
+<pre class="text"><code>assemble_vector!
+    local element vector
+    → requires a local-to-global map
+    → global vector
+
+add_nodal_forces!
+    force already specified at a global DOF
+    → no element map is required
+    → global vector</code></pre>
+<p>An element vector is local and needs a DOF map. A nodal force is already specified at a global DOF. They are different FEM operations.</p>
+<p>Add the interface</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">add_nodal_forces!</span>(f, applied_forces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>to <code>fem_assembly.jl</code>. Iterate through the supplied <code>(dof, value)</code> pairs and add each value to <code>f[dof]</code>. The name describes the operation precisely and distinguishes it from element-vector assembly. Remove the spring-specific <code>assemble_forces!</code> definition, replace its call with <code>add_nodal_forces!</code>, and replace the equivalent explicit loop in the axial-bar solver with the same shared function. Then run the regression suite again. The same six regression checks must pass.</p>
+<p>This builds on the distinction introduced in <a href="four-element-axial-bar-analysis.html" class="quarto-xref"><span>Chapter 11</span></a> between distributed element loads and concentrated nodal loads. The former produce element load vectors that must be assembled, while the latter are already defined at global DOFs and can be added directly to the global load vector.</p>
+</section>
+<section id="inspect-the-result" class="level2" data-number="12.10">
+<h2 data-number="12.10" class="anchored" data-anchor-id="inspect-the-result"><span class="header-section-number">12.10</span> Inspect the result</h2>
+<p>After completing the three refactoring steps and checking each one with the regression tests, compare your implementation with the expected result shown next.</p>
+<p>The refactored spring element loop should have the following structure:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>K_e <span class="op">=</span> <span class="fu">spring_stiffness</span>(k_e)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># construct dof_map for this spring element</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Similarly, the refactored axial-bar element loop should retain the formulation-specific quantities while delegating the shared assembly operations:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>K_e <span class="op">=</span> <span class="fu">bar_stiffness</span>(E_e, A_e, L_e)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>f_e <span class="op">=</span> <span class="fu">bar_distributed_load</span>(q_e, L_e)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># construct dof_map for this bar element</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_vector!</span>(f, f_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The two element loops are therefore still different, as expected. Each retains the operations required by its own element formulation, while the local-to-global assembly steps have been moved to the shared functions.</p>
+</section>
+<section id="reflect-on-the-programming-principles" class="level2" data-number="12.11">
+<h2 data-number="12.11" class="anchored" data-anchor-id="reflect-on-the-programming-principles"><span class="header-section-number">12.11</span> Reflect on the programming principles</h2>
+<p>The S06 refactoring can now be interpreted in terms of several programming principles. The concepts introduced below provide a vocabulary for understanding why the code was organized in this way; they are design principles rather than rigid rules that require every implementation to have the same structure.</p>
+<p>The first of these principles is <a href="../glossary.html#gls-separation-of-concerns">separation of concerns</a>. Element formulation and local-to-global assembly perform different parts of the finite element algorithm, so S06 keeps them separate. This separation can then be examined more closely through several related principles: the Single Responsibility Principle, cohesion, coupling and interface design, and a restrained application of DRY. Each of these is discussed in the following subsections.</p>
+<section id="single-responsibility-principle" class="level3" data-number="12.11.1">
+<h3 data-number="12.11.1" class="anchored" data-anchor-id="single-responsibility-principle"><span class="header-section-number">12.11.1</span> Single Responsibility Principle</h3>
+<p>The distinction between element formulation and local-to-global assembly also illustrates the <a href="../glossary.html#gls-single-responsibility-principle">Single Responsibility Principle</a>: a function should have a coherent responsibility and a principal reason to change. It does not mean that a function should merely “do one tiny thing.” Element formulation changes for spring- or bar-specific reasons, while local-to-global scatter-add assembly changes for assembly-algorithm reasons.</p>
+<p>The principle does not require fragmenting every sequence of formulas. For example, <code>recover_axial_bar_response</code> computes displacement increments, strains, stresses, and axial forces. Together these form one coherent two-node axial-bar response-recovery responsibility. Splitting them solely because several formulas appear inside the function would make the calculation harder to follow.</p>
+</section>
+<section id="cohesion" class="level3" data-number="12.11.2">
+<h3 data-number="12.11.2" class="anchored" data-anchor-id="cohesion"><span class="header-section-number">12.11.2</span> Cohesion</h3>
+<p>The three functions in <code>fem_assembly.jl</code> form a small, cohesive family: each operates on contributions that must be added to global finite element arrays. This <a href="../glossary.html#gls-cohesion">cohesion</a> gives the file a clear purpose. A more generic <code>fem_utils.jl</code> file would make that purpose less clear and could gradually collect unrelated operations.</p>
+</section>
+<section id="coupling-and-interface-design" class="level3" data-number="12.11.3">
+<h3 data-number="12.11.3" class="anchored" data-anchor-id="coupling-and-interface-design"><span class="header-section-number">12.11.3</span> Coupling and interface design</h3>
+<p>The interface</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>does not need to know the spring stiffness, Young’s modulus, cross-sectional area, coordinates, distributed load, or element type. A useful function interface is defined partly by what the function does <em>not</em> need to know. This reduces <a href="../glossary.html#gls-coupling">coupling</a> between element formulation and assembly: each element formulation provides the required local data, while the assembly function is concerned only with the scatter-add operation.</p>
+</section>
+<section id="dont-repeat-yourself-without-dogmatism" class="level3" data-number="12.11.4">
+<h3 data-number="12.11.4" class="anchored" data-anchor-id="dont-repeat-yourself-without-dogmatism"><span class="header-section-number">12.11.4</span> Don’t Repeat Yourself without dogmatism</h3>
+<p>The <a href="../glossary.html#gls-dry">Don’t Repeat Yourself (DRY)</a> principle is useful when repeated code performs the same stable operation. It should not be applied mechanically simply to remove every instance of repeated code.</p>
+<p>MiniFEM intentionally retained duplicated matrix scatter code through the earlier snapshots. The operation first needed to remain visible alongside the element formulations that required it. Refactoring becomes appropriate at this stage because matrix scatter is now repeated, stable, already understood, and independent of the particular spring or bar formulation. Keeping separate copies would therefore begin to distract from the differences that actually matter between the two element formulations.</p>
+<p>The vector scatter operation is not yet repeated across the two examples, but it has the same element-independent local-to-global assembly role for a different mathematical object. Keeping matrix and vector assembly as separate functions also shows an important limit to DRY: similar syntax alone is not sufficient reason to combine operations when they have different responsibilities.</p>
+</section>
+</section>
+<section id="what-s06-deliberately-does-not-refactor" class="level2" data-number="12.12">
+<h2 data-number="12.12" class="anchored" data-anchor-id="what-s06-deliberately-does-not-refactor"><span class="header-section-number">12.12</span> What S06 deliberately does not refactor</h2>
+<p>S06 is also useful for identifying which parts of the two implementations are <em>not</em> ready to be shared:</p>
+<ul>
+<li>boundary-condition treatment;</li>
+<li>spring and axial-bar element formulations;</li>
+<li>axial-bar response recovery;</li>
+<li>strain-energy computation;</li>
+<li>reaction recovery; and</li>
+<li>solver structure.</li>
+</ul>
+<p>Some of these operations are genuinely different and should remain separate; others have not yet appeared often enough, or in a sufficiently stable form, to justify a shared abstraction. Whether any of them should be shared later will depend on evidence from future examples.</p>
+<p>The boundary-condition treatment is a clear example. The spring analysis uses homogeneous row-and-column modification, whereas the axial-bar analysis uses free/constrained partitioning and can therefore accommodate nonzero prescribed displacements. These are different implementations introduced for different stages of the course, so S06 leaves both visible rather than forcing them into a shared function prematurely.</p>
+<p>The same reasoning applies to the other items in the list. Some may remain specific to their current formulations, while others may become candidates for later refactoring if future examples reveal a stable common operation. S06 therefore shares only those operations for which a stable element-independent responsibility is already sufficiently clear.</p>
+</section>
+<section id="final-regression-checkpoint" class="level2" data-number="12.13">
+<h2 data-number="12.13" class="anchored" data-anchor-id="final-regression-checkpoint"><span class="header-section-number">12.13</span> Final regression checkpoint</h2>
+<p>The regression references introduced in S04 and extended in S05 are unchanged. After completing the refactoring, run:</p>
+<pre class="text"><code>julia test/runtests.jl</code></pre>
+<p>The expected result is:</p>
+<pre class="text"><code>Two-spring regression tests: 4 pass
+Four-element axial-bar regression tests: 2 pass</code></pre>
+<p>If so, the tests confirm that the accepted numerical results remain unchanged after the refactoring.</p>
+</section>
+<section id="what-comes-next" class="level2" data-number="12.14">
+<h2 data-number="12.14" class="anchored" data-anchor-id="what-comes-next"><span class="header-section-number">12.14</span> What comes next</h2>
+<p>S06 has introduced the first shared MiniFEM assembly operations. The element-specific FEM calculations remain visible, and the current source still shows which responsibilities have not yet earned a shared abstraction.</p>
+<p>The next step returns to the finite element formulation. Before numerical integration is introduced in the code, the theory chapter will develop Gauss quadrature and show how it can be used to evaluate integrals numerically. The following coding task will then apply that theory to the axial-bar element, replacing the closed-form evaluation of element contributions with numerical integration.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/four-element-axial-bar-analysis.html" class="pagination-link" aria-label="Implementing a finite element analysis of a one-dimensional axial bar">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

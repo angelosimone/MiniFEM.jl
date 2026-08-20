@@ -1110,23 +1110,208 @@
     ]
   },
   {
+    "objectID": "chapters/shared-fem-assembly.html",
+    "href": "chapters/shared-fem-assembly.html",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "",
+    "text": "12.1 Establish the verified baseline\nThe two-spring and four-element axial-bar analyses have already been formulated, implemented, and independently verified. Their accepted numerical results are also checked by the regression tests introduced in Chapter 8. S06 therefore focuses on refactoring: the code organization will change, but the mathematical problems and accepted numerical behavior must remain unchanged.\nBefore proceeding, run the regression tests:\nThe expected baseline results are:\nThis checkpoint is important before refactoring because the regression tests provide a reliable reference against which to check that the numerical behavior remains unchanged as the code is reorganized.\nThe aim of S06 is therefore not to eliminate every instance of repeated code, but to use the repeated assembly patterns to identify FEM operations that are stable and sufficiently independent of the element formulation to justify a shared implementation.\nS06 starts from the completed S05 state. Begin by comparing the two existing finite element implementations and the regression tests that establish their accepted numerical behavior:\nThe first implementation step in S06 is to create examples/fem_assembly.jl; this file will contain the FEM assembly operations that the comparison shows are appropriate to share.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#establish-the-verified-baseline",
+    "href": "chapters/shared-fem-assembly.html#establish-the-verified-baseline",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "",
+    "text": "julia test/runtests.jl\n\nTwo-spring regression tests: 4 pass\nFour-element axial-bar regression tests: 2 pass\n\n\n\ntwo_springs_fem.jl\n    spring-specific element formulation and analysis\n\naxial_bar_fem.jl\n    two-node axial-bar formulation and analysis\n\ntest/runtests.jl\n    regression tests for both analyses",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#compare-the-s05-element-loops",
+    "href": "chapters/shared-fem-assembly.html#compare-the-s05-element-loops",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.2 Compare the S05 element loops",
+    "text": "12.2 Compare the S05 element loops\nBefore making any changes, compare the S05 spring and axial-bar element loops. The code snippets below are sufficient to identify what is common and what remains element-specific; there is no need to compare the complete files line by line.\nThe essential part of the spring loop is:\nk_e = element_stiffness[e]\nK_e = spring_stiffness(k_e)\ndof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]\n\nfor i in 1:2\n    I = dof_map[i]\n    for j in 1:2\n        J = dof_map[j]\n        K[I, J] += K_e[i, j]\n    end\nend\nThe axial-bar loop performs additional element-specific operations and assembles both a matrix and a consistent element load vector:\nx_e = node_coordinates[element_nodes]\nE_e = element_E[e]\nA_e = element_A[e]\nq_e = element_q[e]\n\nL_e = x_e[2] - x_e[1]\nK_e = bar_stiffness(E_e, A_e, L_e)\nf_e = bar_distributed_load(q_e, L_e)\ndof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]\n\nfor i in 1:2\n    I = dof_map[i]\n    f[I] += f_e[i]\n    for j in 1:2\n        J = dof_map[j]\n        K[I, J] += K_e[i, j]\n    end\nend\nBefore continuing, classify the following operations. For each one, ask whether it depends on a particular element formulation, whether the operation itself is element-independent, and whether the current examples provide enough evidence to justify sharing its implementation in S06.\n\n\n\n\n\n\n\n\n\noperation\ndepends on the element formulation?\nelement-independent operation?\nenough evidence to share in S06?\n\n\n\n\nobtain \\(k_e\\)\n\n\n\n\n\nobtain \\(E_e\\), \\(A_e\\), and \\(q_e\\); compute \\(L_e\\)\n\n\n\n\n\nconstruct \\(\\mathbf K_e\\) or \\(\\mathbf f_e\\)\n\n\n\n\n\nconstruct dof_map\n\n\n\n\n\nscatter \\(\\mathbf K_e\\) into \\(\\mathbf K\\)\n\n\n\n\n\nscatter \\(\\mathbf f_e\\) into \\(\\mathbf f\\)\n\n\n\n\n\n\nUse the table to decide whether an operation should remain specific to an element formulation or whether it is sufficiently independent and established to justify a shared implementation. In particular, do not decide from similar syntax alone. Consider whether the operation represents the same conceptual task and serves the same abstraction.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#decide-what-should-be-shared",
+    "href": "chapters/shared-fem-assembly.html#decide-what-should-be-shared",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.3 Decide what should be shared",
+    "text": "12.3 Decide what should be shared\nUse the comparison to examine the operations according to the three categories described below: element-specific operations, assembly operations that are appropriate to share, and operations that only appear similar. Before extracting the first shared operation, make sure that the distinction between these categories is clear.\nElement-specific operations remain in the source file associated with each element formulation. For the spring analysis, these are the spring stiffness calculation and the spring element loop. For the axial-bar analysis, they are bar_stiffness, bar_distributed_load, the axial-bar element loop, and recover_axial_bar_response. These operations depend on the particular element formulation and therefore change when that formulation changes. The axial-bar element loop, for example, must obtain the element coordinates, material properties, cross-sectional area, and distributed load before it can construct the local stiffness matrix and load vector.\nShared assembly operations are sufficiently independent of the element formulation to justify a common implementation. The local-to-global matrix scatter-add operation is clearly repeated in both analyses. Adding forces that are already specified at global DOFs is also common to both, although S05 implements this operation differently in the spring and axial-bar files. These two cases therefore provide direct evidence for shared functions.\nElement-vector scatter-add is different. It currently appears only in the axial-bar analysis because the spring example has no element load vector. Nevertheless, it is naturally part of the same small assembly layer: it is the vector form of the same local-to-global scatter operation, its responsibility is independent of the element formulation, and it requires only f, f_e, and dof_map. Keeping matrix and vector assembly as separate functions also preserves the distinction between the different mathematical objects being assembled.\nIn each case, once the element formulation has produced a local matrix \\(\\mathbf K_e\\), a local vector \\(\\mathbf f_e\\) when required, and the corresponding local-to-global DOF map, the assembly operation no longer needs to know how those quantities were obtained.\nConstructing dof_map, however, remains visible in each element loop. Although the spring and axial-bar examples currently construct it in a similar way, both have only one DOF per node. In more general finite element models, the DOF map depends on the element topology and on the number and arrangement of DOFs at each node. S06 therefore does not yet introduce a shared DOF-map construction function.\nThis illustrates an important aspect of the Don’t Repeat Yourself (DRY) principle: similar-looking code should not be shared automatically; the repeated code must also represent the same stable responsibility.\nSuperficially similar operations may share syntax without having the same responsibility. The matrix and vector scatter loops share an outer loop and a DOF map, but they assemble different mathematical objects. This distinction will matter when deciding whether matrix and vector assembly should remain separate shared operations.\nThe separation between element-specific formulation and shared assembly follows the finite element algorithm itself:\nelement-specific formulation\n        ↓\nlocal K_e and possibly f_e\n        ↓\nelement-independent assembly\n        ↓\nglobal K and f\nThe element-specific part constructs the local contributions required by the chosen element formulation. Once those local quantities and their DOF map are known, assembly performs the same local-to-global scatter operation regardless of whether they came from a spring or an axial-bar element.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#first-guided-implementation-matrix-assembly",
+    "href": "chapters/shared-fem-assembly.html#first-guided-implementation-matrix-assembly",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.4 First guided implementation: matrix assembly",
+    "text": "12.4 First guided implementation: matrix assembly\nCreate examples/fem_assembly.jl and begin with this interface:\nassemble_matrix!(K, K_e, dof_map)\nFor local DOFs \\(i\\) and \\(j\\), let \\(I\\) and \\(J\\) denote the corresponding global DOFs obtained from the local-to-global DOF map:\n\\[\n  I = \\texttt{dof\\_map}[i],\n  \\qquad\n  J = \\texttt{dof\\_map}[j].\n\\]\nMatrix assembly then performs the scatter-add operation\n\\[\n  K_{IJ} \\mathrel{+}= K^e_{ij}.\n\\]\nImplement it by following this procedure:\n\nuse axes(K_e, 1) to iterate over the local rows of \\(\\mathbf K_e\\);\nmap local row \\(i\\) to global row \\(I\\) through dof_map;\nuse axes(K_e, 2) to iterate over the local columns of \\(\\mathbf K_e\\);\nmap local column \\(j\\) to global column \\(J\\); and\nscatter-add K_e[i, j] into K[I, J].\n\nThe use of axes follows the Julia iteration tools introduced in Chapter 2. In S05, both element loops used fixed 1:2 ranges because the spring and axial-bar elements each had two local displacement DOFs. The shared matrix assembly operation should no longer encode that assumption. By deriving the loop ranges from K_e, the operation is not tied to a local matrix with exactly two rows and two columns.\nThis does not make the element formulations themselves generic. The appropriate element matrix K_e and local-to-global dof_map must still be supplied; only the scatter-add operation is being shared.\nAfter completing the task, compare your function with this short reference excerpt:\nfunction assemble_matrix!(K, K_e, dof_map)\n    for i in axes(K_e, 1)\n        I = dof_map[i]\n\n        for j in axes(K_e, 2)\n            J = dof_map[j]\n            K[I, J] += K_e[i, j]\n        end\n    end\nend\nThe explicit loops are deliberately retained so that the local-to-global assembly operation remains visible in the code.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#decide-where-the-shared-file-is-loaded",
+    "href": "chapters/shared-fem-assembly.html#decide-where-the-shared-file-is-loaded",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.5 Decide where the shared file is loaded",
+    "text": "12.5 Decide where the shared file is loaded\nBefore modifying either source file, first make the new matrix assembly function available to both implementations. Should fem_assembly.jl be included directly inside two_springs_fem.jl and axial_bar_fem.jl, or should it instead be included by the scripts and tests that use those files?\nS06 keeps the file dependencies explicit. In the spring executable, load:\ninclude(\"fem_assembly.jl\")\ninclude(\"two_springs_fem.jl\")\nIn the axial-bar executable, load:\ninclude(\"fem_assembly.jl\")\ninclude(\"axial_bar_fem.jl\")\nIn test/runtests.jl, include fem_assembly.jl once before loading two_springs_fem.jl and axial_bar_fem.jl. Neither source file includes fem_assembly.jl itself, so the shared definitions are loaded only once in the same test process.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#refactor-the-spring-implementation-first",
+    "href": "chapters/shared-fem-assembly.html#refactor-the-spring-implementation-first",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.6 Refactor the spring implementation first",
+    "text": "12.6 Refactor the spring implementation first\nUse the new matrix function in two_springs_fem.jl before changing the bar implementation. Rename assemble_stiffness! to assemble_springs!. Retain the spring element loop, spring_stiffness, and construction of dof_map; replace only the nested local-to-global matrix scatter with:\nassemble_matrix!(K, K_e, dof_map)\nDo not change the homogeneous boundary-condition treatment, the strain-energy calculation, or the solve_two_springs return interface. Then run:\njulia test/runtests.jl\nAt this intermediate checkpoint, all six existing regression checks must still pass.\nCompare the information required by assemble_springs! and assemble_matrix!. The spring function must know the spring stiffnesses and element connectivity, and it must use the spring-element formulation to construct each local matrix K_e and its dof_map. The shared matrix assembly function does not need any of this spring-specific information: it receives K_e and dof_map and only scatters the local matrix into the global matrix.\nThe two functions therefore have different responsibilities: assemble_springs! forms the element contribution, while assemble_matrix! assembles that contribution into the global system.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#second-guided-implementation-vector-assembly",
+    "href": "chapters/shared-fem-assembly.html#second-guided-implementation-vector-assembly",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.7 Second guided implementation: vector assembly",
+    "text": "12.7 Second guided implementation: vector assembly\nNow turn to the axial-bar formulation. Add this second interface to fem_assembly.jl:\nassemble_vector!(f, f_e, dof_map)\nFor local DOF \\(i\\), let \\(I\\) denote the corresponding global DOF,\n\\[\n  I = \\texttt{dof\\_map}[i].\n\\]\nVector assembly then performs\n\\[\n  f_I \\mathrel{+}= f^e_i.\n\\]\nWrite the function by using axes(f_e, 1) to iterate over the local entries of \\(\\mathbf f_e\\), mapping local index \\(i\\) to global index \\(I\\), and scatter-adding f_e[i] into f[I]. As in the matrix assembly function, deriving the iteration range from the supplied local quantity avoids encoding the two-DOF assumption. Only after implementing the function, compare it with this reference excerpt:\nfunction assemble_vector!(f, f_e, dof_map)\n    for i in axes(f_e, 1)\n        I = dof_map[i]\n        f[I] += f_e[i]\n    end\nend\nIn assemble_axial_bar!, retain the element loop; extraction of nodes, coordinates, \\(E_e\\), \\(A_e\\), and \\(q_e\\); computation of \\(L_e\\); construction of \\(\\mathbf K_e\\) and \\(\\mathbf f_e\\); and construction of dof_map. Replace only the scatter operations with:\nassemble_matrix!(K, K_e, dof_map)\nassemble_vector!(f, f_e, dof_map)\nRun the regression suite again. The existing references must remain unchanged.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#why-not-combine-matrix-and-vector-assembly",
+    "href": "chapters/shared-fem-assembly.html#why-not-combine-matrix-and-vector-assembly",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.8 Why not combine matrix and vector assembly?",
+    "text": "12.8 Why not combine matrix and vector assembly?\nThe former axial-bar scatter loop placed vector assembly inside the outer matrix loop:\nfor i in 1:2\n    I = dof_map[i]\n    f[I] += f_e[i]\n\n    for j in 1:2\n        J = dof_map[j]\n        K[I, J] += K_e[i, j]\n    end\nend\nSince the two operations use the same dof_map and share the outer loop, why not extract them as one function?\nBefore answering, consider these questions:\n\nDoes every element that contributes a matrix necessarily contribute a vector?\nCan matrix and vector assembly occur independently?\nIs sharing control-flow structure the same as sharing a responsibility?\n\nThe answer distinguishes syntactic similarity from conceptual responsibility. Matrix assembly and vector assembly are distinct finite element operations. An analysis may assemble a stiffness matrix without an element load vector, or it may assemble a vector independently of a matrix. Sharing part of their control flow is not sufficient reason to give them one responsibility.\nSimilar code does not necessarily represent the same abstraction. A future higher-level operation could compose assemble_matrix! and assemble_vector! if a genuine repeated need for that composition emerges. For now, keeping them separate helps make clear that matrix assembly and vector assembly act on different mathematical objects and have different responsibilities. S06 therefore avoids combining them simply because parts of their code look similar.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#third-guided-implementation-nodal-loads",
+    "href": "chapters/shared-fem-assembly.html#third-guided-implementation-nodal-loads",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.9 Third guided implementation: nodal loads",
+    "text": "12.9 Third guided implementation: nodal loads\nCompare the two existing ways of adding forces that are already specified at global DOFs. At the S05 starting state, the spring implementation encapsulates the operation in:\nassemble_forces!(f, applied_forces)\nThe axial-bar solver instead contains the equivalent explicit loop:\nfor (dof, value) in applied_forces\n    f[dof] += value\nend\nBoth forms add the same kind of force to the global vector. Before naming a new function, decide whether this is the same operation as assembling an element vector:\nassemble_vector!\n    local element vector\n    → requires a local-to-global map\n    → global vector\n\nadd_nodal_forces!\n    force already specified at a global DOF\n    → no element map is required\n    → global vector\nAn element vector is local and needs a DOF map. A nodal force is already specified at a global DOF. They are different FEM operations.\nAdd the interface\nadd_nodal_forces!(f, applied_forces)\nto fem_assembly.jl. Iterate through the supplied (dof, value) pairs and add each value to f[dof]. The name describes the operation precisely and distinguishes it from element-vector assembly. Remove the spring-specific assemble_forces! definition, replace its call with add_nodal_forces!, and replace the equivalent explicit loop in the axial-bar solver with the same shared function. Then run the regression suite again. The same six regression checks must pass.\nThis builds on the distinction introduced in Chapter 11 between distributed element loads and concentrated nodal loads. The former produce element load vectors that must be assembled, while the latter are already defined at global DOFs and can be added directly to the global load vector.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#inspect-the-result",
+    "href": "chapters/shared-fem-assembly.html#inspect-the-result",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.10 Inspect the result",
+    "text": "12.10 Inspect the result\nAfter completing the three refactoring steps and checking each one with the regression tests, compare your implementation with the expected result shown next.\nThe refactored spring element loop should have the following structure:\nK_e = spring_stiffness(k_e)\n# construct dof_map for this spring element\nassemble_matrix!(K, K_e, dof_map)\nSimilarly, the refactored axial-bar element loop should retain the formulation-specific quantities while delegating the shared assembly operations:\nK_e = bar_stiffness(E_e, A_e, L_e)\nf_e = bar_distributed_load(q_e, L_e)\n# construct dof_map for this bar element\nassemble_matrix!(K, K_e, dof_map)\nassemble_vector!(f, f_e, dof_map)\nThe two element loops are therefore still different, as expected. Each retains the operations required by its own element formulation, while the local-to-global assembly steps have been moved to the shared functions.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#reflect-on-the-programming-principles",
+    "href": "chapters/shared-fem-assembly.html#reflect-on-the-programming-principles",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.11 Reflect on the programming principles",
+    "text": "12.11 Reflect on the programming principles\nThe S06 refactoring can now be interpreted in terms of several programming principles. The concepts introduced below provide a vocabulary for understanding why the code was organized in this way; they are design principles rather than rigid rules that require every implementation to have the same structure.\nThe first of these principles is separation of concerns. Element formulation and local-to-global assembly perform different parts of the finite element algorithm, so S06 keeps them separate. This separation can then be examined more closely through several related principles: the Single Responsibility Principle, cohesion, coupling and interface design, and a restrained application of DRY. Each of these is discussed in the following subsections.\n\n12.11.1 Single Responsibility Principle\nThe distinction between element formulation and local-to-global assembly also illustrates the Single Responsibility Principle: a function should have a coherent responsibility and a principal reason to change. It does not mean that a function should merely “do one tiny thing.” Element formulation changes for spring- or bar-specific reasons, while local-to-global scatter-add assembly changes for assembly-algorithm reasons.\nThe principle does not require fragmenting every sequence of formulas. For example, recover_axial_bar_response computes displacement increments, strains, stresses, and axial forces. Together these form one coherent two-node axial-bar response-recovery responsibility. Splitting them solely because several formulas appear inside the function would make the calculation harder to follow.\n\n\n12.11.2 Cohesion\nThe three functions in fem_assembly.jl form a small, cohesive family: each operates on contributions that must be added to global finite element arrays. This cohesion gives the file a clear purpose. A more generic fem_utils.jl file would make that purpose less clear and could gradually collect unrelated operations.\n\n\n12.11.3 Coupling and interface design\nThe interface\nassemble_matrix!(K, K_e, dof_map)\ndoes not need to know the spring stiffness, Young’s modulus, cross-sectional area, coordinates, distributed load, or element type. A useful function interface is defined partly by what the function does not need to know. This reduces coupling between element formulation and assembly: each element formulation provides the required local data, while the assembly function is concerned only with the scatter-add operation.\n\n\n12.11.4 Don’t Repeat Yourself without dogmatism\nThe Don’t Repeat Yourself (DRY) principle is useful when repeated code performs the same stable operation. It should not be applied mechanically simply to remove every instance of repeated code.\nMiniFEM intentionally retained duplicated matrix scatter code through the earlier snapshots. The operation first needed to remain visible alongside the element formulations that required it. Refactoring becomes appropriate at this stage because matrix scatter is now repeated, stable, already understood, and independent of the particular spring or bar formulation. Keeping separate copies would therefore begin to distract from the differences that actually matter between the two element formulations.\nThe vector scatter operation is not yet repeated across the two examples, but it has the same element-independent local-to-global assembly role for a different mathematical object. Keeping matrix and vector assembly as separate functions also shows an important limit to DRY: similar syntax alone is not sufficient reason to combine operations when they have different responsibilities.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#what-s06-deliberately-does-not-refactor",
+    "href": "chapters/shared-fem-assembly.html#what-s06-deliberately-does-not-refactor",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.12 What S06 deliberately does not refactor",
+    "text": "12.12 What S06 deliberately does not refactor\nS06 is also useful for identifying which parts of the two implementations are not ready to be shared:\n\nboundary-condition treatment;\nspring and axial-bar element formulations;\naxial-bar response recovery;\nstrain-energy computation;\nreaction recovery; and\nsolver structure.\n\nSome of these operations are genuinely different and should remain separate; others have not yet appeared often enough, or in a sufficiently stable form, to justify a shared abstraction. Whether any of them should be shared later will depend on evidence from future examples.\nThe boundary-condition treatment is a clear example. The spring analysis uses homogeneous row-and-column modification, whereas the axial-bar analysis uses free/constrained partitioning and can therefore accommodate nonzero prescribed displacements. These are different implementations introduced for different stages of the course, so S06 leaves both visible rather than forcing them into a shared function prematurely.\nThe same reasoning applies to the other items in the list. Some may remain specific to their current formulations, while others may become candidates for later refactoring if future examples reveal a stable common operation. S06 therefore shares only those operations for which a stable element-independent responsibility is already sufficiently clear.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#final-regression-checkpoint",
+    "href": "chapters/shared-fem-assembly.html#final-regression-checkpoint",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.13 Final regression checkpoint",
+    "text": "12.13 Final regression checkpoint\nThe regression references introduced in S04 and extended in S05 are unchanged. After completing the refactoring, run:\njulia test/runtests.jl\nThe expected result is:\nTwo-spring regression tests: 4 pass\nFour-element axial-bar regression tests: 2 pass\nIf so, the tests confirm that the accepted numerical results remain unchanged after the refactoring.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/shared-fem-assembly.html#what-comes-next",
+    "href": "chapters/shared-fem-assembly.html#what-comes-next",
+    "title": "12  From repeated assembly to shared FEM operations",
+    "section": "12.14 What comes next",
+    "text": "12.14 What comes next\nS06 has introduced the first shared MiniFEM assembly operations. The element-specific FEM calculations remain visible, and the current source still shows which responsibilities have not yet earned a shared abstraction.\nThe next step returns to the finite element formulation. Before numerical integration is introduced in the code, the theory chapter will develop Gauss quadrature and show how it can be used to evaluate integrals numerically. The following coding task will then apply that theory to the axial-bar element, replacing the closed-form evaluation of element contributions with numerical integration.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>From repeated assembly to shared FEM operations</span>"
+    ]
+  },
+  {
     "objectID": "glossary.html",
     "href": "glossary.html",
     "title": "Glossary",
     "section": "",
-    "text": "D",
+    "text": "A",
     "crumbs": [
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
+    ]
+  },
+  {
+    "objectID": "glossary.html#a",
+    "href": "glossary.html#a",
+    "title": "Glossary",
+    "section": "",
+    "text": "Abstraction\nIn programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.\nSimilar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.\nFurther details: Wikipedia — Abstraction (computer science).",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
+    ]
+  },
+  {
+    "objectID": "glossary.html#c",
+    "href": "glossary.html#c",
+    "title": "Glossary",
+    "section": "C",
+    "text": "C\n\nCohesion\nThe degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Cohesion (computer science).\n\n\nCoupling\nThe degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.\nFurther details: Wikipedia — Coupling (computer programming).",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
     "objectID": "glossary.html#d",
     "href": "glossary.html#d",
     "title": "Glossary",
-    "section": "",
-    "text": "Declarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.",
+    "section": "D",
+    "text": "D\n\nDeclarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.\n\n\nDon’t Repeat Yourself (DRY)\nA design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Don’t repeat yourself.",
     "crumbs": [
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1136,7 +1321,7 @@
     "section": "I",
     "text": "I\n\nImmutable object\nAn object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.\nSee also: Mutable object; Modified in place.\n\n\nImperative programming\nA programming paradigm in which a computation is expressed as an explicit sequence of commands that describe how a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.\nSee also: Declarative programming. Further details: Wikipedia — Imperative programming.",
     "crumbs": [
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1146,7 +1331,7 @@
     "section": "M",
     "text": "M\n\nModified in place\nDescribes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.\nFor example, in Julia, integers are immutable:\nx = 4\nx = x + 1\nHere, x is not modified in place. Instead, x is rebound from the value 4 to the new value 5.\nBy contrast, an array is mutable:\nx = [4]\nx[1] += 1\nHere, the existing array is modified in place, changing its contents from [4] to [5].\nSee also: Mutable object; Immutable object.\n\n\nMutable object\nAn object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.\nSee also: Immutable object; Modified in place.",
     "crumbs": [
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1156,7 +1341,7 @@
     "section": "R",
     "text": "R\n\nRefactoring\nRestructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.",
     "crumbs": [
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1164,9 +1349,9 @@
     "href": "glossary.html#s",
     "title": "Glossary",
     "section": "S",
-    "text": "S\n\nSeparation of concerns\nA software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.\nFurther details: Wikipedia — Separation of concerns.",
+    "text": "S\n\nSeparation of concerns\nA software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.\nFurther details: Wikipedia — Separation of concerns.\n\n\nSingle Responsibility Principle\nA design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Single-responsibility principle.",
     "crumbs": [
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
