@@ -27,6 +27,7 @@ book:
         - chapters/one-dimensional-axial-bar-weak-form.qmd
         - chapters/two-node-linear-bar-element.qmd
         - chapters/four-element-axial-bar-analysis.qmd
+        - chapters/shared-fem-assembly.qmd
     - glossary.qmd
     - references.qmd
 

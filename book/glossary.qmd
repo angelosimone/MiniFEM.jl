@@ -4,6 +4,50 @@ number-sections: false
 
 # Glossary
 
+## A
+
+### Abstraction {#gls-abstraction}
+
+In programming, an abstraction represents a common idea or operation while
+leaving out details that are not essential to using it. A useful abstraction
+groups code that performs the same conceptual task and can therefore be used
+through a common interface.
+
+Similar-looking code does not necessarily belong to the same abstraction. The
+important question is whether the code has the same purpose and responsibility.
+In MiniFEM, for example, matrix assembly can be shared because the same
+local-to-global scatter-add operation is used for different element
+formulations, while the element stiffness calculations remain specific to each
+formulation.
+
+**Further details:** [Wikipedia --- Abstraction (computer
+science)](https://en.wikipedia.org/wiki/Abstraction_(computer_science)).
+
+## C
+
+### Cohesion {#gls-cohesion}
+
+The degree to which the responsibilities within a function, module, or file
+belong together. High cohesion means that the contained operations serve a
+clear, closely related purpose. For example, the local-to-global matrix and
+vector assembly operations in MiniFEM form a small, cohesive family because they
+both add element contributions to global finite element arrays, as illustrated
+by the S06 refactoring in @sec-shared-fem-assembly.
+
+**Further details:** [Wikipedia --- Cohesion (computer
+science)](https://en.wikipedia.org/wiki/Cohesion_%28computer_science%29).
+
+### Coupling {#gls-coupling}
+
+The degree to which one part of a program depends on details of another part.
+Lower coupling is often useful because a function can then change independently
+of details that are outside its responsibility. For example, a local-to-global
+assembly operation needs a local contribution and a DOF map, but does not need
+to know how a spring or bar formulation produced that contribution.
+
+**Further details:** [Wikipedia --- Coupling (computer
+programming)](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29).
+
 ## D
 
 ### Declarative programming {#gls-declarative-programming}
@@ -19,6 +63,19 @@ changes required to construct it.
 **See also:** [Imperative programming](#gls-imperative-programming). **Further
 details:** [Wikipedia --- Declarative
 programming](https://en.wikipedia.org/wiki/Declarative_programming).
+
+### Don't Repeat Yourself (DRY) {#gls-dry}
+
+A design principle that encourages a stable piece of knowledge or responsibility
+to have one well-defined implementation. It is not an absolute prohibition on
+duplicated syntax: repeated code should be abstracted when it represents the
+same stable responsibility and the resulting abstraction improves the design.
+MiniFEM, for example, retains element-specific formulation code while sharing
+the local-to-global assembly operation, as illustrated by the S06 refactoring in
+@sec-shared-fem-assembly.
+
+**Further details:** [Wikipedia --- Don't repeat
+yourself](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 
 ## I
 
@@ -104,3 +161,16 @@ diagnostic output is handled separately.
 
 **Further details:** [Wikipedia --- Separation of
 concerns](https://en.wikipedia.org/wiki/Separation_of_concerns).
+
+### Single Responsibility Principle {#gls-single-responsibility-principle}
+
+A design principle stating that a function, module, or other program component
+should have a coherent responsibility and a principal reason to change. It does
+not mean that every component must perform only one small action. For example,
+element-response recovery may coherently compute several related physical
+quantities, while element formulation and local-to-global assembly have
+different reasons to change and can be separated, as illustrated by the S06
+refactoring in @sec-shared-fem-assembly.
+
+**Further details:** [Wikipedia --- Single-responsibility
+principle](https://en.wikipedia.org/wiki/Single-responsibility_principle).

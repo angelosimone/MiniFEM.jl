@@ -1,5 +1,6 @@
 using Test
 
+include("../examples/fem_assembly.jl")
 include("../examples/two_springs_fem.jl")
 include("../examples/axial_bar_fem.jl")
 

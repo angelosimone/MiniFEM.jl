@@ -40,15 +40,8 @@ function assemble_axial_bar!(
         # are also the corresponding global DOF numbers.
         dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
 
-        for i in 1:2
-            I = dof_map[i]
-            f[I] += f_e[i]
-
-            for j in 1:2
-                J = dof_map[j]
-                K[I, J] += K_e[i, j]
-            end
-        end
+        assemble_matrix!(K, K_e, dof_map)
+        assemble_vector!(f, f_e, dof_map)
     end
 end
 
@@ -80,10 +73,7 @@ function solve_axial_bar(
         element_q,
     )
 
-    # Add concentrated forces that are already specified at global DOFs.
-    for (dof, value) in applied_forces
-        f[dof] += value
-    end
+    add_nodal_forces!(f, applied_forces)
 
     free_dofs = setdiff(1:total_dofs, constrained_dofs)
     K_ff = K[free_dofs, free_dofs]

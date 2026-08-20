@@ -4,7 +4,7 @@
 ## Repository snapshot
 
 **Course edition:** 2026--27\
-**Starting point:** `2026-27/S04-regression-tests`\
+**Starting snapshot:** `2026-27/S04-regression-tests`\
 **Target snapshot:** `2026-27/S05-four-element-bar-analysis`
 :::
 

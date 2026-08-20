@@ -9,8 +9,8 @@ function spring_stiffness(k_e)
     return K_e
 end
 
-# Assemble all spring-element stiffness matrices into the global matrix.
-function assemble_stiffness!(K, element_connectivity, element_stiffness)
+# Assemble the stiffness matrices of all spring elements into the global matrix.
+function assemble_springs!(K, element_connectivity, element_stiffness)
     num_elements = size(element_connectivity, 1)
 
     for e in 1:num_elements
@@ -21,20 +21,7 @@ function assemble_stiffness!(K, element_connectivity, element_stiffness)
         # are also the corresponding global DOF numbers.
         dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
 
-        for i in 1:2
-            I = dof_map[i]
-            for j in 1:2
-                J = dof_map[j]
-                K[I, J] += K_e[i, j]
-            end
-        end
-    end
-end
-
-# Assemble the applied nodal forces into the global force vector.
-function assemble_forces!(f, applied_forces)
-    for (dof, value) in applied_forces
-        f[dof] += value
+        assemble_matrix!(K, K_e, dof_map)
     end
 end
 
@@ -77,12 +64,12 @@ function solve_two_springs(k_1, k_2, applied_force)
     K = zeros(total_dofs, total_dofs)
     f = zeros(total_dofs)
 
-    assemble_stiffness!(K, element_connectivity, element_stiffness)
+    assemble_springs!(K, element_connectivity, element_stiffness)
 
     # Preserve the physical stiffness matrix before Dirichlet modification.
     K_original = copy(K)
 
-    assemble_forces!(f, applied_forces)
+    add_nodal_forces!(f, applied_forces)
     apply_homogeneous_constraints!(K, f, constrained_dofs)
 
     u = K \ f

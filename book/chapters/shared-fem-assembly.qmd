@@ -1,0 +1,639 @@
+# From repeated assembly to shared FEM operations {#sec-shared-fem-assembly}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S05-four-element-bar-analysis`\
+**Target snapshot:** `2026-27/S06-shared-fem-assembly`
+:::
+
+::: {.callout-important}
+## Task: Identify and share element-independent FEM assembly operations
+
+Compare the verified spring and axial-bar implementations. Identify the assembly
+operations that are sufficiently independent of the element formulation to
+justify a shared implementation, while keeping the element-specific finite
+element formulation visible.
+:::
+
+## Establish the verified baseline
+
+The two-spring and four-element axial-bar analyses have already been formulated,
+implemented, and independently verified. Their accepted numerical results are
+also checked by the regression tests introduced in
+@sec-two-springs-regression-tests. S06 therefore focuses on
+[*refactoring*](../glossary.qmd#gls-refactoring): the code organization will
+change, but the mathematical problems and accepted numerical behavior must
+remain unchanged.
+
+Before proceeding, run the regression tests:
+
+```text
+julia test/runtests.jl
+```
+
+The expected baseline results are:
+
+```text
+Two-spring regression tests: 4 pass
+Four-element axial-bar regression tests: 2 pass
+```
+
+This checkpoint is important before refactoring because the regression tests
+provide a reliable reference against which to check that the numerical behavior
+remains unchanged as the code is reorganized.
+
+The aim of S06 is therefore not to eliminate every instance of repeated code,
+but to use the repeated assembly patterns to identify FEM operations that are
+stable and sufficiently independent of the element formulation to justify a
+shared implementation.
+
+S06 starts from the completed S05 state. Begin by comparing the two existing
+finite element implementations and the regression tests that establish their
+accepted numerical behavior:
+
+```text
+two_springs_fem.jl
+    spring-specific element formulation and analysis
+
+axial_bar_fem.jl
+    two-node axial-bar formulation and analysis
+
+test/runtests.jl
+    regression tests for both analyses
+```
+
+The first implementation step in S06 is to create `examples/fem_assembly.jl`;
+this file will contain the FEM assembly operations that the comparison shows are
+appropriate to share.
+
+## Compare the S05 element loops
+
+Before making any changes, compare the S05 spring and axial-bar element loops.
+The code snippets below are sufficient to identify what is common and what
+remains element-specific; there is no need to compare the complete files line by
+line.
+
+The essential part of the spring loop is:
+
+```julia
+k_e = element_stiffness[e]
+K_e = spring_stiffness(k_e)
+dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
+
+for i in 1:2
+    I = dof_map[i]
+    for j in 1:2
+        J = dof_map[j]
+        K[I, J] += K_e[i, j]
+    end
+end
+```
+
+The axial-bar loop performs additional element-specific operations and assembles
+both a matrix and a consistent element load vector:
+
+```julia
+x_e = node_coordinates[element_nodes]
+E_e = element_E[e]
+A_e = element_A[e]
+q_e = element_q[e]
+
+L_e = x_e[2] - x_e[1]
+K_e = bar_stiffness(E_e, A_e, L_e)
+f_e = bar_distributed_load(q_e, L_e)
+dof_map = [element_connectivity[e, 1], element_connectivity[e, 2]]
+
+for i in 1:2
+    I = dof_map[i]
+    f[I] += f_e[i]
+    for j in 1:2
+        J = dof_map[j]
+        K[I, J] += K_e[i, j]
+    end
+end
+```
+
+Before continuing, classify the following operations. For each one, ask whether
+it depends on a particular element formulation, whether the operation itself is
+element-independent, and whether the current examples provide enough evidence to
+justify sharing its implementation in S06.
+
+  | operation                                     | depends on the element formulation? | element-independent operation? | enough evidence to share in S06? |
+  | --------------------------------------------- | :---------------------------------: | :----------------------------: | :------------------------------: |
+  | obtain $k_e$                                  |                                     |                                |                                  |
+  | obtain $E_e$, $A_e$, and $q_e$; compute $L_e$ |                                     |                                |                                  |
+  | construct $\mathbf K_e$ or $\mathbf f_e$      |                                     |                                |                                  |
+  | construct `dof_map`                           |                                     |                                |                                  |
+  | scatter $\mathbf K_e$ into $\mathbf K$        |                                     |                                |                                  |
+  | scatter $\mathbf f_e$ into $\mathbf f$        |                                     |                                |                                  |
+
+Use the table to decide whether an operation should remain specific to an
+element formulation or whether it is sufficiently independent and established to
+justify a shared implementation. In particular, do not decide from similar
+syntax alone. Consider whether the operation represents the same conceptual task
+and serves the same [abstraction](../glossary.qmd#gls-abstraction).
+
+## Decide what should be shared
+
+Use the comparison to examine the operations according to the three categories
+described below: element-specific operations, assembly operations that are
+appropriate to share, and operations that only appear similar. Before extracting
+the first shared operation, make sure that the distinction between these
+categories is clear.
+
+**Element-specific operations** remain in the source file associated with each
+element formulation. For the spring analysis, these are the spring stiffness
+calculation and the spring element loop. For the axial-bar analysis, they are
+`bar_stiffness`, `bar_distributed_load`, the axial-bar element loop, and
+`recover_axial_bar_response`. These operations depend on the particular element
+formulation and therefore change when that formulation changes. The axial-bar
+element loop, for example, must obtain the element coordinates, material
+properties, cross-sectional area, and distributed load before it can construct
+the local stiffness matrix and load vector.
+
+**Shared assembly operations** are sufficiently independent of the element
+formulation to justify a common implementation. The local-to-global **matrix**
+scatter-add operation is clearly repeated in both analyses. Adding forces that
+are already specified at global DOFs is also common to both, although S05
+implements this operation differently in the spring and axial-bar files. These
+two cases therefore provide direct evidence for shared functions.
+
+Element-vector scatter-add is different. It currently appears only in the
+axial-bar analysis because the spring example has no element load vector.
+Nevertheless, it is naturally part of the same small assembly layer: it is the
+vector form of the same local-to-global scatter operation, its responsibility is
+independent of the element formulation, and it requires only `f`, `f_e`, and
+`dof_map`. Keeping matrix and vector assembly as separate functions also
+preserves the distinction between the different mathematical objects being
+assembled.
+
+In each case, once the element formulation has produced a local matrix
+$\mathbf K_e$, a local vector $\mathbf f_e$ when required, and the corresponding
+local-to-global DOF map, the assembly operation no longer needs to know how
+those quantities were obtained.
+
+Constructing `dof_map`, however, remains visible in each element loop. Although
+the spring and axial-bar examples currently construct it in a similar way, both
+have only one DOF per node. In more general finite element models, the DOF map
+depends on the element topology and on the number and arrangement of DOFs at
+each node. S06 therefore does not yet introduce a shared DOF-map construction
+function.
+
+This illustrates an important aspect of the [Don't Repeat Yourself
+(DRY)](../glossary.qmd#gls-dry) principle: similar-looking code should not be
+shared automatically; the repeated code must also represent the same stable
+responsibility.
+
+**Superficially similar operations** may share syntax without having the same
+responsibility. The matrix and vector scatter loops share an outer loop and a
+DOF map, but they assemble different mathematical objects. This distinction will
+matter when deciding whether matrix and vector assembly should remain separate
+shared operations.
+
+The separation between element-specific formulation and shared assembly follows
+the finite element algorithm itself:
+
+```text
+element-specific formulation
+        ↓
+local K_e and possibly f_e
+        ↓
+element-independent assembly
+        ↓
+global K and f
+```
+
+The element-specific part constructs the local contributions required by the
+chosen element formulation. Once those local quantities and their DOF map are
+known, assembly performs the same local-to-global scatter operation regardless
+of whether they came from a spring or an axial-bar element.
+
+## First guided implementation: matrix assembly
+
+Create `examples/fem_assembly.jl` and begin with this interface:
+
+```julia
+assemble_matrix!(K, K_e, dof_map)
+```
+
+For local DOFs $i$ and $j$, let $I$ and $J$ denote the corresponding global DOFs
+obtained from the local-to-global DOF map:
+
+$$
+  I = \texttt{dof\_map}[i],
+  \qquad
+  J = \texttt{dof\_map}[j].
+$$
+
+Matrix assembly then performs the scatter-add operation
+
+$$
+  K_{IJ} \mathrel{+}= K^e_{ij}.
+$$
+
+Implement it by following this procedure:
+
+1. use `axes(K_e, 1)` to iterate over the local rows of $\mathbf K_e$;
+2. map local row $i$ to global row $I$ through `dof_map`;
+3. use `axes(K_e, 2)` to iterate over the local columns of $\mathbf K_e$;
+4. map local column $j$ to global column $J$; and
+5. scatter-add `K_e[i, j]` into `K[I, J]`.
+
+The use of `axes` follows the Julia iteration tools introduced in
+@sec-julia-essentials. In S05, both element loops used fixed `1:2` ranges
+because the spring and axial-bar elements each had two local displacement DOFs.
+The shared matrix assembly operation should no longer encode that assumption. By
+deriving the loop ranges from `K_e`, the operation is not tied to a local matrix
+with exactly two rows and two columns.
+
+This does not make the element formulations themselves generic. The appropriate
+element matrix `K_e` and local-to-global `dof_map` must still be supplied; only
+the scatter-add operation is being shared.
+
+After completing the task, compare your function with this short reference
+excerpt:
+
+```julia
+function assemble_matrix!(K, K_e, dof_map)
+    for i in axes(K_e, 1)
+        I = dof_map[i]
+
+        for j in axes(K_e, 2)
+            J = dof_map[j]
+            K[I, J] += K_e[i, j]
+        end
+    end
+end
+```
+
+The explicit loops are deliberately retained so that the local-to-global
+assembly operation remains visible in the code.
+
+## Decide where the shared file is loaded
+
+Before modifying either source file, first make the new matrix assembly function
+available to both implementations. Should `fem_assembly.jl` be included directly
+inside `two_springs_fem.jl` and `axial_bar_fem.jl`, or should it instead be
+included by the scripts and tests that use those files?
+
+S06 keeps the file dependencies explicit. In the spring executable, load:
+
+```julia
+include("fem_assembly.jl")
+include("two_springs_fem.jl")
+```
+
+In the axial-bar executable, load:
+
+```julia
+include("fem_assembly.jl")
+include("axial_bar_fem.jl")
+```
+
+In `test/runtests.jl`, include `fem_assembly.jl` once before loading
+`two_springs_fem.jl` and `axial_bar_fem.jl`. Neither source file includes
+`fem_assembly.jl` itself, so the shared definitions are loaded only once in the
+same test process.
+
+## Refactor the spring implementation first
+
+Use the new matrix function in `two_springs_fem.jl` before changing the bar
+implementation. Rename `assemble_stiffness!` to `assemble_springs!`. Retain the
+spring element loop, `spring_stiffness`, and construction of `dof_map`; replace
+only the nested local-to-global matrix scatter with:
+
+```julia
+assemble_matrix!(K, K_e, dof_map)
+```
+
+Do not change the homogeneous boundary-condition treatment, the strain-energy
+calculation, or the `solve_two_springs` return interface. Then run:
+
+```text
+julia test/runtests.jl
+```
+
+At this intermediate checkpoint, all six existing regression checks must still
+pass.
+
+Compare the information required by `assemble_springs!` and `assemble_matrix!`.
+The spring function must know the spring stiffnesses and element connectivity,
+and it must use the spring-element formulation to construct each local matrix
+`K_e` and its `dof_map`. The shared matrix assembly function does not need any
+of this spring-specific information: it receives `K_e` and `dof_map` and only
+scatters the local matrix into the global matrix.
+
+The two functions therefore have different responsibilities: `assemble_springs!`
+forms the element contribution, while `assemble_matrix!` assembles that
+contribution into the global system.
+
+## Second guided implementation: vector assembly
+
+Now turn to the axial-bar formulation. Add this second interface to
+`fem_assembly.jl`:
+
+```julia
+assemble_vector!(f, f_e, dof_map)
+```
+
+For local DOF $i$, let $I$ denote the corresponding global DOF,
+
+$$
+  I = \texttt{dof\_map}[i].
+$$
+
+Vector assembly then performs
+
+$$
+  f_I \mathrel{+}= f^e_i.
+$$
+
+Write the function by using `axes(f_e, 1)` to iterate over the local entries of
+$\mathbf f_e$, mapping local index $i$ to global index $I$, and scatter-adding
+`f_e[i]` into `f[I]`. As in the matrix assembly function, deriving the iteration
+range from the supplied local quantity avoids encoding the two-DOF assumption.
+Only after implementing the function, compare it with this reference excerpt:
+
+```julia
+function assemble_vector!(f, f_e, dof_map)
+    for i in axes(f_e, 1)
+        I = dof_map[i]
+        f[I] += f_e[i]
+    end
+end
+```
+
+In `assemble_axial_bar!`, retain the element loop; extraction of nodes,
+coordinates, $E_e$, $A_e$, and $q_e$; computation of $L_e$; construction of
+$\mathbf K_e$ and $\mathbf f_e$; and construction of `dof_map`. Replace only the
+scatter operations with:
+
+```julia
+assemble_matrix!(K, K_e, dof_map)
+assemble_vector!(f, f_e, dof_map)
+```
+
+Run the regression suite again. The existing references must remain unchanged.
+
+## Why not combine matrix and vector assembly?
+
+The former axial-bar scatter loop placed vector assembly inside the outer matrix
+loop:
+
+```julia
+for i in 1:2
+    I = dof_map[i]
+    f[I] += f_e[i]
+
+    for j in 1:2
+        J = dof_map[j]
+        K[I, J] += K_e[i, j]
+    end
+end
+```
+
+Since the two operations use the same `dof_map` and share the outer loop, why
+not extract them as one function?
+
+Before answering, consider these questions:
+
+- Does every element that contributes a matrix necessarily contribute a vector?
+- Can matrix and vector assembly occur independently?
+- Is sharing control-flow structure the same as sharing a responsibility?
+
+The answer distinguishes *syntactic similarity* from *conceptual
+responsibility*. Matrix assembly and vector assembly are distinct finite element
+operations. An analysis may assemble a stiffness matrix without an element load
+vector, or it may assemble a vector independently of a matrix. Sharing part of
+their control flow is not sufficient reason to give them one responsibility.
+
+Similar code does not necessarily represent the same abstraction. A future
+higher-level operation could compose `assemble_matrix!` and `assemble_vector!`
+if a genuine repeated need for that composition emerges. For now, keeping them
+separate helps make clear that matrix assembly and vector assembly act on
+different mathematical objects and have different responsibilities. S06
+therefore avoids combining them simply because parts of their code look similar.
+
+## Third guided implementation: nodal loads
+
+Compare the two existing ways of adding forces that are already specified at
+global DOFs. At the S05 starting state, the spring implementation encapsulates
+the operation in:
+
+```julia
+assemble_forces!(f, applied_forces)
+```
+
+The axial-bar solver instead contains the equivalent explicit loop:
+
+```julia
+for (dof, value) in applied_forces
+    f[dof] += value
+end
+```
+
+Both forms add the same kind of force to the global vector. Before naming a new
+function, decide whether this is the same operation as assembling an element
+vector:
+
+```text
+assemble_vector!
+    local element vector
+    → requires a local-to-global map
+    → global vector
+
+add_nodal_forces!
+    force already specified at a global DOF
+    → no element map is required
+    → global vector
+```
+
+An element vector is local and needs a DOF map. A nodal force is already
+specified at a global DOF. They are different FEM operations.
+
+Add the interface
+
+```julia
+add_nodal_forces!(f, applied_forces)
+```
+
+to `fem_assembly.jl`. Iterate through the supplied `(dof, value)` pairs and add
+each value to `f[dof]`. The name describes the operation precisely and
+distinguishes it from element-vector assembly. Remove the spring-specific
+`assemble_forces!` definition, replace its call with `add_nodal_forces!`, and
+replace the equivalent explicit loop in the axial-bar solver with the same
+shared function. Then run the regression suite again. The same six regression
+checks must pass.
+
+This builds on the distinction introduced in
+@sec-four-element-axial-bar-analysis between distributed element loads and
+concentrated nodal loads. The former produce element load vectors that must be
+assembled, while the latter are already defined at global DOFs and can be added
+directly to the global load vector.
+
+## Inspect the result
+
+After completing the three refactoring steps and checking each one with the
+regression tests, compare your implementation with the expected result shown
+next.
+
+The refactored spring element loop should have the following structure:
+
+```julia
+K_e = spring_stiffness(k_e)
+# construct dof_map for this spring element
+assemble_matrix!(K, K_e, dof_map)
+```
+
+Similarly, the refactored axial-bar element loop should retain the
+formulation-specific quantities while delegating the shared assembly operations:
+
+```julia
+K_e = bar_stiffness(E_e, A_e, L_e)
+f_e = bar_distributed_load(q_e, L_e)
+# construct dof_map for this bar element
+assemble_matrix!(K, K_e, dof_map)
+assemble_vector!(f, f_e, dof_map)
+```
+
+The two element loops are therefore still different, as expected. Each retains
+the operations required by its own element formulation, while the
+local-to-global assembly steps have been moved to the shared functions.
+
+## Reflect on the programming principles
+
+The S06 refactoring can now be interpreted in terms of several programming
+principles. The concepts introduced below provide a vocabulary for understanding
+why the code was organized in this way; they are design principles rather than
+rigid rules that require every implementation to have the same structure.
+
+The first of these principles is [separation of
+concerns](../glossary.qmd#gls-separation-of-concerns). Element formulation and
+local-to-global assembly perform different parts of the finite element
+algorithm, so S06 keeps them separate. This separation can then be examined more
+closely through several related principles: the Single Responsibility Principle,
+cohesion, coupling and interface design, and a restrained application of DRY.
+Each of these is discussed in the following subsections.
+
+### Single Responsibility Principle
+
+The distinction between element formulation and local-to-global assembly also
+illustrates the [Single Responsibility
+Principle](../glossary.qmd#gls-single-responsibility-principle): a function
+should have a coherent responsibility and a principal reason to change. It does
+not mean that a function should merely "do one tiny thing." Element formulation
+changes for spring- or bar-specific reasons, while local-to-global scatter-add
+assembly changes for assembly-algorithm reasons.
+
+The principle does not require fragmenting every sequence of formulas. For
+example, `recover_axial_bar_response` computes displacement increments, strains,
+stresses, and axial forces. Together these form one coherent two-node axial-bar
+response-recovery responsibility. Splitting them solely because several formulas
+appear inside the function would make the calculation harder to follow.
+
+### Cohesion
+
+The three functions in `fem_assembly.jl` form a small, cohesive family: each
+operates on contributions that must be added to global finite element arrays.
+This [cohesion](../glossary.qmd#gls-cohesion) gives the file a clear purpose. A
+more generic `fem_utils.jl` file would make that purpose less clear and could
+gradually collect unrelated operations.
+
+### Coupling and interface design
+
+The interface
+
+```julia
+assemble_matrix!(K, K_e, dof_map)
+```
+
+does not need to know the spring stiffness, Young's modulus, cross-sectional
+area, coordinates, distributed load, or element type. A useful function
+interface is defined partly by what the function does *not* need to know. This
+reduces [coupling](../glossary.qmd#gls-coupling) between element formulation and
+assembly: each element formulation provides the required local data, while the
+assembly function is concerned only with the scatter-add operation.
+
+### Don't Repeat Yourself without dogmatism
+
+The [Don't Repeat Yourself (DRY)](../glossary.qmd#gls-dry) principle is useful
+when repeated code performs the same stable operation. It should not be applied
+mechanically simply to remove every instance of repeated code.
+
+MiniFEM intentionally retained duplicated matrix scatter code through the
+earlier snapshots. The operation first needed to remain visible alongside the
+element formulations that required it. Refactoring becomes appropriate at this
+stage because matrix scatter is now repeated, stable, already understood, and
+independent of the particular spring or bar formulation. Keeping separate copies
+would therefore begin to distract from the differences that actually matter
+between the two element formulations.
+
+The vector scatter operation is not yet repeated across the two examples, but it
+has the same element-independent local-to-global assembly role for a different
+mathematical object. Keeping matrix and vector assembly as separate functions
+also shows an important limit to DRY: similar syntax alone is not sufficient
+reason to combine operations when they have different responsibilities.
+
+## What S06 deliberately does not refactor
+
+S06 is also useful for identifying which parts of the two implementations are
+*not* ready to be shared:
+
+- boundary-condition treatment;
+- spring and axial-bar element formulations;
+- axial-bar response recovery;
+- strain-energy computation;
+- reaction recovery; and
+- solver structure.
+
+Some of these operations are genuinely different and should remain separate;
+others have not yet appeared often enough, or in a sufficiently stable form, to
+justify a shared abstraction. Whether any of them should be shared later will
+depend on evidence from future examples.
+
+The boundary-condition treatment is a clear example. The spring analysis uses
+homogeneous row-and-column modification, whereas the axial-bar analysis uses
+free/constrained partitioning and can therefore accommodate nonzero prescribed
+displacements. These are different implementations introduced for different
+stages of the course, so S06 leaves both visible rather than forcing them into a
+shared function prematurely.
+
+The same reasoning applies to the other items in the list. Some may remain
+specific to their current formulations, while others may become candidates for
+later refactoring if future examples reveal a stable common operation. S06
+therefore shares only those operations for which a stable element-independent
+responsibility is already sufficiently clear.
+
+## Final regression checkpoint
+
+The regression references introduced in S04 and extended in S05 are unchanged.
+After completing the refactoring, run:
+
+```text
+julia test/runtests.jl
+```
+
+The expected result is:
+
+```text
+Two-spring regression tests: 4 pass
+Four-element axial-bar regression tests: 2 pass
+```
+
+If so, the tests confirm that the accepted numerical results remain unchanged
+after the refactoring.
+
+## What comes next
+
+S06 has introduced the first shared MiniFEM assembly operations. The
+element-specific FEM calculations remain visible, and the current source still
+shows which responsibilities have not yet earned a shared abstraction.
+
+The next step returns to the finite element formulation. Before numerical
+integration is introduced in the code, the theory chapter will develop Gauss
+quadrature and show how it can be used to evaluate integrals numerically. The
+following coding task will then apply that theory to the axial-bar element,
+replacing the closed-form evaluation of element contributions with numerical
+integration.

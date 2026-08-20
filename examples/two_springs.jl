@@ -12,6 +12,7 @@
 #
 # Left-to-right node order: [2, 3, 1].
 
+include("fem_assembly.jl")
 include("two_springs_fem.jl")
 
 # -------------------------------
