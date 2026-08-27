@@ -30,6 +30,7 @@ book:
         - chapters/shared-fem-assembly.qmd
         - chapters/numerical-integration-one-dimension.qmd
         - chapters/standard-and-physical-coordinates.qmd
+        - chapters/gauss-quadrature-two-node-bar.qmd
     - glossary.qmd
     - references.qmd
 

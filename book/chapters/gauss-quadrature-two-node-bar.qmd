@@ -1,0 +1,1069 @@
+# Gauss--Legendre quadrature for the two-node bar {#sec-gauss-quadrature-two-node-bar}
+
+## Motivation
+
+The preceding chapters developed two separate ideas:
+
+1. Gauss--Legendre quadrature approximates an integral on $[-1,1]$ by a weighted
+   sum of integrand values;
+2. an affine mapping expresses an integral over a physical interval as an
+   equivalent integral over $[-1,1]$.
+
+These ideas can now be combined to evaluate the stiffness matrix and the
+consistent distributed-load vector of the two-node linear bar element.
+
+Both element quantities are treated within the same integration framework.
+Numerical integration is not restricted to the stiffness matrix: whenever an
+element integral is evaluated numerically, including the consistent load-vector
+integral, the quadrature rule must be appropriate to its integrand.
+
+## Element relations recalled
+
+Consider a straight two-node bar element extending from $x_1$ to $x_2$, with
+local node ordering $x_1<x_2$ and $L_e=x_2-x_1>0$.
+
+The affine mapping from the reference element $\xi\in[-1,1]$ is
+
+$$
+  x(\xi)
+  =
+  \frac{1-\xi}{2}x_1
+  +
+  \frac{1+\xi}{2}x_2,
+$$
+
+and its Jacobian is
+
+$$
+  J
+  =
+  \frac{dx}{d\xi}
+  =
+  \frac{L_e}{2}
+  >0.
+$$
+
+Consequently,
+
+$$
+  dx=J\,d\xi,
+  \qquad
+  \frac{d}{dx}
+  =
+  \frac{1}{J}\frac{d}{d\xi}.
+$$
+
+The shape-function matrix is
+
+$$
+  \mathbf{N}(\xi)
+  =
+  \begin{bmatrix}
+  N_1(\xi) & N_2(\xi)
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  \dfrac{1-\xi}{2} & \dfrac{1+\xi}{2}
+  \end{bmatrix},
+$$
+
+and the strain--displacement matrix is
+
+$$
+  \mathbf{B}
+  =
+  \frac{1}{J}\frac{d\mathbf{N}}{d\xi}
+  =
+  \begin{bmatrix}
+  -\dfrac{1}{L_e} & \dfrac{1}{L_e}
+  \end{bmatrix}.
+$$
+
+Both $\mathbf{N}$ and $\mathbf{B}$ are $1\times2$ row matrices, while
+$\mathbf{N}^{\mathsf T}$ and $\mathbf{B}^{\mathsf T}$ are $2\times1$ column
+matrices. For this element, $J$ and $\mathbf{B}$ are constant, while
+$\mathbf{N}$ varies linearly with $\xi$.
+
+## The common quadrature pattern
+
+Let $\mathbf{H}(\xi)$ denote a matrix- or vector-valued element integrand. Its
+integral over the reference interval is approximated by
+
+$$
+  \boxed{
+  \int_{-1}^{1}\mathbf{H}(\xi)\,d\xi
+  \approx
+  \sum_{g=1}^{n_g}w_g\mathbf{H}(\xi_g).
+  }
+$$
+
+The rule is applied entry by entry. At each Gauss--Legendre point, the complete
+matrix or vector integrand is evaluated, multiplied by the scalar weight, and
+added to the accumulated element quantity.
+
+For an integral originally expressed in the physical coordinate, the Jacobian is
+part of the transformed integrand:
+
+$$
+  \int_{x_1}^{x_2}\mathbf{G}(x)\,dx
+  =
+  \int_{-1}^{1}
+  \mathbf{G}\!\left(x(\xi)\right)J\,d\xi
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g\mathbf{G}(x_g)J,
+  \qquad
+  x_g=x(\xi_g).
+$$
+
+The change of coordinate, including $dx=J\,d\xi$, is exact, and the mapping from
+$\xi_g$ to $x_g$ is also exact. Numerical approximation begins only when the
+transformed integral is replaced by the finite Gauss--Legendre sum. The factor
+$w_g$ belongs to the quadrature rule, whereas $J$ comes from the coordinate
+transformation; although they appear as the product $w_gJ$, the Jacobian is not
+a quadrature weight.
+
+## Element stiffness matrix
+
+The element stiffness matrix is
+
+$$
+  \mathbf{K}_e
+  =
+  \int_{x_1}^{x_2}
+  \mathbf{B}^{\mathsf T}EA\mathbf{B}\,dx.
+$$
+
+The material property and area may in general depend on position, so we write
+
+$$
+  E=E(x),
+  \qquad
+  A=A(x).
+$$
+
+After changing coordinates,
+
+$$
+  \mathbf{K}_e
+  =
+  \int_{-1}^{1}
+  \mathbf{B}(\xi)^{\mathsf T}
+  E(\xi)A(\xi)
+  \mathbf{B}(\xi)J\,d\xi.
+$$
+
+Here $E(\xi)$ and $A(\xi)$ are shorthand for $E\!\left(x(\xi)\right)$ and
+$A\!\left(x(\xi)\right)$. Consequently, their values at a Gauss--Legendre point
+are the physical-coordinate values $E(x_g)$ and $A(x_g)$, with $x_g=x(\xi_g)$.
+
+Gauss--Legendre quadrature gives
+
+$$
+  \boxed{
+  \mathbf{K}_e
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  \mathbf{B}(\xi_g)^{\mathsf T}
+  E(\xi_g)A(\xi_g)
+  \mathbf{B}(\xi_g)J.
+  }
+$$
+
+### What is actually being integrated?
+
+The compact matrix expression can obscure the fact that ordinary scalar
+functions are being integrated. Write the strain--displacement matrix as
+
+$$
+  \mathbf{B}
+  =
+  \begin{bmatrix}
+  B_1 & B_2
+  \end{bmatrix}.
+$$
+
+Since $EA$ is scalar in the axial-bar formulation,
+
+$$
+  \begin{aligned}
+  \mathbf{B}^{\mathsf T}EA\mathbf{B}
+  &=
+  EA
+  \begin{bmatrix}
+  B_1\\
+  B_2
+  \end{bmatrix}
+  \begin{bmatrix}
+  B_1 & B_2
+  \end{bmatrix}
+  \\
+  &=
+  EA
+  \begin{bmatrix}
+  B_1^2 & B_1B_2\\
+  B_2B_1 & B_2^2
+  \end{bmatrix}.
+  \end{aligned}
+$$
+
+The stiffness matrix therefore represents four scalar integrals:
+
+$$
+  \mathbf{K}_e
+  =
+  \begin{bmatrix}
+  \displaystyle
+  \int_{-1}^{1}B_1EA B_1J\,d\xi
+  &
+  \displaystyle
+  \int_{-1}^{1}B_1EA B_2J\,d\xi
+  \\[10pt]
+  \displaystyle
+  \int_{-1}^{1}B_2EA B_1J\,d\xi
+  &
+  \displaystyle
+  \int_{-1}^{1}B_2EA B_2J\,d\xi
+  \end{bmatrix}.
+$$
+
+For example,
+
+$$
+  K_{e,12}
+  =
+  \int_{-1}^{1}
+  B_1(\xi)E(\xi)A(\xi)B_2(\xi)J\,d\xi
+$$
+
+is approximated by
+
+$$
+  K_{e,12}
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  B_1(\xi_g)E(\xi_g)A(\xi_g)B_2(\xi_g)J.
+$$
+
+The other three entries are evaluated in exactly the same way. Forming the
+matrix product at each Gauss--Legendre point simply performs these four scalar
+calculations together.
+
+### Constant properties: one point is sufficient
+
+For the two-node bar,
+
+$$
+  B_1=-\frac{1}{L_e},
+  \qquad
+  B_2=\frac{1}{L_e}.
+$$
+
+If $E$ and $A$ are constant within the element,
+
+$$
+  \mathbf{B}^{\mathsf T}EA\mathbf{B}
+  =
+  \frac{EA}{L_e^2}
+  \begin{bmatrix}
+  1 & -1\\
+  -1 & 1
+  \end{bmatrix}.
+$$
+
+The Jacobian is also constant, so every scalar entry of the transformed
+integrand
+
+$$
+  \mathbf{B}^{\mathsf T}EA\mathbf{B}J
+$$
+
+is constant in $\xi$ and its polynomial degree is zero. The one-point
+Gauss--Legendre rule, which integrates polynomials through degree one exactly,
+is therefore sufficient.
+
+Using
+
+$$
+  \xi_1=0,
+  \qquad
+  w_1=2,
+  \qquad
+  J=\frac{L_e}{2},
+$$
+
+gives
+
+$$
+  \begin{aligned}
+  \mathbf{K}_e^{(1)}
+  &=
+  2
+  \frac{EA}{L_e^2}
+  \begin{bmatrix}
+  1 & -1\\
+  -1 & 1
+  \end{bmatrix}
+  \frac{L_e}{2}
+  \\
+  &=
+  \boxed{
+  \frac{EA}{L_e}
+  \begin{bmatrix}
+  1 & -1\\
+  -1 & 1
+  \end{bmatrix}.
+  }
+  \end{aligned}
+$$
+
+This is the stiffness matrix previously obtained by closed-form integration.
+
+The result is symmetric and has units of force per unit length. Its row sums
+vanish, and
+
+$$
+  \mathbf{K}_e
+  \begin{bmatrix}
+  1\\
+  1
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  0\\
+  0
+  \end{bmatrix},
+$$
+
+confirming that a rigid translation produces no axial deformation or internal
+force.
+
+The two-point rule produces the same exact matrix. Because the integrand is
+constant and $w_1+w_2=2$,
+
+$$
+  \mathbf{K}_e^{(2)}
+  =
+  \mathbf{K}_e^{(1)}.
+$$
+
+Both rules are exact for this integrand, but the two-point rule obtains the same
+result at the cost of an additional integrand evaluation.
+
+### Varying properties
+
+If $E$ or $A$ varies within the element, the degree of each stiffness integrand
+is determined by the product
+
+$$
+  B_i(\xi)E(\xi)A(\xi)B_j(\xi)J.
+$$
+
+For the present affine two-node element, $B_i$, $B_j$, and $J$ are constant. The
+variation therefore comes from $E(\xi)A(\xi)$. If this product is polynomial,
+its degree determines the minimum exact Gauss--Legendre rule. If it is not
+polynomial, the quadrature result is generally approximate and its convergence
+must be assessed.
+
+## Consistent distributed-load vector
+
+Let $q(x)$ denote the distributed axial force per unit length, taken as positive
+when it acts in the positive $x$ direction. Thus, $q$ has units of force per
+unit length. The corresponding consistent element load vector, whose entries are
+equivalent nodal forces, is
+
+$$
+  \mathbf{f}_e^q
+  =
+  \int_{x_1}^{x_2}\mathbf{N}^{\mathsf T}q(x)\,dx.
+$$
+
+Writing
+
+$$
+  q(\xi)
+  =
+  q\!\left(x(\xi)\right),
+$$
+
+the exact coordinate transformation gives
+
+$$
+  \mathbf{f}_e^q
+  =
+  \int_{-1}^{1}
+  \mathbf{N}(\xi)^{\mathsf T}q(\xi)J\,d\xi.
+$$
+
+Gauss--Legendre quadrature then gives
+
+$$
+  \boxed{
+  \mathbf{f}_e^q
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  \mathbf{N}(\xi_g)^{\mathsf T}
+  q(\xi_g)J.
+  }
+$$
+
+At each Gauss--Legendre point, $q(\xi_g)=q(x_g)$, where $x_g=x(\xi_g)$. This is
+the same weighted-sum structure used for the stiffness matrix.
+
+### What is actually being integrated?
+
+Since
+
+$$
+  \mathbf{N}^{\mathsf T}
+  =
+  \begin{bmatrix}
+  N_1\\
+  N_2
+  \end{bmatrix},
+$$
+
+the vector expression contains two scalar integrals:
+
+$$
+  \mathbf{f}_e^q
+  =
+  \begin{bmatrix}
+  \displaystyle
+  \int_{-1}^{1}N_1(\xi)q(\xi)J\,d\xi
+  \\[10pt]
+  \displaystyle
+  \int_{-1}^{1}N_2(\xi)q(\xi)J\,d\xi
+  \end{bmatrix}.
+$$
+
+For example,
+
+$$
+  f_{e,1}^q
+  =
+  \int_{-1}^{1}N_1(\xi)q(\xi)J\,d\xi
+$$
+
+is approximated by
+
+$$
+  f_{e,1}^q
+  \approx
+  \sum_{g=1}^{n_g}
+  w_gN_1(\xi_g)q(\xi_g)J.
+$$
+
+Again, the vector notation simply collects the two scalar integrals into a
+single compact expression; integration is understood componentwise.
+
+## Uniform distributed load
+
+Suppose
+
+$$
+  q(\xi)=q
+$$
+
+is constant. The Jacobian is constant, while each shape function is linear in
+$\xi$. Each scalar integrand
+
+$$
+  N_i(\xi)qJ
+$$
+
+therefore has polynomial degree one. The one-point rule is exact.
+
+At $\xi_1=0$,
+
+$$
+  N_1(0)=N_2(0)=\frac12.
+$$
+
+Using $w_1=2$ and $J=L_e/2$ gives
+
+$$
+  \begin{aligned}
+  \mathbf{f}_e^{q,(1)}
+  &=
+  2
+  \begin{bmatrix}
+  N_1(0)\\
+  N_2(0)
+  \end{bmatrix}
+  q\frac{L_e}{2}
+  \\
+  &=
+  2
+  \begin{bmatrix}
+  1/2\\
+  1/2
+  \end{bmatrix}
+  q\frac{L_e}{2}
+  \\
+  &=
+  \boxed{
+  \frac{qL_e}{2}
+  \begin{bmatrix}
+  1\\
+  1
+  \end{bmatrix}.
+  }
+  \end{aligned}
+$$
+
+This is the consistent distributed-load vector previously obtained by
+closed-form integration. The two-point rule also gives the same exact result,
+but one point is sufficient.
+
+The sum of the two entries is
+
+$$
+  \begin{bmatrix}
+  1 & 1
+  \end{bmatrix}
+  \mathbf{f}_e^q
+  =
+  qL_e,
+$$
+
+which is the total distributed force acting on the element.
+
+## Linearly varying distributed load
+
+Suppose the distributed-load intensity varies linearly between
+
+$$
+  q_1=q(x_1)
+$$
+
+and
+
+$$
+  q_2=q(x_2).
+$$
+
+The load intensity can be interpolated as
+
+$$
+  q(\xi)
+  =
+  N_1(\xi)q_1
+  +
+  N_2(\xi)q_2.
+$$
+
+Here $q_1$ and $q_2$ are distributed-load intensities evaluated at the element
+nodes. They are not concentrated nodal forces.
+
+Both $N_i(\xi)$ and $q(\xi)$ are linear. Their product is quadratic, while $J$
+is constant. Each entry of
+
+$$
+  \mathbf{N}(\xi)^{\mathsf T}q(\xi)J
+$$
+
+therefore has degree two. A one-point rule is not generally exact, whereas a
+two-point rule is exact.
+
+### Result from the one-point rule
+
+The one-point Gauss--Legendre rule has the quadrature point $\xi_1=0$ and weight
+$w_1=2$. At this point,
+
+$$
+  \mathbf{N}(0)^{\mathsf T}
+  =
+  \begin{bmatrix}
+  1/2\\
+  1/2
+  \end{bmatrix},
+  \qquad
+  q(0)
+  =
+  \frac{q_1+q_2}{2},
+  \qquad
+  J
+  =
+  \frac{L_e}{2}.
+$$
+
+The resulting approximation is therefore
+
+$$
+  \begin{aligned}
+  \mathbf{f}_e^{q,(1)}
+  &=
+  w_1
+  \mathbf{N}(0)^{\mathsf T}
+  q(0)
+  J
+  \\[1mm]
+  &=
+  2
+  \begin{bmatrix}
+  1/2\\
+  1/2
+  \end{bmatrix}
+  \frac{q_1+q_2}{2}
+  \frac{L_e}{2}
+  \\[1mm]
+  &=
+  \boxed{
+  \frac{L_e}{4}
+  \begin{bmatrix}
+  q_1+q_2\\
+  q_1+q_2
+  \end{bmatrix}
+  }.
+  \end{aligned}
+$$
+
+Because it samples the integrand only at the midpoint, the one-point rule
+assigns the same force to both nodes, regardless of the direction of the load
+variation. Its entries nevertheless sum to
+
+$$
+  \frac{L_e}{2}(q_1+q_2),
+$$
+
+which is the correct total force under a linearly varying load. This does not
+make the consistent load vector exact: the individual load-vector integrands
+$N_i(\xi)q(\xi)J$ are quadratic and are therefore underintegrated by the
+one-point rule. When the two entries are summed, however, the partition-of-unity
+property $N_1+N_2=1$ reduces the aggregate integrand to $q(\xi)J$. Because $J$
+is constant, this integrand is linear and the one-point rule integrates it
+exactly. The rule therefore recovers the total force but not its consistent
+nodal distribution.
+
+### Result from the two-point rule
+
+The two-point Gauss--Legendre rule uses
+
+$$
+  \xi_1=-\frac{1}{\sqrt{3}},
+  \qquad
+  \xi_2=\frac{1}{\sqrt{3}},
+  \qquad
+  w_1=w_2=1.
+$$
+
+At these two quadrature points, the shape-function vectors are
+
+$$
+  \mathbf{N}(\xi_1)^{\mathsf T}
+  =
+  \frac{1}{2}
+  \begin{bmatrix}
+  1+1/\sqrt{3}\\
+  1-1/\sqrt{3}
+  \end{bmatrix},
+  \qquad
+  \mathbf{N}(\xi_2)^{\mathsf T}
+  =
+  \frac{1}{2}
+  \begin{bmatrix}
+  1-1/\sqrt{3}\\
+  1+1/\sqrt{3}
+  \end{bmatrix}.
+$$
+
+The corresponding values of the interpolated load are
+
+$$
+  \begin{aligned}
+  q(\xi_1)
+  &=
+  \frac{1}{2}
+  \left[
+  \left(1+\frac{1}{\sqrt{3}}\right)q_1
+  +
+  \left(1-\frac{1}{\sqrt{3}}\right)q_2
+  \right],
+  \\
+  q(\xi_2)
+  &=
+  \frac{1}{2}
+  \left[
+  \left(1-\frac{1}{\sqrt{3}}\right)q_1
+  +
+  \left(1+\frac{1}{\sqrt{3}}\right)q_2
+  \right].
+  \end{aligned}
+$$
+
+The quadrature sum is
+
+$$
+  \mathbf{f}_e^{q,(2)}
+  =
+  \sum_{g=1}^{2}
+  w_g
+  \mathbf{N}(\xi_g)^{\mathsf T}
+  q(\xi_g)
+  J,
+$$
+
+which gives, with $J=L_e/2$,
+
+$$
+  \boxed{
+  \mathbf{f}_e^{q,(2)}
+  =
+  \frac{L_e}{6}
+  \begin{bmatrix}
+  2q_1+q_2\\
+  q_1+2q_2
+  \end{bmatrix}.
+  }
+$$
+
+Each component of the load-vector integrand, $N_i(\xi)q(\xi)J$, is quadratic
+because both $N_i(\xi)$ and $q(\xi)$ are linear, while $J$ is constant. The
+two-point Gauss--Legendre rule is exact for polynomials of degree up to three
+and therefore evaluates both components exactly. Unlike the one-point result,
+the two entries distinguish between $q_1$ and $q_2$: the node nearer the larger
+endpoint load receives the larger equivalent nodal force. Their sum remains
+
+$$
+  \frac{L_e}{2}(q_1+q_2),
+$$
+
+so the two-point rule recovers both the correct total force and its consistent
+nodal distribution.
+
+Direct analytical integration provides an independent verification. Since
+
+$$
+  \int_{-1}^{1}N_1^2\,d\xi
+  =
+  \int_{-1}^{1}N_2^2\,d\xi
+  =
+  \frac{2}{3},
+  \qquad
+  \int_{-1}^{1}N_1N_2\,d\xi
+  =
+  \frac{1}{3},
+$$
+
+the exact integral gives
+
+$$
+  \begin{aligned}
+  \mathbf{f}_e^q
+  &=
+  \frac{L_e}{2}
+  \begin{bmatrix}
+  \displaystyle
+  q_1\int_{-1}^{1}N_1^2\,d\xi
+  +
+  q_2\int_{-1}^{1}N_1N_2\,d\xi
+  \\[8pt]
+  \displaystyle
+  q_1\int_{-1}^{1}N_1N_2\,d\xi
+  +
+  q_2\int_{-1}^{1}N_2^2\,d\xi
+  \end{bmatrix}
+  \\
+  &=
+  \frac{L_e}{6}
+  \begin{bmatrix}
+  2q_1+q_2\\
+  q_1+2q_2
+  \end{bmatrix}.
+  \end{aligned}
+$$
+
+The two-point Gauss--Legendre rule therefore agrees with direct integration. The
+sum of the equivalent nodal forces is
+
+$$
+  \begin{bmatrix}
+  1 & 1
+  \end{bmatrix}
+  \mathbf{f}_e^q
+  =
+  \frac{L_e}{2}(q_1+q_2),
+$$
+
+which is the exact resultant of the linearly varying distributed load. If
+$q_1=q_2=q$, the vector reduces to
+
+$$
+  \mathbf{f}_e^q
+  =
+  \frac{qL_e}{2}
+  \begin{bmatrix}
+  1\\
+  1
+  \end{bmatrix},
+$$
+
+as required.
+
+## Choosing the rule from the integrand
+
+Although the stiffness matrix and load vector are written in matrix and vector
+form, quadrature is applied to their individual scalar entries. The minimum
+exact rule is therefore determined from the polynomial degree of each entry of
+the complete transformed integrand.
+
+  | Element quantity         | Scalar integrand | Degree in $\xi$ | Minimum exact rule |
+  | :----------------------- | :--------------- | --------------: | :----------------- |
+  | stiffness, constant $EA$ | $B_iEA B_jJ$     |               0 | one point          |
+  | load vector, uniform $q$ | $N_iqJ$          |               1 | one point          |
+  | load vector, linear $q$  | $N_iqJ$          |               2 | two points         |
+
+The quadrature rule must consequently be selected only after all factors in the
+transformed integrand have been identified. Considering the load intensity alone
+can lead to the wrong choice. For example, a linearly varying $q(\xi)$ is a
+polynomial of degree one, but each entry of the consistent load-vector integrand
+also contains a linear shape function $N_i(\xi)$. Because $J$ is constant for
+the present affine mapping, the complete product $N_i(\xi)q(\xi)J$ is quadratic
+and requires a two-point rule for exact integration.
+
+### One framework does not imply one minimum rule
+
+Using the same quadrature framework for stiffness and loading does not mean that
+their integrands always have the same minimum exact rule. Each integrand has its
+own degree.
+
+If stiffness and load contributions are accumulated in one element loop, a
+single rule may be selected that is sufficient for the highest degree present.
+For constant $EA$ and a linearly varying distributed load, a two-point rule is
+therefore sufficient for both quantities:
+
+- it is exact, although more than necessary, for the constant stiffness
+  integrand;
+- it is the minimum exact rule for the quadratic load-vector integrands.
+
+This preserves a common element integration procedure without integrating the
+load vector inadequately.
+
+## Exactness and approximation in an element calculation
+
+The rule
+
+$$
+  p\leq2n_g-1
+$$
+
+applies to the complete scalar integrand expressed in the reference coordinate
+$\xi$. For the present two-node bar, the affine mapping makes $J$ constant and
+$\mathbf{B}$ constant, so the degrees are easy to identify.
+
+If material properties or loading are non-polynomial functions of $\xi$, no
+finite-degree exactness guarantee follows. The quadrature result is then
+generally approximate. Increasing the number of Gauss--Legendre points and
+examining the change in the element matrix, element vector, or final finite
+element response provides a practical convergence check.
+
+The degree counts in the table rely on the affine mapping of the two-node bar,
+for which both $J$ and its inverse are constant. In more general element
+mappings, these quantities may vary with position and must also be included when
+determining the degree of the complete integrand. Those cases will be considered
+when the corresponding element formulations are introduced.
+
+## The element-level mathematical procedure
+
+After the exact transformation to the reference coordinate, the element
+stiffness matrix and consistent distributed-load vector have the forms
+
+$$
+  \mathbf{K}_e
+  =
+  \int_{-1}^{1}
+  \mathbf{B}(\xi)^{\mathsf T}
+  E\!\left(x(\xi)\right)
+  A\!\left(x(\xi)\right)
+  \mathbf{B}(\xi)
+  J\,d\xi
+$$
+
+and
+
+$$
+  \mathbf{f}_e^q
+  =
+  \int_{-1}^{1}
+  \mathbf{N}(\xi)^{\mathsf T}
+  q(\xi)
+  J\,d\xi.
+$$
+
+For the present affine two-node bar, $J=L_e/2$ and $\mathbf{B}$ are constant.
+They remain visible in the complete transformed integrands because they
+contribute to the element quantities and must be accounted for when selecting
+the quadrature rule.
+
+The quadrature order is determined from the complete scalar entries of these
+transformed integrands. If their highest polynomial degrees are $d_K$ and $d_q$,
+respectively, the minimum numbers of Gauss--Legendre points required for exact
+integration are
+
+$$
+  n_K
+  =
+  \left\lceil\frac{d_K+1}{2}\right\rceil,
+  \qquad
+  n_q
+  =
+  \left\lceil\frac{d_q+1}{2}\right\rceil,
+$$
+
+because an $n_g$-point Gauss--Legendre rule is exact for polynomials of degree
+up to $2n_g-1$. If the stiffness matrix and load vector are accumulated using
+the same quadrature rule, the number of points must satisfy
+
+$$
+  n_g
+  =
+  \max(n_K,n_q).
+$$
+
+For a selected rule with quadrature points $\xi_g$ and weights $w_g$, define
+
+$$
+  x_g=x(\xi_g),
+  \qquad
+  \mathbf{N}_g=\mathbf{N}(\xi_g),
+  \qquad
+  \mathbf{B}_g=\mathbf{B}(\xi_g),
+$$
+
+together with
+
+$$
+  E_g=E(x_g),
+  \qquad
+  A_g=A(x_g),
+  \qquad
+  q_g=q(x_g)=q(\xi_g).
+$$
+
+The element quantities are then evaluated as
+
+$$
+  \boxed{
+  \mathbf{K}_e
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  \mathbf{B}_g^{\mathsf T}
+  E_gA_g
+  \mathbf{B}_g
+  J
+  }
+$$
+
+and
+
+$$
+  \boxed{
+  \mathbf{f}_e^q
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  \mathbf{N}_g^{\mathsf T}
+  q_g
+  J.
+  }
+$$
+
+Each approximation becomes an equality when the selected rule integrates every
+scalar entry of the corresponding transformed integrand exactly. Once
+$\mathbf{K}_e$ and $\mathbf{f}_e^q$ have been evaluated, they are assembled
+using the local-to-global operations established in the preceding MiniFEM
+chapters.
+
+## Verification against the closed-form element
+
+The closed-form element results derived earlier provide reference values for the
+quadrature calculations. For constant $EA$, the exact stiffness matrix is
+
+$$
+  \mathbf{K}_e
+  =
+  \frac{EA}{L_e}
+  \begin{bmatrix}
+  1 & -1\\
+  -1 & 1
+  \end{bmatrix},
+$$
+
+while, for a uniform distributed load $q$, the exact consistent load vector is
+
+$$
+  \mathbf{f}_e^q
+  =
+  \frac{qL_e}{2}
+  \begin{bmatrix}
+  1\\
+  1
+  \end{bmatrix}.
+$$
+
+One-point Gauss--Legendre quadrature reproduces both closed-form results
+exactly. This agreement checks the combined use of the coordinate mapping,
+Jacobian, transformed integrands, quadrature point, weight, and accumulation.
+Its validity is limited to these particular integrands, whose degrees do not
+exceed one.
+
+The linearly varying load provides the complementary check. Its quadratic
+load-vector integrands are not integrated exactly by the one-point rule, even
+though that rule recovers their correct aggregate force. The two-point rule
+reproduces the closed-form consistent load vector and therefore recovers both
+the total force and its correct nodal distribution.
+
+## Exercises
+
+1. Expand every entry of $\mathbf{B}^{\mathsf T}EA\mathbf{B}J$ for constant $EA$
+   and verify its polynomial degree in $\xi$.
+2. Evaluate the constant-$EA$ stiffness matrix using the two-point rule and
+   verify explicitly that it agrees with the one-point and closed-form results.
+3. For a uniform distributed load, evaluate both scalar entries of the
+   consistent load vector separately using one-point quadrature.
+4. Let $q_1=0$ and $q_2=q_0$. Compare the one- and two-point load vectors and
+   verify that both have the correct total force while only the two-point vector
+   is consistent with exact integration.
+5. Suppose $EA$ varies linearly with $\xi$. Determine the minimum
+   Gauss--Legendre rule required for exact stiffness integration for the present
+   affine two-node element.
+6. Suppose $EA$ is constant and $q(\xi)$ is quadratic. Determine the degree of
+   each consistent load-vector integrand and the minimum exact Gauss--Legendre
+   rule.
+
+::: {.callout-important title="Key points to remember"}
+- Rewriting an element integral from $x$ to $\xi$, transforming $dx=J\,d\xi$,
+  transforming derivatives, and mapping $\xi_g$ to $x_g$ are exact operations.
+  Numerical approximation begins only when the transformed integral is replaced
+  by a finite Gauss--Legendre sum.
+
+- The quadrature weight $w_g$ belongs to the numerical integration rule, whereas
+  the Jacobian $J$ belongs to the coordinate transformation. Their product
+  $w_gJ$ combines two factors with different origins.
+
+- Matrix and vector quadrature is ordinary scalar quadrature applied entry by
+  entry. At each Gauss--Legendre point, the complete matrix or vector integrand
+  is formed and its weighted contribution is accumulated.
+
+- The quadrature order must be selected from the degree of the complete
+  transformed scalar integrand. A rule with $n_g$ points integrates every
+  polynomial of degree $p\leq2n_g-1$ exactly.
+
+- For a straight two-node bar with constant $EA$, the stiffness integrands have
+  degree zero, so one-point quadrature is exact.
+
+- For a uniform distributed load, the consistent load-vector integrands have
+  degree one, so one-point quadrature is exact. For a linearly varying load,
+  multiplication by the linear shape functions produces quadratic integrands, so
+  two-point quadrature is required for exact integration.
+
+- Using more points than necessary can still give an exact result, but requires
+  additional integrand evaluations. Underintegration may reproduce an aggregate
+  quantity, such as the total distributed force, without reproducing the correct
+  element vector.
+:::
