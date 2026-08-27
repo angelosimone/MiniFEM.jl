@@ -1418,13 +1418,123 @@
     ]
   },
   {
+    "objectID": "chapters/standard-and-physical-coordinates.html",
+    "href": "chapters/standard-and-physical-coordinates.html",
+    "title": "14  Standard and physical coordinates",
+    "section": "",
+    "text": "14.1 Relating two intervals\nThe Gauss–Legendre rules introduced in Chapter 13 are defined on the standard integration interval\n\\[\n  \\xi\\in[-1,1].\n\\]\nA scalar integral or a physical finite element is usually defined over a different interval. For example, consider a two-node bar element whose local nodes are ordered so that \\(x_2&gt;x_1\\). The element extends from \\(x_1\\) to \\(x_2\\) and has positive length\n\\[\n  L_e=x_2-x_1&gt;0.\n\\]\nThe quadrature rule and the physical element therefore use two different coordinates:\nThis chapter develops the exact change of coordinate that relates them. The mapping is not itself a numerical approximation. Its purpose is to express an integral defined on a physical interval as an equivalent integral on the standard interval.\nConsider an integral over the physical interval \\([a,b]\\),\n\\[\n  I\n  =\n  \\int_a^b f(x)\\,dx,\n  \\qquad\n  a&lt;b.\n\\]\nWe seek a coordinate transformation \\(x=x(\\xi)\\) satisfying\n\\[\n  \\xi=-1\n  \\quad\\Longleftrightarrow\\quad\n  x=a\n\\]\nand\n\\[\n  \\xi=1\n  \\quad\\Longleftrightarrow\\quad\n  x=b.\n\\]\nAssume a transformation of the form\n\\[\n  x(\\xi)=c+d\\xi.\n\\]\nThe endpoint conditions give\n\\[\n  a=c-d,\n  \\qquad\n  b=c+d.\n\\]\nAdding and subtracting these equations yields\n\\[\n  c=\\frac{a+b}{2},\n  \\qquad\n  d=\\frac{b-a}{2}.\n\\]\nThe required transformation is therefore\n\\[\n  \\boxed{\n  x(\\xi)\n  =\n  \\frac{a+b}{2}\n  +\n  \\frac{b-a}{2}\\xi.\n  }\n\\]\nThe first term locates the midpoint of the physical interval. The second term scales the standard interval, whose length is \\(2\\), to the physical interval, whose length is \\(b-a\\).\nThe same transformation can be written as\n\\[\n  \\boxed{\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}a\n  +\n  \\frac{1+\\xi}{2}b.\n  }\n\\]\nSubstitution confirms the endpoint correspondence:\n\\[\n  x(-1)=a,\n  \\qquad\n  x(1)=b.\n\\]\nThe inverse transformation obtained by solving the affine mapping for \\(\\xi\\) is\n\\[\n  \\boxed{\n  \\xi(x)\n  =\n  \\frac{2x-(a+b)}{b-a}\n  },\n\\]\nand satisfies\n\\[\n  \\xi(a)=-1,\n  \\qquad\n  \\xi(b)=1.\n\\]\nBecause \\(a&lt;b\\), the denominator \\(b-a\\) is positive. The forward and inverse mappings are therefore one-to-one and preserve the orientation of the interval.\nThis transformation is an affine mapping. The exact correspondence between the standard and physical intervals is summarized in Figure 14.1.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#relating-two-intervals",
+    "href": "chapters/standard-and-physical-coordinates.html#relating-two-intervals",
+    "title": "14  Standard and physical coordinates",
+    "section": "",
+    "text": "Figure 14.1: Exact affine mapping from the standard interval \\([-1,1]\\) to the physical interval \\([a,b]\\). The endpoints and midpoints correspond, the standard length \\(2\\) is transformed into the physical length \\(b-a\\), and differential lengths are scaled by the constant Jacobian \\(J=(b-a)/2\\). The diagram is schematic: no quadrature rule or numerical approximation is involved.\n\n\n\n\n\n\n\n\n\nNoteWhy ‘affine’?\n\n\n\nAn affine mapping has the form\n\\[\n  x=a_0+a_1\\xi.\n\\]\nIt combines a linear scaling with a translation. This is more general than a strictly linear mapping: a linear mapping must send the origin to the origin, whereas an affine mapping may shift it.\nFor the transformation between two one-dimensional intervals, the translation places the midpoint and the scaling adjusts the length. The mapping cannot bend or curve the interval, and its local scale factor is therefore constant.\nMore general finite element mappings introduced later may have a scale factor that varies with position. Higher-order geometric interpolation can represent such non-affine mappings, although using higher-order shape functions does not by itself require the mapping to be non-affine.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#the-jacobian",
+    "href": "chapters/standard-and-physical-coordinates.html#the-jacobian",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.2 The Jacobian",
+    "text": "14.2 The Jacobian\nDifferentiating the mapping gives\n\\[\n  \\boxed{\n  J\n  =\n  \\frac{dx}{d\\xi}\n  =\n  \\frac{b-a}{2}.\n  }\n\\]\nThe quantity \\(J\\) is the one-dimensional Jacobian of the transformation. It is the exact local scale factor between the two coordinates: at each point, it gives the ratio between a differential length in the physical coordinate and the corresponding differential length in the standard coordinate. Thus,\n\\[\n  \\boxed{\n  dx=J\\,d\\xi.\n  }\n\\]\nFor \\(a&lt;b\\), the Jacobian is positive and the mapping preserves orientation. In the affine mapping considered here, \\(J\\) is also constant: every part of the standard interval is scaled by the same factor.\n\n14.2.1 A geometric check\nThe length of the interval \\([a,b]\\) can be recovered by integrating the constant function \\(1\\):\n\\[\n  \\begin{aligned}\n  \\int_a^b 1\\,dx\n  &=\n  \\int_{-1}^{1}J\\,d\\xi\n  \\\\\n  &=\n  2J\n  \\\\\n  &=\n  b-a.\n  \\end{aligned}\n\\]\nThis calculation explains the Jacobian geometrically: the standard interval has length \\(2\\), and multiplication by \\(J=(b-a)/2\\) converts that length into the physical length \\(b-a\\).",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#transforming-an-integral",
+    "href": "chapters/standard-and-physical-coordinates.html#transforming-an-integral",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.3 Transforming an integral",
+    "text": "14.3 Transforming an integral\nUsing the change of variable \\(x=x(\\xi)\\) and \\(dx=J\\,d\\xi\\) gives\n\\[\n  \\boxed{\n  \\int_a^b f(x)\\,dx\n  =\n  \\int_{-1}^{1}\n  f\\!\\left(x(\\xi)\\right)J\\,d\\xi.\n  }\n\\]\nThis equation is an exact identity. The integrand expressed in the standard coordinate is\n\\[\n  h(\\xi)\n  =\n  f\\!\\left(x(\\xi)\\right)J.\n\\]\nOnly after the integral has been expressed on \\([-1,1]\\) is Gauss–Legendre quadrature applied:\n\\[\n  \\boxed{\n  \\int_a^b f(x)\\,dx\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\n  f(x_g)J,\n  }\n\\]\nwhere\n\\[\n  x_g=x(\\xi_g)\n\\]\nis the physical position corresponding to standard integration point \\(\\xi_g\\).\nThe Jacobian \\(J\\) and the quadrature weight \\(w_g\\) have different origins and roles. The Jacobian is fixed by the exact coordinate transformation, whereas \\(w_g\\) belongs to the selected Gauss–Legendre rule and appears only when the integral is replaced by a finite sum. Although the product \\(w_gJ\\) occurs in the quadrature formula for the present affine mapping, \\(J\\) is not a quadrature weight.\n\n\n\n\n\n\nImportantEquality and approximation are different steps\n\n\n\nThe coordinate transformation introduces no approximation:\n\\[\n  \\int_a^b f(x)\\,dx\n  =\n  \\int_{-1}^{1}f\\!\\left(x(\\xi)\\right)J\\,d\\xi.\n\\]\nThe approximation is introduced only when the transformed integral is replaced by a finite weighted sum:\n\\[\n  \\int_{-1}^{1}f\\!\\left(x(\\xi)\\right)J\\,d\\xi\n  \\approx\n  \\sum_{g=1}^{n_g}w_gf(x_g)J.\n\\]\nAn inaccurate quadrature result is therefore not an error caused by the affine mapping. It results from using a quadrature rule that is insufficient for the transformed integrand.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#worked-example-mapping-an-integral-to-the-standard-interval",
+    "href": "chapters/standard-and-physical-coordinates.html#worked-example-mapping-an-integral-to-the-standard-interval",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.4 Worked example: mapping an integral to the standard interval",
+    "text": "14.4 Worked example: mapping an integral to the standard interval\nReturn to the scalar integral used to study the midpoint and trapezoidal rules:\n\\[\n  I\n  =\n  \\int_0^3(x^2+1)\\,dx\n  =\n  12.\n\\]\nThe physical interval is \\([0,3]\\). Its affine mapping is\n\\[\n  x(\\xi)\n  =\n  \\frac{0+3}{2}\n  +\n  \\frac{3-0}{2}\\xi\n  =\n  \\frac{3}{2}(1+\\xi),\n\\]\nand its Jacobian is\n\\[\n  J=\\frac{3}{2}.\n\\]\nChanging variables from \\(x\\) to \\(\\xi\\) gives\n\\[\n  I\n  =\n  \\int_{-1}^{1}\n  \\left[\n  \\left(\\frac{3}{2}(1+\\xi)\\right)^2+1\n  \\right]\n  \\frac{3}{2}\\,d\\xi.\n\\]\nDefine the transformed integrand\n\\[\n  h(\\xi)\n  =\n  \\left[\n  \\left(\\frac{3}{2}(1+\\xi)\\right)^2+1\n  \\right]\n  \\frac{3}{2}.\n\\]\nExpanding it gives\n\\[\n  h(\\xi)\n  =\n  \\frac{39}{8}\n  +\n  \\frac{27}{4}\\xi\n  +\n  \\frac{27}{8}\\xi^2.\n\\]\nThe transformed integrand is quadratic in \\(\\xi\\).\n\n14.4.1 One-point rule\nThe one-point rule gives\n\\[\n  \\begin{aligned}\n  Q_1\n  &=\n  2h(0)\n  \\\\\n  &=\n  2\\left(\\frac{39}{8}\\right)\n  \\\\\n  &=\n  9.75.\n  \\end{aligned}\n\\]\nThe result is not exact because a one-point Gauss–Legendre rule has degree of exactness one, whereas \\(h(\\xi)\\) has degree two.\n\n\n14.4.2 Two-, three-, and four-point rules\nThe two-point rule has degree of exactness three and therefore integrates the quadratic transformed integrand exactly:\n\\[\n  Q_2=12.\n\\]\nThe three- and four-point rules also give\n\\[\n  Q_3=Q_4=12.\n\\]\nThey are exact but use more function evaluations than required. In general, the original integrand and the coordinate mapping together determine the transformed integrand. If the transformed integrand is a polynomial of degree \\(p\\), an \\(n_g\\)-point Gauss–Legendre rule is guaranteed to integrate it exactly when\n\\[\n  2n_g-1\\geq p.\n\\]\nHere \\(p=2\\), so the two-point rule is the lowest-order rule satisfying this guarantee, and the preceding one-point calculation confirms that the one-point rule is not exact.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#from-a-physical-interval-to-a-reference-element",
+    "href": "chapters/standard-and-physical-coordinates.html#from-a-physical-interval-to-a-reference-element",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.5 From a physical interval to a reference element",
+    "text": "14.5 From a physical interval to a reference element\nWe now specialize the preceding transformation to a two-node bar element. Let the local nodes be ordered so that\n\\[\n  x_1&lt;x_2,\n\\]\nand define\n\\[\n  L_e=x_2-x_1&gt;0.\n\\]\nThe physical element extends over\n\\[\n  x\\in[x_1,x_2],\n\\]\nwhile the standard coordinate belongs to\n\\[\n  \\xi\\in[-1,1].\n\\]\nIn this finite element context, the standard interval is called the reference element, and \\(\\xi\\) is called the reference coordinate or natural coordinate.\nThe affine element mapping is\n\\[\n  \\boxed{\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2.\n  }\n\\]\nEquivalently,\n\\[\n  x(\\xi)\n  =\n  \\frac{x_1+x_2}{2}\n  +\n  \\frac{L_e}{2}\\xi.\n\\]\nThe Jacobian is\n\\[\n  \\boxed{\n  J\n  =\n  \\frac{dx}{d\\xi}\n  =\n  \\frac{L_e}{2}.\n  }\n\\]\nThe assumption \\(x_1&lt;x_2\\) ensures \\(J&gt;0\\). The mapping is therefore nondegenerate and preserves the left-to-right orientation of the element.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#shape-functions-in-the-reference-coordinate",
+    "href": "chapters/standard-and-physical-coordinates.html#shape-functions-in-the-reference-coordinate",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.6 Shape functions in the reference coordinate",
+    "text": "14.6 Shape functions in the reference coordinate\nIn Chapter 10, the two-node bar shape functions were derived directly in the physical coordinate:\n\\[\n  N_1(x)\n  =\n  \\frac{x_2-x}{L_e},\n  \\qquad\n  N_2(x)\n  =\n  \\frac{x-x_1}{L_e}.\n\\]\nSubstituting \\(x=x(\\xi)\\) gives\n\\[\n  \\boxed{\n  N_1(\\xi)=\\frac{1-\\xi}{2},\n  \\qquad\n  N_2(\\xi)=\\frac{1+\\xi}{2}.\n  }\n\\]\nThese functions satisfy\n\\[\n  N_1(-1)=1,\n  \\qquad\n  N_1(1)=0,\n\\]\nand\n\\[\n  N_2(-1)=0,\n  \\qquad\n  N_2(1)=1.\n\\]\nThe element mapping can therefore also be written as\n\\[\n  \\boxed{\n  x(\\xi)\n  =\n  N_1(\\xi)x_1\n  +\n  N_2(\\xi)x_2.\n  }\n\\]\nWithin the straight one-dimensional two-node bar model, the element geometry is completely specified by the endpoint coordinates \\(x_1\\) and \\(x_2\\). Consequently, this affine interpolation does not introduce a geometric approximation and represents the physical element interval exactly.\nThe same shape functions interpolate the displacement field:\n\\[\n  u^h(\\xi)\n  =\n  N_1(\\xi)u_1\n  +\n  N_2(\\xi)u_2.\n\\]\nIn contrast to the exact representation of the element geometry, the displacement field is only an approximation of the unknown physical field.\nExpressing the approximation in \\(\\xi\\) does not create a new displacement approximation. It is the previously derived linear interpolation written using a different coordinate.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#transforming-shape-function-derivatives",
+    "href": "chapters/standard-and-physical-coordinates.html#transforming-shape-function-derivatives",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.7 Transforming shape-function derivatives",
+    "text": "14.7 Transforming shape-function derivatives\nThe bar strain is defined using a derivative with respect to the physical coordinate \\(x\\). The element stiffness matrix,\n\\[\n  \\mathbf{K}_e\n  =\n  \\int_{x_1}^{x_2}\n  \\mathbf{B}^{\\mathsf T}EA\\mathbf{B}\\,dx,\n\\]\nis likewise written in the physical coordinate. The next chapter evaluates this integral using Gauss–Legendre quadrature on the standard interval. Before that rule can be applied, both the integration measure \\(dx\\) and the physical derivatives contained in \\(\\mathbf{B}\\) must therefore be expressed exactly in terms of the standard coordinate \\(\\xi\\).\nAt this point, it is natural to ask why the standard coordinate is needed at all. For the present two-node bar, the shape functions are already available as simple explicit functions of \\(x\\). Their physical derivatives can be computed directly, and the stiffness integral could also be evaluated directly over the physical interval. This is a special advantage of such a simple element and mapping, however, rather than the general finite element procedure.\nIn finite element theory and implementation, shape functions are customarily defined directly on a standard element. The functions \\(N_i(\\xi)\\) are then fixed polynomials, independent of the position and size of any particular physical element. The geometry of each element is introduced separately through the mapping \\(x(\\xi)\\). This separation makes it possible to use the same shape functions, differentiation procedure, and selected quadrature rule for every element of the same type, while the mapping accounts for the geometry of the individual physical element.\nIn Chapter 10, the two-node shape functions were derived in the physical coordinate as \\(N_i(x)\\). In this chapter, they were rewritten as \\(N_i(\\xi)\\) by substituting the affine mapping. This order makes the connection between the physical and standard descriptions especially transparent. In the general formulation, however, \\(N_i(\\xi)\\) is normally introduced directly, without first constructing an explicit expression for \\(N_i(x)\\). The physical shape function is then known through the composition of \\(N_i(\\xi)\\) with the inverse of the element mapping.\nOnce \\(N_i(\\xi)\\) is available as an explicit polynomial, its derivative \\(dN_i/d\\xi\\) follows immediately by direct differentiation. Strain, however, requires the physical derivative \\(dN_i/dx\\). The exact relationship between these derivatives follows from the chain rule. For the present two-node bar, \\(dN_i/dx\\) is also known from the earlier physical-coordinate derivation, so it provides a direct check of the transformed result.\nLet\n\\[\n  \\widehat{\\phi}(\\xi)=\\phi\\!\\left(x(\\xi)\\right)\n\\]\ndenote any scalar function expressed in the standard coordinate. The chain rule gives\n\\[\n  \\frac{d\\widehat{\\phi}}{d\\xi}\n  =\n  \\frac{d\\phi}{dx}\n  \\frac{dx}{d\\xi}\n  =\n  J\\frac{d\\phi}{dx}.\n\\]\nBecause \\(J&gt;0\\), this relationship can be inverted. At the operator level,\n\\[\n  \\boxed{\n  \\frac{d}{dx}\n  =\n  \\frac{1}{J}\\frac{d}{d\\xi}.\n  }\n\\]\nApplied to the shape functions, it gives\n\\[\n  \\boxed{\n  \\frac{dN_i}{dx}\n  =\n  \\frac{1}{J}\n  \\frac{dN_i}{d\\xi}.\n  }\n\\]\nFor the two-node shape functions,\n\\[\n  \\frac{dN_1}{d\\xi}=-\\frac12,\n  \\qquad\n  \\frac{dN_2}{d\\xi}=\\frac12.\n\\]\nUsing \\(J=L_e/2\\) gives\n\\[\n  \\frac{dN_1}{dx}=-\\frac{1}{L_e},\n  \\qquad\n  \\frac{dN_2}{dx}=\\frac{1}{L_e}.\n\\]\nThe strain–displacement matrix is therefore\n\\[\n  \\begin{aligned}\n  \\mathbf{B}\n  &=\n  \\frac{d\\mathbf{N}}{dx}\n  \\\\\n  &=\n  \\frac{1}{J}\n  \\frac{d\\mathbf{N}}{d\\xi}\n  \\\\\n  &=\n  \\begin{bmatrix}\n  -\\dfrac{1}{L_e} & \\dfrac{1}{L_e}\n  \\end{bmatrix}.\n  \\end{aligned}\n\\]\nThis is exactly the same constant matrix obtained previously by differentiating the physical-coordinate shape functions directly.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#what-the-mapping-has-accomplished",
+    "href": "chapters/standard-and-physical-coordinates.html#what-the-mapping-has-accomplished",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.8 What the mapping has accomplished",
+    "text": "14.8 What the mapping has accomplished\nThe affine mapping provides the following relationships:\n\n\n\nQuantity\nRelationship\n\n\n\n\nphysical position\n\\(x(\\xi)=N_1(\\xi)x_1+N_2(\\xi)x_2\\)\n\n\nphysical differential\n\\(dx=J\\,d\\xi\\)\n\n\nJacobian\n\\(J=L_e/2\\)\n\n\nphysical derivative\n\\(dN_i/dx=J^{-1}dN_i/d\\xi\\)\n\n\nmapped physical point\n\\(x_g=x(\\xi_g)\\)\n\n\n\nNo numerical approximation has yet been made in deriving these relationships. They allow element integrals and derivatives to be expressed using one standard coordinate system. The next chapter combines these exact transformations with Gauss–Legendre quadrature to evaluate the stiffness matrix and consistent distributed-load vector of the two-node bar.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/standard-and-physical-coordinates.html#exercises",
+    "href": "chapters/standard-and-physical-coordinates.html#exercises",
+    "title": "14  Standard and physical coordinates",
+    "section": "14.9 Exercises",
+    "text": "14.9 Exercises\n\nDerive the affine mapping from \\([-1,1]\\) to \\([2,8]\\) and its inverse, verify both endpoint correspondences, and calculate the Jacobian.\nMap the standard points \\(\\xi=-1/\\sqrt{3}\\) and \\(\\xi=1/\\sqrt{3}\\) to the physical interval \\([2,8]\\).\nVerify by direct integration that \\(\\int_2^8 1\\,dx=\\int_{-1}^{1}J\\,d\\xi\\).\nTransform \\(\\int_2^8x\\,dx\\) to the standard interval and evaluate the transformed integral analytically.\nFor a bar element with \\(x_1=7\\) and \\(x_2=11\\), calculate \\(x(0)\\), \\(J\\), \\(dN_1/dx\\), and \\(dN_2/dx\\).\nExplain why the equality introduced by the coordinate transformation must be distinguished from the approximation introduced by quadrature.\n\n\n\n\n\n\n\nImportantKey points to remember\n\n\n\n\nThe affine mapping relates the standard interval \\(\\xi\\in[-1,1]\\) to a physical interval by a constant scaling and a translation. It is an exact, one-to-one change of coordinate when the physical endpoints are correctly ordered.\nThe Jacobian\n\\[\n  J=\\frac{dx}{d\\xi}\n\\]\nis the exact local scale factor of the mapping. It transforms differential lengths according to \\(dx=J\\,d\\xi\\).\nChanging coordinates produces the exact identity\n\\[\n  \\int_a^b f(x)\\,dx\n  =\n  \\int_{-1}^{1}f\\!\\left(x(\\xi)\\right)J\\,d\\xi.\n\\]\nNumerical approximation begins only when the transformed integral is replaced by a finite quadrature sum.\nThe Jacobian and the quadrature weights have different roles. The mapping determines \\(J\\), whereas the selected Gauss–Legendre rule determines the integration points \\(\\xi_g\\) and weights \\(w_g\\). The Jacobian is not a quadrature weight.\nFor a straight two-node bar,\n\\[\n  x(\\xi)=N_1(\\xi)x_1+N_2(\\xi)x_2,\n  \\qquad\n  J=\\frac{L_e}{2},\n\\]\nrepresents the element geometry exactly. The interpolated displacement \\(u^h(\\xi)\\) remains an approximation of the unknown physical field.\nPhysical derivatives are recovered exactly through the chain rule:\n\\[\n  \\frac{d}{dx}\n  =\n  \\frac{1}{J}\\frac{d}{d\\xi}.\n\\]",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Standard and physical coordinates</span>"
+    ]
+  },
+  {
     "objectID": "glossary.html",
     "href": "glossary.html",
     "title": "Glossary",
     "section": "",
     "text": "A",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1432,9 +1542,9 @@
     "href": "glossary.html#a",
     "title": "Glossary",
     "section": "",
-    "text": "Abstraction\nIn programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.\nSimilar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.\nFurther details: Wikipedia — Abstraction (computer science).\n\n\nAffine mapping\nA one-dimensional coordinate transformation of the form\n\\[\n  x = a + b\\xi,\n\\]\nwhich combines a scaling with a translation. For a two-node bar element extending from \\(x_1\\) to \\(x_2&gt;x_1\\), the affine mapping from the standard interval \\(\\xi \\in [-1,1]\\) to the physical element is\n\\[\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2\n  =\n  \\frac{x_1+x_2}{2}\n  +\n  \\frac{L_e}{2}\\xi,\n\\]\nwhere \\(L_e=x_2-x_1\\). This mapping sends \\(\\xi=-1\\) to \\(x_1\\) and \\(\\xi=1\\) to \\(x_2\\). Its Jacobian is constant and equal to\n\\[\n  J=\\frac{dx}{d\\xi}=\\frac{L_e}{2}.\n\\]\n\n\nAsymptotic behavior\nThe behavior of a quantity as a parameter approaches a limiting value. An asymptotic statement describes what happens near that limit; it does not generally claim that the stated relationship is an exact equality for every value of the parameter.\nIn numerical integration, for example,\n\\[\n  e_Q(h)=O(h^2)\n\\]\nas \\(h\\) approaches zero means that there are constants \\(C&gt;0\\) and \\(h_0&gt;0\\), independent of \\(h\\), such that\n\\[\n  e_Q(h)\\leq Ch^2\n\\]\nwhenever \\(0&lt;h\\leq h_0\\). Thus, once the subinterval width is sufficiently small, the error is bounded above by a constant times \\(h^2\\).\nThe big-\\(O\\) statement specifies this asymptotic bound; it does not by itself claim that\n\\[\n  e_Q(h)=Ch^2\n\\]\nor prescribe an exact error-reduction factor. If, more specifically, the error approaches a nonzero multiple of \\(h^2\\), halving \\(h\\) reduces the error by approximately a factor of four once the asymptotic behavior has been reached.\nOn a fixed integration interval divided into \\(n\\) equal subintervals,\n\\[\n  h=\\frac{b-a}{n},\n\\]\nso the same asymptotic bound may be written as\n\\[\n  e_Q=O(n^{-2})\n\\]\nas \\(n\\) increases.\nThe quadratic midpoint-rule example in 13  Numerical integration in one dimension is stronger than this general asymptotic statement. For that particular function and interval, its error satisfies the exact relationship\n\\[\n  e_Q=\\frac{h^2}{4}\n\\]\nfor every positive integer \\(n\\). Consequently, doubling \\(n\\) and therefore halving \\(h\\) reduces the error by exactly a factor of four in that example.",
+    "text": "Abstraction\nIn programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.\nSimilar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.\nFurther details: Wikipedia — Abstraction (computer science).\n\n\nAffine mapping\nA one-dimensional coordinate transformation of the form\n\\[\n  x(\\xi)=a_0+a_1\\xi,\n\\]\nwhich combines a constant scaling with a translation. For a two-node bar element extending from \\(x_1\\) to \\(x_2&gt;x_1\\), the affine mapping from the standard interval \\(\\xi\\in[-1,1]\\) to the physical element is\n\\[\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2\n  =\n  \\frac{x_1+x_2}{2}\n  +\n  \\frac{L_e}{2}\\xi,\n\\]\nwhere \\(L_e=x_2-x_1&gt;0\\). This mapping sends \\(\\xi=-1\\) to \\(x_1\\) and \\(\\xi=1\\) to \\(x_2\\). Its Jacobian is constant and equal to\n\\[\n  J=\\frac{dx}{d\\xi}=\\frac{L_e}{2}.\n\\]\nThe mapping and its Jacobian belong to an exact change of coordinate, as developed in 14  Standard and physical coordinates. Numerical approximation begins only when a quadrature rule is subsequently applied to the transformed integral.\n\n\nAsymptotic behavior\nThe behavior of a quantity as a parameter approaches a limiting value. An asymptotic statement describes what happens near that limit; it does not generally claim that the stated relationship is an exact equality for every value of the parameter.\nIn numerical integration, for example,\n\\[\n  e_Q(h)=O(h^2)\n\\]\nas \\(h\\) approaches zero means that there are constants \\(C&gt;0\\) and \\(h_0&gt;0\\), independent of \\(h\\), such that\n\\[\n  e_Q(h)\\leq Ch^2\n\\]\nwhenever \\(0&lt;h\\leq h_0\\). Thus, once the subinterval width is sufficiently small, the error is bounded above by a constant times \\(h^2\\).\nThe big-\\(O\\) statement specifies this asymptotic bound; it does not by itself claim that\n\\[\n  e_Q(h)=Ch^2\n\\]\nor prescribe an exact error-reduction factor. If, more specifically, the error approaches a nonzero multiple of \\(h^2\\), halving \\(h\\) reduces the error by approximately a factor of four once the asymptotic behavior has been reached.\nOn a fixed integration interval divided into \\(n\\) equal subintervals,\n\\[\n  h=\\frac{b-a}{n},\n\\]\nso the same asymptotic bound may be written as\n\\[\n  e_Q=O(n^{-2})\n\\]\nas \\(n\\) increases.\nThe quadratic midpoint-rule example in 13  Numerical integration in one dimension is stronger than this general asymptotic statement. For that particular function and interval, its error satisfies the exact relationship\n\\[\n  e_Q=\\frac{h^2}{4}\n\\]\nfor every positive integer \\(n\\). Consequently, doubling \\(n\\) and therefore halving \\(h\\) reduces the error by exactly a factor of four in that example.",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1444,7 +1554,7 @@
     "section": "C",
     "text": "C\n\nCohesion\nThe degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Cohesion (computer science).\n\n\nCoupling\nThe degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.\nFurther details: Wikipedia — Coupling (computer programming).",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1454,7 +1564,7 @@
     "section": "D",
     "text": "D\n\nDeclarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.\n\n\nDon’t Repeat Yourself (DRY)\nA design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Don’t repeat yourself.",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1464,7 +1574,7 @@
     "section": "I",
     "text": "I\n\nImmutable object\nAn object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.\nSee also: Mutable object; Modified in place.\n\n\nImperative programming\nA programming paradigm in which a computation is expressed as an explicit sequence of commands that describe how a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.\nSee also: Declarative programming. Further details: Wikipedia — Imperative programming.",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1474,7 +1584,7 @@
     "section": "M",
     "text": "M\n\nModified in place\nDescribes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.\nFor example, in Julia, integers are immutable:\nx = 4\nx = x + 1\nHere, x is not modified in place. Instead, x is rebound from the value 4 to the new value 5.\nBy contrast, an array is mutable:\nx = [4]\nx[1] += 1\nHere, the existing array is modified in place, changing its contents from [4] to [5].\nSee also: Mutable object; Immutable object.\n\n\nMutable object\nAn object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.\nSee also: Immutable object; Modified in place.",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1484,7 +1594,7 @@
     "section": "R",
     "text": "R\n\nRefactoring\nRestructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1494,7 +1604,7 @@
     "section": "S",
     "text": "S\n\nSeparation of concerns\nA software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.\nFurther details: Wikipedia — Separation of concerns.\n\n\nSingle Responsibility Principle\nA design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Single-responsibility principle.",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {

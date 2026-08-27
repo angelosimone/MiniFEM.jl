@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./references.html" rel="next">
-<link href="./chapters/numerical-integration-one-dimension.html" rel="prev">
+<link href="./chapters/standard-and-physical-coordinates.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -162,7 +162,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -302,12 +302,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./glossary.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -398,9 +404,9 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="gls-affine-mapping">Affine mapping</h3>
 <p>A one-dimensional coordinate transformation of the form</p>
 <p><span class="math display">\[
-  x = a + b\xi,
+  x(\xi)=a_0+a_1\xi,
 \]</span></p>
-<p>which combines a scaling with a translation. For a two-node bar element extending from <span class="math inline">\(x_1\)</span> to <span class="math inline">\(x_2&gt;x_1\)</span>, the affine mapping from the standard interval <span class="math inline">\(\xi \in [-1,1]\)</span> to the physical element is</p>
+<p>which combines a constant scaling with a translation. For a two-node bar element extending from <span class="math inline">\(x_1\)</span> to <span class="math inline">\(x_2&gt;x_1\)</span>, the affine mapping from the standard interval <span class="math inline">\(\xi\in[-1,1]\)</span> to the physical element is</p>
 <p><span class="math display">\[
   x(\xi)
   =
@@ -412,10 +418,11 @@ window.Quarto = {
   +
   \frac{L_e}{2}\xi,
 \]</span></p>
-<p>where <span class="math inline">\(L_e=x_2-x_1\)</span>. This mapping sends <span class="math inline">\(\xi=-1\)</span> to <span class="math inline">\(x_1\)</span> and <span class="math inline">\(\xi=1\)</span> to <span class="math inline">\(x_2\)</span>. Its Jacobian is constant and equal to</p>
+<p>where <span class="math inline">\(L_e=x_2-x_1&gt;0\)</span>. This mapping sends <span class="math inline">\(\xi=-1\)</span> to <span class="math inline">\(x_1\)</span> and <span class="math inline">\(\xi=1\)</span> to <span class="math inline">\(x_2\)</span>. Its Jacobian is constant and equal to</p>
 <p><span class="math display">\[
   J=\frac{dx}{d\xi}=\frac{L_e}{2}.
 \]</span></p>
+<p>The mapping and its Jacobian belong to an exact change of coordinate, as developed in <a href="chapters/standard-and-physical-coordinates.html" class="quarto-xref"><span>14&nbsp; Standard and physical coordinates</span></a>. Numerical approximation begins only when a quadrature rule is subsequently applied to the transformed integral.</p>
 </section>
 <section id="gls-asymptotic-behavior" class="level3">
 <h3 class="anchored" data-anchor-id="gls-asymptotic-behavior">Asymptotic behavior</h3>
@@ -936,8 +943,8 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./chapters/numerical-integration-one-dimension.html" class="pagination-link" aria-label="Numerical integration in one dimension">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span>
+      <a href="./chapters/standard-and-physical-coordinates.html" class="pagination-link" aria-label="Standard and physical coordinates">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
