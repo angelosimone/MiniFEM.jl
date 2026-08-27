@@ -1528,13 +1528,156 @@
     ]
   },
   {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html",
+    "href": "chapters/gauss-quadrature-two-node-bar.html",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "",
+    "text": "15.1 Motivation\nThe preceding chapters developed two separate ideas:\nThese ideas can now be combined to evaluate the stiffness matrix and the consistent distributed-load vector of the two-node linear bar element.\nBoth element quantities are treated within the same integration framework. Numerical integration is not restricted to the stiffness matrix: whenever an element integral is evaluated numerically, including the consistent load-vector integral, the quadrature rule must be appropriate to its integrand.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#motivation",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#motivation",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "",
+    "text": "Gauss–Legendre quadrature approximates an integral on \\([-1,1]\\) by a weighted sum of integrand values;\nan affine mapping expresses an integral over a physical interval as an equivalent integral over \\([-1,1]\\).",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#element-relations-recalled",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#element-relations-recalled",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.2 Element relations recalled",
+    "text": "15.2 Element relations recalled\nConsider a straight two-node bar element extending from \\(x_1\\) to \\(x_2\\), with local node ordering \\(x_1&lt;x_2\\) and \\(L_e=x_2-x_1&gt;0\\).\nThe affine mapping from the reference element \\(\\xi\\in[-1,1]\\) is\n\\[\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2,\n\\]\nand its Jacobian is\n\\[\n  J\n  =\n  \\frac{dx}{d\\xi}\n  =\n  \\frac{L_e}{2}\n  &gt;0.\n\\]\nConsequently,\n\\[\n  dx=J\\,d\\xi,\n  \\qquad\n  \\frac{d}{dx}\n  =\n  \\frac{1}{J}\\frac{d}{d\\xi}.\n\\]\nThe shape-function matrix is\n\\[\n  \\mathbf{N}(\\xi)\n  =\n  \\begin{bmatrix}\n  N_1(\\xi) & N_2(\\xi)\n  \\end{bmatrix}\n  =\n  \\begin{bmatrix}\n  \\dfrac{1-\\xi}{2} & \\dfrac{1+\\xi}{2}\n  \\end{bmatrix},\n\\]\nand the strain–displacement matrix is\n\\[\n  \\mathbf{B}\n  =\n  \\frac{1}{J}\\frac{d\\mathbf{N}}{d\\xi}\n  =\n  \\begin{bmatrix}\n  -\\dfrac{1}{L_e} & \\dfrac{1}{L_e}\n  \\end{bmatrix}.\n\\]\nBoth \\(\\mathbf{N}\\) and \\(\\mathbf{B}\\) are \\(1\\times2\\) row matrices, while \\(\\mathbf{N}^{\\mathsf T}\\) and \\(\\mathbf{B}^{\\mathsf T}\\) are \\(2\\times1\\) column matrices. For this element, \\(J\\) and \\(\\mathbf{B}\\) are constant, while \\(\\mathbf{N}\\) varies linearly with \\(\\xi\\).",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#the-common-quadrature-pattern",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#the-common-quadrature-pattern",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.3 The common quadrature pattern",
+    "text": "15.3 The common quadrature pattern\nLet \\(\\mathbf{H}(\\xi)\\) denote a matrix- or vector-valued element integrand. Its integral over the reference interval is approximated by\n\\[\n  \\boxed{\n  \\int_{-1}^{1}\\mathbf{H}(\\xi)\\,d\\xi\n  \\approx\n  \\sum_{g=1}^{n_g}w_g\\mathbf{H}(\\xi_g).\n  }\n\\]\nThe rule is applied entry by entry. At each Gauss–Legendre point, the complete matrix or vector integrand is evaluated, multiplied by the scalar weight, and added to the accumulated element quantity.\nFor an integral originally expressed in the physical coordinate, the Jacobian is part of the transformed integrand:\n\\[\n  \\int_{x_1}^{x_2}\\mathbf{G}(x)\\,dx\n  =\n  \\int_{-1}^{1}\n  \\mathbf{G}\\!\\left(x(\\xi)\\right)J\\,d\\xi\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\\mathbf{G}(x_g)J,\n  \\qquad\n  x_g=x(\\xi_g).\n\\]\nThe change of coordinate, including \\(dx=J\\,d\\xi\\), is exact, and the mapping from \\(\\xi_g\\) to \\(x_g\\) is also exact. Numerical approximation begins only when the transformed integral is replaced by the finite Gauss–Legendre sum. The factor \\(w_g\\) belongs to the quadrature rule, whereas \\(J\\) comes from the coordinate transformation; although they appear as the product \\(w_gJ\\), the Jacobian is not a quadrature weight.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#element-stiffness-matrix",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#element-stiffness-matrix",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.4 Element stiffness matrix",
+    "text": "15.4 Element stiffness matrix\nThe element stiffness matrix is\n\\[\n  \\mathbf{K}_e\n  =\n  \\int_{x_1}^{x_2}\n  \\mathbf{B}^{\\mathsf T}EA\\mathbf{B}\\,dx.\n\\]\nThe material property and area may in general depend on position, so we write\n\\[\n  E=E(x),\n  \\qquad\n  A=A(x).\n\\]\nAfter changing coordinates,\n\\[\n  \\mathbf{K}_e\n  =\n  \\int_{-1}^{1}\n  \\mathbf{B}(\\xi)^{\\mathsf T}\n  E(\\xi)A(\\xi)\n  \\mathbf{B}(\\xi)J\\,d\\xi.\n\\]\nHere \\(E(\\xi)\\) and \\(A(\\xi)\\) are shorthand for \\(E\\!\\left(x(\\xi)\\right)\\) and \\(A\\!\\left(x(\\xi)\\right)\\). Consequently, their values at a Gauss–Legendre point are the physical-coordinate values \\(E(x_g)\\) and \\(A(x_g)\\), with \\(x_g=x(\\xi_g)\\).\nGauss–Legendre quadrature gives\n\\[\n  \\boxed{\n  \\mathbf{K}_e\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\n  \\mathbf{B}(\\xi_g)^{\\mathsf T}\n  E(\\xi_g)A(\\xi_g)\n  \\mathbf{B}(\\xi_g)J.\n  }\n\\]\n\n15.4.1 What is actually being integrated?\nThe compact matrix expression can obscure the fact that ordinary scalar functions are being integrated. Write the strain–displacement matrix as\n\\[\n  \\mathbf{B}\n  =\n  \\begin{bmatrix}\n  B_1 & B_2\n  \\end{bmatrix}.\n\\]\nSince \\(EA\\) is scalar in the axial-bar formulation,\n\\[\n  \\begin{aligned}\n  \\mathbf{B}^{\\mathsf T}EA\\mathbf{B}\n  &=\n  EA\n  \\begin{bmatrix}\n  B_1\\\\\n  B_2\n  \\end{bmatrix}\n  \\begin{bmatrix}\n  B_1 & B_2\n  \\end{bmatrix}\n  \\\\\n  &=\n  EA\n  \\begin{bmatrix}\n  B_1^2 & B_1B_2\\\\\n  B_2B_1 & B_2^2\n  \\end{bmatrix}.\n  \\end{aligned}\n\\]\nThe stiffness matrix therefore represents four scalar integrals:\n\\[\n  \\mathbf{K}_e\n  =\n  \\begin{bmatrix}\n  \\displaystyle\n  \\int_{-1}^{1}B_1EA B_1J\\,d\\xi\n  &\n  \\displaystyle\n  \\int_{-1}^{1}B_1EA B_2J\\,d\\xi\n  \\\\[10pt]\n  \\displaystyle\n  \\int_{-1}^{1}B_2EA B_1J\\,d\\xi\n  &\n  \\displaystyle\n  \\int_{-1}^{1}B_2EA B_2J\\,d\\xi\n  \\end{bmatrix}.\n\\]\nFor example,\n\\[\n  K_{e,12}\n  =\n  \\int_{-1}^{1}\n  B_1(\\xi)E(\\xi)A(\\xi)B_2(\\xi)J\\,d\\xi\n\\]\nis approximated by\n\\[\n  K_{e,12}\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\n  B_1(\\xi_g)E(\\xi_g)A(\\xi_g)B_2(\\xi_g)J.\n\\]\nThe other three entries are evaluated in exactly the same way. Forming the matrix product at each Gauss–Legendre point simply performs these four scalar calculations together.\n\n\n15.4.2 Constant properties: one point is sufficient\nFor the two-node bar,\n\\[\n  B_1=-\\frac{1}{L_e},\n  \\qquad\n  B_2=\\frac{1}{L_e}.\n\\]\nIf \\(E\\) and \\(A\\) are constant within the element,\n\\[\n  \\mathbf{B}^{\\mathsf T}EA\\mathbf{B}\n  =\n  \\frac{EA}{L_e^2}\n  \\begin{bmatrix}\n  1 & -1\\\\\n  -1 & 1\n  \\end{bmatrix}.\n\\]\nThe Jacobian is also constant, so every scalar entry of the transformed integrand\n\\[\n  \\mathbf{B}^{\\mathsf T}EA\\mathbf{B}J\n\\]\nis constant in \\(\\xi\\) and its polynomial degree is zero. The one-point Gauss–Legendre rule, which integrates polynomials through degree one exactly, is therefore sufficient.\nUsing\n\\[\n  \\xi_1=0,\n  \\qquad\n  w_1=2,\n  \\qquad\n  J=\\frac{L_e}{2},\n\\]\ngives\n\\[\n  \\begin{aligned}\n  \\mathbf{K}_e^{(1)}\n  &=\n  2\n  \\frac{EA}{L_e^2}\n  \\begin{bmatrix}\n  1 & -1\\\\\n  -1 & 1\n  \\end{bmatrix}\n  \\frac{L_e}{2}\n  \\\\\n  &=\n  \\boxed{\n  \\frac{EA}{L_e}\n  \\begin{bmatrix}\n  1 & -1\\\\\n  -1 & 1\n  \\end{bmatrix}.\n  }\n  \\end{aligned}\n\\]\nThis is the stiffness matrix previously obtained by closed-form integration.\nThe result is symmetric and has units of force per unit length. Its row sums vanish, and\n\\[\n  \\mathbf{K}_e\n  \\begin{bmatrix}\n  1\\\\\n  1\n  \\end{bmatrix}\n  =\n  \\begin{bmatrix}\n  0\\\\\n  0\n  \\end{bmatrix},\n\\]\nconfirming that a rigid translation produces no axial deformation or internal force.\nThe two-point rule produces the same exact matrix. Because the integrand is constant and \\(w_1+w_2=2\\),\n\\[\n  \\mathbf{K}_e^{(2)}\n  =\n  \\mathbf{K}_e^{(1)}.\n\\]\nBoth rules are exact for this integrand, but the two-point rule obtains the same result at the cost of an additional integrand evaluation.\n\n\n15.4.3 Varying properties\nIf \\(E\\) or \\(A\\) varies within the element, the degree of each stiffness integrand is determined by the product\n\\[\n  B_i(\\xi)E(\\xi)A(\\xi)B_j(\\xi)J.\n\\]\nFor the present affine two-node element, \\(B_i\\), \\(B_j\\), and \\(J\\) are constant. The variation therefore comes from \\(E(\\xi)A(\\xi)\\). If this product is polynomial, its degree determines the minimum exact Gauss–Legendre rule. If it is not polynomial, the quadrature result is generally approximate and its convergence must be assessed.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#consistent-distributed-load-vector",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#consistent-distributed-load-vector",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.5 Consistent distributed-load vector",
+    "text": "15.5 Consistent distributed-load vector\nLet \\(q(x)\\) denote the distributed axial force per unit length, taken as positive when it acts in the positive \\(x\\) direction. Thus, \\(q\\) has units of force per unit length. The corresponding consistent element load vector, whose entries are equivalent nodal forces, is\n\\[\n  \\mathbf{f}_e^q\n  =\n  \\int_{x_1}^{x_2}\\mathbf{N}^{\\mathsf T}q(x)\\,dx.\n\\]\nWriting\n\\[\n  q(\\xi)\n  =\n  q\\!\\left(x(\\xi)\\right),\n\\]\nthe exact coordinate transformation gives\n\\[\n  \\mathbf{f}_e^q\n  =\n  \\int_{-1}^{1}\n  \\mathbf{N}(\\xi)^{\\mathsf T}q(\\xi)J\\,d\\xi.\n\\]\nGauss–Legendre quadrature then gives\n\\[\n  \\boxed{\n  \\mathbf{f}_e^q\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\n  \\mathbf{N}(\\xi_g)^{\\mathsf T}\n  q(\\xi_g)J.\n  }\n\\]\nAt each Gauss–Legendre point, \\(q(\\xi_g)=q(x_g)\\), where \\(x_g=x(\\xi_g)\\). This is the same weighted-sum structure used for the stiffness matrix.\n\n15.5.1 What is actually being integrated?\nSince\n\\[\n  \\mathbf{N}^{\\mathsf T}\n  =\n  \\begin{bmatrix}\n  N_1\\\\\n  N_2\n  \\end{bmatrix},\n\\]\nthe vector expression contains two scalar integrals:\n\\[\n  \\mathbf{f}_e^q\n  =\n  \\begin{bmatrix}\n  \\displaystyle\n  \\int_{-1}^{1}N_1(\\xi)q(\\xi)J\\,d\\xi\n  \\\\[10pt]\n  \\displaystyle\n  \\int_{-1}^{1}N_2(\\xi)q(\\xi)J\\,d\\xi\n  \\end{bmatrix}.\n\\]\nFor example,\n\\[\n  f_{e,1}^q\n  =\n  \\int_{-1}^{1}N_1(\\xi)q(\\xi)J\\,d\\xi\n\\]\nis approximated by\n\\[\n  f_{e,1}^q\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_gN_1(\\xi_g)q(\\xi_g)J.\n\\]\nAgain, the vector notation simply collects the two scalar integrals into a single compact expression; integration is understood componentwise.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#uniform-distributed-load",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#uniform-distributed-load",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.6 Uniform distributed load",
+    "text": "15.6 Uniform distributed load\nSuppose\n\\[\n  q(\\xi)=q\n\\]\nis constant. The Jacobian is constant, while each shape function is linear in \\(\\xi\\). Each scalar integrand\n\\[\n  N_i(\\xi)qJ\n\\]\ntherefore has polynomial degree one. The one-point rule is exact.\nAt \\(\\xi_1=0\\),\n\\[\n  N_1(0)=N_2(0)=\\frac12.\n\\]\nUsing \\(w_1=2\\) and \\(J=L_e/2\\) gives\n\\[\n  \\begin{aligned}\n  \\mathbf{f}_e^{q,(1)}\n  &=\n  2\n  \\begin{bmatrix}\n  N_1(0)\\\\\n  N_2(0)\n  \\end{bmatrix}\n  q\\frac{L_e}{2}\n  \\\\\n  &=\n  2\n  \\begin{bmatrix}\n  1/2\\\\\n  1/2\n  \\end{bmatrix}\n  q\\frac{L_e}{2}\n  \\\\\n  &=\n  \\boxed{\n  \\frac{qL_e}{2}\n  \\begin{bmatrix}\n  1\\\\\n  1\n  \\end{bmatrix}.\n  }\n  \\end{aligned}\n\\]\nThis is the consistent distributed-load vector previously obtained by closed-form integration. The two-point rule also gives the same exact result, but one point is sufficient.\nThe sum of the two entries is\n\\[\n  \\begin{bmatrix}\n  1 & 1\n  \\end{bmatrix}\n  \\mathbf{f}_e^q\n  =\n  qL_e,\n\\]\nwhich is the total distributed force acting on the element.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#linearly-varying-distributed-load",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#linearly-varying-distributed-load",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.7 Linearly varying distributed load",
+    "text": "15.7 Linearly varying distributed load\nSuppose the distributed-load intensity varies linearly between\n\\[\n  q_1=q(x_1)\n\\]\nand\n\\[\n  q_2=q(x_2).\n\\]\nThe load intensity can be interpolated as\n\\[\n  q(\\xi)\n  =\n  N_1(\\xi)q_1\n  +\n  N_2(\\xi)q_2.\n\\]\nHere \\(q_1\\) and \\(q_2\\) are distributed-load intensities evaluated at the element nodes. They are not concentrated nodal forces.\nBoth \\(N_i(\\xi)\\) and \\(q(\\xi)\\) are linear. Their product is quadratic, while \\(J\\) is constant. Each entry of\n\\[\n  \\mathbf{N}(\\xi)^{\\mathsf T}q(\\xi)J\n\\]\ntherefore has degree two. A one-point rule is not generally exact, whereas a two-point rule is exact.\n\n15.7.1 Result from the one-point rule\nThe one-point Gauss–Legendre rule has the quadrature point \\(\\xi_1=0\\) and weight \\(w_1=2\\). At this point,\n\\[\n  \\mathbf{N}(0)^{\\mathsf T}\n  =\n  \\begin{bmatrix}\n  1/2\\\\\n  1/2\n  \\end{bmatrix},\n  \\qquad\n  q(0)\n  =\n  \\frac{q_1+q_2}{2},\n  \\qquad\n  J\n  =\n  \\frac{L_e}{2}.\n\\]\nThe resulting approximation is therefore\n\\[\n  \\begin{aligned}\n  \\mathbf{f}_e^{q,(1)}\n  &=\n  w_1\n  \\mathbf{N}(0)^{\\mathsf T}\n  q(0)\n  J\n  \\\\[1mm]\n  &=\n  2\n  \\begin{bmatrix}\n  1/2\\\\\n  1/2\n  \\end{bmatrix}\n  \\frac{q_1+q_2}{2}\n  \\frac{L_e}{2}\n  \\\\[1mm]\n  &=\n  \\boxed{\n  \\frac{L_e}{4}\n  \\begin{bmatrix}\n  q_1+q_2\\\\\n  q_1+q_2\n  \\end{bmatrix}\n  }.\n  \\end{aligned}\n\\]\nBecause it samples the integrand only at the midpoint, the one-point rule assigns the same force to both nodes, regardless of the direction of the load variation. Its entries nevertheless sum to\n\\[\n  \\frac{L_e}{2}(q_1+q_2),\n\\]\nwhich is the correct total force under a linearly varying load. This does not make the consistent load vector exact: the individual load-vector integrands \\(N_i(\\xi)q(\\xi)J\\) are quadratic and are therefore underintegrated by the one-point rule. When the two entries are summed, however, the partition-of-unity property \\(N_1+N_2=1\\) reduces the aggregate integrand to \\(q(\\xi)J\\). Because \\(J\\) is constant, this integrand is linear and the one-point rule integrates it exactly. The rule therefore recovers the total force but not its consistent nodal distribution.\n\n\n15.7.2 Result from the two-point rule\nThe two-point Gauss–Legendre rule uses\n\\[\n  \\xi_1=-\\frac{1}{\\sqrt{3}},\n  \\qquad\n  \\xi_2=\\frac{1}{\\sqrt{3}},\n  \\qquad\n  w_1=w_2=1.\n\\]\nAt these two quadrature points, the shape-function vectors are\n\\[\n  \\mathbf{N}(\\xi_1)^{\\mathsf T}\n  =\n  \\frac{1}{2}\n  \\begin{bmatrix}\n  1+1/\\sqrt{3}\\\\\n  1-1/\\sqrt{3}\n  \\end{bmatrix},\n  \\qquad\n  \\mathbf{N}(\\xi_2)^{\\mathsf T}\n  =\n  \\frac{1}{2}\n  \\begin{bmatrix}\n  1-1/\\sqrt{3}\\\\\n  1+1/\\sqrt{3}\n  \\end{bmatrix}.\n\\]\nThe corresponding values of the interpolated load are\n\\[\n  \\begin{aligned}\n  q(\\xi_1)\n  &=\n  \\frac{1}{2}\n  \\left[\n  \\left(1+\\frac{1}{\\sqrt{3}}\\right)q_1\n  +\n  \\left(1-\\frac{1}{\\sqrt{3}}\\right)q_2\n  \\right],\n  \\\\\n  q(\\xi_2)\n  &=\n  \\frac{1}{2}\n  \\left[\n  \\left(1-\\frac{1}{\\sqrt{3}}\\right)q_1\n  +\n  \\left(1+\\frac{1}{\\sqrt{3}}\\right)q_2\n  \\right].\n  \\end{aligned}\n\\]\nThe quadrature sum is\n\\[\n  \\mathbf{f}_e^{q,(2)}\n  =\n  \\sum_{g=1}^{2}\n  w_g\n  \\mathbf{N}(\\xi_g)^{\\mathsf T}\n  q(\\xi_g)\n  J,\n\\]\nwhich gives, with \\(J=L_e/2\\),\n\\[\n  \\boxed{\n  \\mathbf{f}_e^{q,(2)}\n  =\n  \\frac{L_e}{6}\n  \\begin{bmatrix}\n  2q_1+q_2\\\\\n  q_1+2q_2\n  \\end{bmatrix}.\n  }\n\\]\nEach component of the load-vector integrand, \\(N_i(\\xi)q(\\xi)J\\), is quadratic because both \\(N_i(\\xi)\\) and \\(q(\\xi)\\) are linear, while \\(J\\) is constant. The two-point Gauss–Legendre rule is exact for polynomials of degree up to three and therefore evaluates both components exactly. Unlike the one-point result, the two entries distinguish between \\(q_1\\) and \\(q_2\\): the node nearer the larger endpoint load receives the larger equivalent nodal force. Their sum remains\n\\[\n  \\frac{L_e}{2}(q_1+q_2),\n\\]\nso the two-point rule recovers both the correct total force and its consistent nodal distribution.\nDirect analytical integration provides an independent verification. Since\n\\[\n  \\int_{-1}^{1}N_1^2\\,d\\xi\n  =\n  \\int_{-1}^{1}N_2^2\\,d\\xi\n  =\n  \\frac{2}{3},\n  \\qquad\n  \\int_{-1}^{1}N_1N_2\\,d\\xi\n  =\n  \\frac{1}{3},\n\\]\nthe exact integral gives\n\\[\n  \\begin{aligned}\n  \\mathbf{f}_e^q\n  &=\n  \\frac{L_e}{2}\n  \\begin{bmatrix}\n  \\displaystyle\n  q_1\\int_{-1}^{1}N_1^2\\,d\\xi\n  +\n  q_2\\int_{-1}^{1}N_1N_2\\,d\\xi\n  \\\\[8pt]\n  \\displaystyle\n  q_1\\int_{-1}^{1}N_1N_2\\,d\\xi\n  +\n  q_2\\int_{-1}^{1}N_2^2\\,d\\xi\n  \\end{bmatrix}\n  \\\\\n  &=\n  \\frac{L_e}{6}\n  \\begin{bmatrix}\n  2q_1+q_2\\\\\n  q_1+2q_2\n  \\end{bmatrix}.\n  \\end{aligned}\n\\]\nThe two-point Gauss–Legendre rule therefore agrees with direct integration. The sum of the equivalent nodal forces is\n\\[\n  \\begin{bmatrix}\n  1 & 1\n  \\end{bmatrix}\n  \\mathbf{f}_e^q\n  =\n  \\frac{L_e}{2}(q_1+q_2),\n\\]\nwhich is the exact resultant of the linearly varying distributed load. If \\(q_1=q_2=q\\), the vector reduces to\n\\[\n  \\mathbf{f}_e^q\n  =\n  \\frac{qL_e}{2}\n  \\begin{bmatrix}\n  1\\\\\n  1\n  \\end{bmatrix},\n\\]\nas required.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#choosing-the-rule-from-the-integrand",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#choosing-the-rule-from-the-integrand",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.8 Choosing the rule from the integrand",
+    "text": "15.8 Choosing the rule from the integrand\nAlthough the stiffness matrix and load vector are written in matrix and vector form, quadrature is applied to their individual scalar entries. The minimum exact rule is therefore determined from the polynomial degree of each entry of the complete transformed integrand.\n\n\n\n\n\n\n\n\n\nElement quantity\nScalar integrand\nDegree in \\(\\xi\\)\nMinimum exact rule\n\n\n\n\nstiffness, constant \\(EA\\)\n\\(B_iEA B_jJ\\)\n0\none point\n\n\nload vector, uniform \\(q\\)\n\\(N_iqJ\\)\n1\none point\n\n\nload vector, linear \\(q\\)\n\\(N_iqJ\\)\n2\ntwo points\n\n\n\nThe quadrature rule must consequently be selected only after all factors in the transformed integrand have been identified. Considering the load intensity alone can lead to the wrong choice. For example, a linearly varying \\(q(\\xi)\\) is a polynomial of degree one, but each entry of the consistent load-vector integrand also contains a linear shape function \\(N_i(\\xi)\\). Because \\(J\\) is constant for the present affine mapping, the complete product \\(N_i(\\xi)q(\\xi)J\\) is quadratic and requires a two-point rule for exact integration.\n\n15.8.1 One framework does not imply one minimum rule\nUsing the same quadrature framework for stiffness and loading does not mean that their integrands always have the same minimum exact rule. Each integrand has its own degree.\nIf stiffness and load contributions are accumulated in one element loop, a single rule may be selected that is sufficient for the highest degree present. For constant \\(EA\\) and a linearly varying distributed load, a two-point rule is therefore sufficient for both quantities:\n\nit is exact, although more than necessary, for the constant stiffness integrand;\nit is the minimum exact rule for the quadratic load-vector integrands.\n\nThis preserves a common element integration procedure without integrating the load vector inadequately.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#exactness-and-approximation-in-an-element-calculation",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#exactness-and-approximation-in-an-element-calculation",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.9 Exactness and approximation in an element calculation",
+    "text": "15.9 Exactness and approximation in an element calculation\nThe rule\n\\[\n  p\\leq2n_g-1\n\\]\napplies to the complete scalar integrand expressed in the reference coordinate \\(\\xi\\). For the present two-node bar, the affine mapping makes \\(J\\) constant and \\(\\mathbf{B}\\) constant, so the degrees are easy to identify.\nIf material properties or loading are non-polynomial functions of \\(\\xi\\), no finite-degree exactness guarantee follows. The quadrature result is then generally approximate. Increasing the number of Gauss–Legendre points and examining the change in the element matrix, element vector, or final finite element response provides a practical convergence check.\nThe degree counts in the table rely on the affine mapping of the two-node bar, for which both \\(J\\) and its inverse are constant. In more general element mappings, these quantities may vary with position and must also be included when determining the degree of the complete integrand. Those cases will be considered when the corresponding element formulations are introduced.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#the-element-level-mathematical-procedure",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#the-element-level-mathematical-procedure",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.10 The element-level mathematical procedure",
+    "text": "15.10 The element-level mathematical procedure\nAfter the exact transformation to the reference coordinate, the element stiffness matrix and consistent distributed-load vector have the forms\n\\[\n  \\mathbf{K}_e\n  =\n  \\int_{-1}^{1}\n  \\mathbf{B}(\\xi)^{\\mathsf T}\n  E\\!\\left(x(\\xi)\\right)\n  A\\!\\left(x(\\xi)\\right)\n  \\mathbf{B}(\\xi)\n  J\\,d\\xi\n\\]\nand\n\\[\n  \\mathbf{f}_e^q\n  =\n  \\int_{-1}^{1}\n  \\mathbf{N}(\\xi)^{\\mathsf T}\n  q(\\xi)\n  J\\,d\\xi.\n\\]\nFor the present affine two-node bar, \\(J=L_e/2\\) and \\(\\mathbf{B}\\) are constant. They remain visible in the complete transformed integrands because they contribute to the element quantities and must be accounted for when selecting the quadrature rule.\nThe quadrature order is determined from the complete scalar entries of these transformed integrands. If their highest polynomial degrees are \\(d_K\\) and \\(d_q\\), respectively, the minimum numbers of Gauss–Legendre points required for exact integration are\n\\[\n  n_K\n  =\n  \\left\\lceil\\frac{d_K+1}{2}\\right\\rceil,\n  \\qquad\n  n_q\n  =\n  \\left\\lceil\\frac{d_q+1}{2}\\right\\rceil,\n\\]\nbecause an \\(n_g\\)-point Gauss–Legendre rule is exact for polynomials of degree up to \\(2n_g-1\\). If the stiffness matrix and load vector are accumulated using the same quadrature rule, the number of points must satisfy\n\\[\n  n_g\n  =\n  \\max(n_K,n_q).\n\\]\nFor a selected rule with quadrature points \\(\\xi_g\\) and weights \\(w_g\\), define\n\\[\n  x_g=x(\\xi_g),\n  \\qquad\n  \\mathbf{N}_g=\\mathbf{N}(\\xi_g),\n  \\qquad\n  \\mathbf{B}_g=\\mathbf{B}(\\xi_g),\n\\]\ntogether with\n\\[\n  E_g=E(x_g),\n  \\qquad\n  A_g=A(x_g),\n  \\qquad\n  q_g=q(x_g)=q(\\xi_g).\n\\]\nThe element quantities are then evaluated as\n\\[\n  \\boxed{\n  \\mathbf{K}_e\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\n  \\mathbf{B}_g^{\\mathsf T}\n  E_gA_g\n  \\mathbf{B}_g\n  J\n  }\n\\]\nand\n\\[\n  \\boxed{\n  \\mathbf{f}_e^q\n  \\approx\n  \\sum_{g=1}^{n_g}\n  w_g\n  \\mathbf{N}_g^{\\mathsf T}\n  q_g\n  J.\n  }\n\\]\nEach approximation becomes an equality when the selected rule integrates every scalar entry of the corresponding transformed integrand exactly. Once \\(\\mathbf{K}_e\\) and \\(\\mathbf{f}_e^q\\) have been evaluated, they are assembled using the local-to-global operations established in the preceding MiniFEM chapters.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#verification-against-the-closed-form-element",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#verification-against-the-closed-form-element",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.11 Verification against the closed-form element",
+    "text": "15.11 Verification against the closed-form element\nThe closed-form element results derived earlier provide reference values for the quadrature calculations. For constant \\(EA\\), the exact stiffness matrix is\n\\[\n  \\mathbf{K}_e\n  =\n  \\frac{EA}{L_e}\n  \\begin{bmatrix}\n  1 & -1\\\\\n  -1 & 1\n  \\end{bmatrix},\n\\]\nwhile, for a uniform distributed load \\(q\\), the exact consistent load vector is\n\\[\n  \\mathbf{f}_e^q\n  =\n  \\frac{qL_e}{2}\n  \\begin{bmatrix}\n  1\\\\\n  1\n  \\end{bmatrix}.\n\\]\nOne-point Gauss–Legendre quadrature reproduces both closed-form results exactly. This agreement checks the combined use of the coordinate mapping, Jacobian, transformed integrands, quadrature point, weight, and accumulation. Its validity is limited to these particular integrands, whose degrees do not exceed one.\nThe linearly varying load provides the complementary check. Its quadratic load-vector integrands are not integrated exactly by the one-point rule, even though that rule recovers their correct aggregate force. The two-point rule reproduces the closed-form consistent load vector and therefore recovers both the total force and its correct nodal distribution.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-quadrature-two-node-bar.html#exercises",
+    "href": "chapters/gauss-quadrature-two-node-bar.html#exercises",
+    "title": "15  Gauss–Legendre quadrature for the two-node bar",
+    "section": "15.12 Exercises",
+    "text": "15.12 Exercises\n\nExpand every entry of \\(\\mathbf{B}^{\\mathsf T}EA\\mathbf{B}J\\) for constant \\(EA\\) and verify its polynomial degree in \\(\\xi\\).\nEvaluate the constant-\\(EA\\) stiffness matrix using the two-point rule and verify explicitly that it agrees with the one-point and closed-form results.\nFor a uniform distributed load, evaluate both scalar entries of the consistent load vector separately using one-point quadrature.\nLet \\(q_1=0\\) and \\(q_2=q_0\\). Compare the one- and two-point load vectors and verify that both have the correct total force while only the two-point vector is consistent with exact integration.\nSuppose \\(EA\\) varies linearly with \\(\\xi\\). Determine the minimum Gauss–Legendre rule required for exact stiffness integration for the present affine two-node element.\nSuppose \\(EA\\) is constant and \\(q(\\xi)\\) is quadratic. Determine the degree of each consistent load-vector integrand and the minimum exact Gauss–Legendre rule.\n\n\n\n\n\n\n\nImportantKey points to remember\n\n\n\n\nRewriting an element integral from \\(x\\) to \\(\\xi\\), transforming \\(dx=J\\,d\\xi\\), transforming derivatives, and mapping \\(\\xi_g\\) to \\(x_g\\) are exact operations. Numerical approximation begins only when the transformed integral is replaced by a finite Gauss–Legendre sum.\nThe quadrature weight \\(w_g\\) belongs to the numerical integration rule, whereas the Jacobian \\(J\\) belongs to the coordinate transformation. Their product \\(w_gJ\\) combines two factors with different origins.\nMatrix and vector quadrature is ordinary scalar quadrature applied entry by entry. At each Gauss–Legendre point, the complete matrix or vector integrand is formed and its weighted contribution is accumulated.\nThe quadrature order must be selected from the degree of the complete transformed scalar integrand. A rule with \\(n_g\\) points integrates every polynomial of degree \\(p\\leq2n_g-1\\) exactly.\nFor a straight two-node bar with constant \\(EA\\), the stiffness integrands have degree zero, so one-point quadrature is exact.\nFor a uniform distributed load, the consistent load-vector integrands have degree one, so one-point quadrature is exact. For a linearly varying load, multiplication by the linear shape functions produces quadratic integrands, so two-point quadrature is required for exact integration.\nUsing more points than necessary can still give an exact result, but requires additional integrand evaluations. Underintegration may reproduce an aggregate quantity, such as the total distributed force, without reproducing the correct element vector.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
     "objectID": "glossary.html",
     "href": "glossary.html",
     "title": "Glossary",
     "section": "",
     "text": "A",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1544,7 +1687,7 @@
     "section": "",
     "text": "Abstraction\nIn programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.\nSimilar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.\nFurther details: Wikipedia — Abstraction (computer science).\n\n\nAffine mapping\nA one-dimensional coordinate transformation of the form\n\\[\n  x(\\xi)=a_0+a_1\\xi,\n\\]\nwhich combines a constant scaling with a translation. For a two-node bar element extending from \\(x_1\\) to \\(x_2&gt;x_1\\), the affine mapping from the standard interval \\(\\xi\\in[-1,1]\\) to the physical element is\n\\[\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2\n  =\n  \\frac{x_1+x_2}{2}\n  +\n  \\frac{L_e}{2}\\xi,\n\\]\nwhere \\(L_e=x_2-x_1&gt;0\\). This mapping sends \\(\\xi=-1\\) to \\(x_1\\) and \\(\\xi=1\\) to \\(x_2\\). Its Jacobian is constant and equal to\n\\[\n  J=\\frac{dx}{d\\xi}=\\frac{L_e}{2}.\n\\]\nThe mapping and its Jacobian belong to an exact change of coordinate, as developed in 14  Standard and physical coordinates. Numerical approximation begins only when a quadrature rule is subsequently applied to the transformed integral.\n\n\nAsymptotic behavior\nThe behavior of a quantity as a parameter approaches a limiting value. An asymptotic statement describes what happens near that limit; it does not generally claim that the stated relationship is an exact equality for every value of the parameter.\nIn numerical integration, for example,\n\\[\n  e_Q(h)=O(h^2)\n\\]\nas \\(h\\) approaches zero means that there are constants \\(C&gt;0\\) and \\(h_0&gt;0\\), independent of \\(h\\), such that\n\\[\n  e_Q(h)\\leq Ch^2\n\\]\nwhenever \\(0&lt;h\\leq h_0\\). Thus, once the subinterval width is sufficiently small, the error is bounded above by a constant times \\(h^2\\).\nThe big-\\(O\\) statement specifies this asymptotic bound; it does not by itself claim that\n\\[\n  e_Q(h)=Ch^2\n\\]\nor prescribe an exact error-reduction factor. If, more specifically, the error approaches a nonzero multiple of \\(h^2\\), halving \\(h\\) reduces the error by approximately a factor of four once the asymptotic behavior has been reached.\nOn a fixed integration interval divided into \\(n\\) equal subintervals,\n\\[\n  h=\\frac{b-a}{n},\n\\]\nso the same asymptotic bound may be written as\n\\[\n  e_Q=O(n^{-2})\n\\]\nas \\(n\\) increases.\nThe quadratic midpoint-rule example in 13  Numerical integration in one dimension is stronger than this general asymptotic statement. For that particular function and interval, its error satisfies the exact relationship\n\\[\n  e_Q=\\frac{h^2}{4}\n\\]\nfor every positive integer \\(n\\). Consequently, doubling \\(n\\) and therefore halving \\(h\\) reduces the error by exactly a factor of four in that example.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1554,7 +1697,7 @@
     "section": "C",
     "text": "C\n\nCohesion\nThe degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Cohesion (computer science).\n\n\nCoupling\nThe degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.\nFurther details: Wikipedia — Coupling (computer programming).",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1564,7 +1707,7 @@
     "section": "D",
     "text": "D\n\nDeclarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.\n\n\nDon’t Repeat Yourself (DRY)\nA design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Don’t repeat yourself.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1574,7 +1717,7 @@
     "section": "I",
     "text": "I\n\nImmutable object\nAn object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.\nSee also: Mutable object; Modified in place.\n\n\nImperative programming\nA programming paradigm in which a computation is expressed as an explicit sequence of commands that describe how a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.\nSee also: Declarative programming. Further details: Wikipedia — Imperative programming.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1584,7 +1727,7 @@
     "section": "M",
     "text": "M\n\nModified in place\nDescribes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.\nFor example, in Julia, integers are immutable:\nx = 4\nx = x + 1\nHere, x is not modified in place. Instead, x is rebound from the value 4 to the new value 5.\nBy contrast, an array is mutable:\nx = [4]\nx[1] += 1\nHere, the existing array is modified in place, changing its contents from [4] to [5].\nSee also: Mutable object; Immutable object.\n\n\nMutable object\nAn object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.\nSee also: Immutable object; Modified in place.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1594,7 +1737,7 @@
     "section": "R",
     "text": "R\n\nRefactoring\nRestructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1604,7 +1747,7 @@
     "section": "S",
     "text": "S\n\nSeparation of concerns\nA software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.\nFurther details: Wikipedia — Separation of concerns.\n\n\nSingle Responsibility Principle\nA design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Single-responsibility principle.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
