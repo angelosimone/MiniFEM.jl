@@ -28,12 +28,12 @@ science)](https://en.wikipedia.org/wiki/Abstraction_(computer_science)).
 A one-dimensional coordinate transformation of the form
 
 $$
-  x = a + b\xi,
+  x(\xi)=a_0+a_1\xi,
 $$
 
-which combines a scaling with a translation. For a two-node bar element
+which combines a constant scaling with a translation. For a two-node bar element
 extending from $x_1$ to $x_2>x_1$, the affine mapping from the standard interval
-$\xi \in [-1,1]$ to the physical element is
+$\xi\in[-1,1]$ to the physical element is
 
 $$
   x(\xi)
@@ -47,12 +47,16 @@ $$
   \frac{L_e}{2}\xi,
 $$
 
-where $L_e=x_2-x_1$. This mapping sends $\xi=-1$ to $x_1$ and $\xi=1$ to $x_2$.
-Its Jacobian is constant and equal to
+where $L_e=x_2-x_1>0$. This mapping sends $\xi=-1$ to $x_1$ and $\xi=1$ to
+$x_2$. Its Jacobian is constant and equal to
 
 $$
   J=\frac{dx}{d\xi}=\frac{L_e}{2}.
 $$
+
+The mapping and its Jacobian belong to an exact change of coordinate, as
+developed in @sec-standard-physical-coordinates. Numerical approximation begins
+only when a quadrature rule is subsequently applied to the transformed integral.
 
 ### Asymptotic behavior {#gls-asymptotic-behavior}
 

@@ -1,4 +1,4 @@
-# The two-node linear bar element
+# The two-node linear bar element {#sec-two-node-linear-bar-element}
 
 The previous chapter ended with the finite-dimensional Galerkin problem: find
 

@@ -29,6 +29,7 @@ book:
         - chapters/four-element-axial-bar-analysis.qmd
         - chapters/shared-fem-assembly.qmd
         - chapters/numerical-integration-one-dimension.qmd
+        - chapters/standard-and-physical-coordinates.qmd
     - glossary.qmd
     - references.qmd
 
