@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; Numerical integration in one dimension – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/shared-fem-assembly.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c72bfcf2850aa2268dce9df1d5752dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/numerical-integration-one-dimension.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Discrete systems and the direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">One-dimensional continuum finite elements</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-node-linear-bar-element.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The two-node linear bar element</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/four-element-axial-bar-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/numerical-integration-one-dimension.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-quadrature-idea" id="toc-the-quadrature-idea" class="nav-link active" data-scroll-target="#the-quadrature-idea"><span class="header-section-number">13.1</span> The quadrature idea</a>
+  <ul class="collapse">
+  <li><a href="#integration-of-a-constant-function" id="toc-integration-of-a-constant-function" class="nav-link" data-scroll-target="#integration-of-a-constant-function"><span class="header-section-number">13.1.1</span> Integration of a constant function</a></li>
+  </ul></li>
+  <li><a href="#quadrature-error-and-computational-cost" id="toc-quadrature-error-and-computational-cost" class="nav-link" data-scroll-target="#quadrature-error-and-computational-cost"><span class="header-section-number">13.2</span> Quadrature error and computational cost</a></li>
+  <li><a href="#the-composite-midpoint-rule" id="toc-the-composite-midpoint-rule" class="nav-link" data-scroll-target="#the-composite-midpoint-rule"><span class="header-section-number">13.3</span> The composite midpoint rule</a>
+  <ul class="collapse">
+  <li><a href="#midpoint-rule-for-a-quadratic-function" id="toc-midpoint-rule-for-a-quadratic-function" class="nav-link" data-scroll-target="#midpoint-rule-for-a-quadratic-function"><span class="header-section-number">13.3.1</span> Midpoint rule for a quadratic function</a></li>
+  <li><a href="#accuracy-through-refinement" id="toc-accuracy-through-refinement" class="nav-link" data-scroll-target="#accuracy-through-refinement"><span class="header-section-number">13.3.2</span> Accuracy through refinement</a></li>
+  </ul></li>
+  <li><a href="#the-composite-trapezoidal-rule" id="toc-the-composite-trapezoidal-rule" class="nav-link" data-scroll-target="#the-composite-trapezoidal-rule"><span class="header-section-number">13.4</span> The composite trapezoidal rule</a>
+  <ul class="collapse">
+  <li><a href="#trapezoidal-rule-for-a-quadratic-function" id="toc-trapezoidal-rule-for-a-quadratic-function" class="nav-link" data-scroll-target="#trapezoidal-rule-for-a-quadratic-function"><span class="header-section-number">13.4.1</span> Trapezoidal rule for a quadratic function</a></li>
+  <li><a href="#accuracy-of-the-composite-trapezoidal-rule" id="toc-accuracy-of-the-composite-trapezoidal-rule" class="nav-link" data-scroll-target="#accuracy-of-the-composite-trapezoidal-rule"><span class="header-section-number">13.4.2</span> Accuracy of the composite trapezoidal rule</a></li>
+  </ul></li>
+  <li><a href="#why-consider-another-quadrature-rule" id="toc-why-consider-another-quadrature-rule" class="nav-link" data-scroll-target="#why-consider-another-quadrature-rule"><span class="header-section-number">13.5</span> Why consider another quadrature rule?</a></li>
+  <li><a href="#gausslegendre-quadrature-on-the-standard-integration-interval" id="toc-gausslegendre-quadrature-on-the-standard-integration-interval" class="nav-link" data-scroll-target="#gausslegendre-quadrature-on-the-standard-integration-interval"><span class="header-section-number">13.6</span> Gauss–Legendre quadrature on the standard integration interval</a></li>
+  <li><a href="#the-one-point-gausslegendre-rule" id="toc-the-one-point-gausslegendre-rule" class="nav-link" data-scroll-target="#the-one-point-gausslegendre-rule"><span class="header-section-number">13.7</span> The one-point Gauss–Legendre rule</a></li>
+  <li><a href="#the-two-point-gausslegendre-rule" id="toc-the-two-point-gausslegendre-rule" class="nav-link" data-scroll-target="#the-two-point-gausslegendre-rule"><span class="header-section-number">13.8</span> The two-point Gauss–Legendre rule</a>
+  <ul class="collapse">
+  <li><a href="#returning-to-the-quadratic-function" id="toc-returning-to-the-quadratic-function" class="nav-link" data-scroll-target="#returning-to-the-quadratic-function"><span class="header-section-number">13.8.1</span> Returning to the quadratic function</a></li>
+  <li><a href="#comparison-with-composite-midpoint-refinement" id="toc-comparison-with-composite-midpoint-refinement" class="nav-link" data-scroll-target="#comparison-with-composite-midpoint-refinement"><span class="header-section-number">13.8.2</span> Comparison with composite midpoint refinement</a></li>
+  <li><a href="#a-general-cubic-polynomial" id="toc-a-general-cubic-polynomial" class="nav-link" data-scroll-target="#a-general-cubic-polynomial"><span class="header-section-number">13.8.3</span> A general cubic polynomial</a></li>
+  </ul></li>
+  <li><a href="#degree-of-exactness" id="toc-degree-of-exactness" class="nav-link" data-scroll-target="#degree-of-exactness"><span class="header-section-number">13.9</span> Degree of exactness</a>
+  <ul class="collapse">
+  <li><a href="#selecting-the-number-of-points" id="toc-selecting-the-number-of-points" class="nav-link" data-scroll-target="#selecting-the-number-of-points"><span class="header-section-number">13.9.1</span> Selecting the number of points</a></li>
+  </ul></li>
+  <li><a href="#non-polynomial-integrands" id="toc-non-polynomial-integrands" class="nav-link" data-scroll-target="#non-polynomial-integrands"><span class="header-section-number">13.10</span> Non-polynomial integrands</a></li>
+  <li><a href="#from-scalar-integrands-to-matrices-and-vectors" id="toc-from-scalar-integrands-to-matrices-and-vectors" class="nav-link" data-scroll-target="#from-scalar-integrands-to-matrices-and-vectors"><span class="header-section-number">13.11</span> From scalar integrands to matrices and vectors</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">13.12</span> Exercises</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/numerical-integration-one-dimension.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-numerical-integration-one-dimension" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The stiffness matrix and consistent distributed-load vector of the two-node linear bar element were previously derived as</p>
+<p><span class="math display">\[
+  \mathbf{K}_e
+  =
+  \int_{\Omega_e}
+  \mathbf{B}^{\mathsf T}EA\mathbf{B}\,dx
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  \mathbf{f}_e^q
+  =
+  \int_{\Omega_e}
+  \mathbf{N}^{\mathsf T}q\,dx.
+\]</span></p>
+<p>For constant material properties, cross-sectional area, and distributed load, these integrals were evaluated in closed form. Closed-form integration becomes less practical when the quantities appearing in an element integrand vary within the element or combine into expressions that are increasingly difficult to integrate analytically. A systematic numerical procedure is then preferable.</p>
+<p>This chapter develops the basic ideas of one-dimensional numerical integration, including the <a href="https://en.wikipedia.org/wiki/Gauss–Legendre_quadrature">Gauss–Legendre quadrature rules</a>, which are the most relevant to the finite element method. These integration rules are developed independently of element geometry. Their use in bar-element integrals is revisited later, once the necessary geometrical description has been introduced.</p>
+<section id="the-quadrature-idea" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="the-quadrature-idea"><span class="header-section-number">13.1</span> The quadrature idea</h2>
+<p>Consider a scalar function <span class="math inline">\(f(x)\)</span> defined on a finite interval <span class="math inline">\([a,b]\)</span>. Its integral is</p>
+<p><span class="math display">\[
+  I
+  =
+  \int_a^b f(x)\,dx.
+\]</span></p>
+<p>A numerical quadrature rule replaces this integral by a finite weighted sum,</p>
+<p><span class="math display">\[
+  \boxed{
+  Q
+  =
+  \sum_{i=1}^{n}w_i f(x_i)
+  \approx
+  I.
+  }
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled" title="Integration points and weights">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Integration points and weights
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this expression,</p>
+<ul>
+<li><span class="math inline">\(n\)</span> is the number of integration points;</li>
+<li><span class="math inline">\(x_i\)</span> is the location of integration point <span class="math inline">\(i\)</span>;</li>
+<li><span class="math inline">\(w_i\)</span> is the weight associated with integration point <span class="math inline">\(i\)</span>;</li>
+<li><span class="math inline">\(f(x_i)\)</span> is the value of the integrand at that point.</li>
+</ul>
+<p>The collection of point locations and weights defines the quadrature rule.</p>
+</div>
+</div>
+<p>Different quadrature rules select the points and weights in different ways. A rule is useful when the weighted sum provides sufficient accuracy without requiring too many evaluations of the integrand.</p>
+<section id="integration-of-a-constant-function" class="level3" data-number="13.1.1">
+<h3 data-number="13.1.1" class="anchored" data-anchor-id="integration-of-a-constant-function"><span class="header-section-number">13.1.1</span> Integration of a constant function</h3>
+<p>Suppose that the quadrature rule integrates the constant function</p>
+<p><span class="math display">\[
+  f(x)=1
+\]</span></p>
+<p>exactly. The exact integral is</p>
+<p><span class="math display">\[
+  \int_a^b 1\,dx
+  =
+  b-a,
+\]</span></p>
+<p>while the quadrature rule gives</p>
+<p><span class="math display">\[
+  Q
+  =
+  \sum_{i=1}^{n}w_i.
+\]</span></p>
+<p>The weights must therefore satisfy</p>
+<p><span class="math display">\[
+  \boxed{
+  \sum_{i=1}^{n}w_i=b-a.
+  }
+\]</span></p>
+<p>The quadrature weights sum to the length of the integration interval. Equivalently, the rule integrates a constant function exactly. This property is shared by the midpoint, trapezoidal, and Gauss–Legendre rules considered in this chapter.</p>
+<p>The same idea extends to higher-dimensional domains: the quadrature weights sum to the measure of the domain (its area in two dimensions and its volume in three dimensions).</p>
+</section>
+</section>
+<section id="quadrature-error-and-computational-cost" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="quadrature-error-and-computational-cost"><span class="header-section-number">13.2</span> Quadrature error and computational cost</h2>
+<p>The quadrature error is the difference between the numerical and exact values. Its magnitude is</p>
+<p><span class="math display">\[
+  \boxed{
+  e_Q
+  =
+  |Q-I|.
+  }
+\]</span></p>
+<p>The exact value <span class="math inline">\(I\)</span> is usually unknown when numerical integration is actually needed. Nevertheless, examples with known analytical integrals are valuable because they reveal the accuracy of a rule and provide verification problems for a later implementation.</p>
+<p>Accuracy is not the only consideration. Every term in the quadrature sum requires an evaluation of the integrand. In a finite element calculation, this evaluation may include shape functions, derivatives, material properties, and constitutive relations, and it is repeated at the integration points of every element. The practical objective is therefore to obtain adequate accuracy with as few function evaluations as possible.</p>
+<p>We first examine two familiar rules based on dividing the integration interval into a chosen number of subintervals. They introduce two central ideas: improving accuracy through refinement and describing the resulting error through an order of accuracy. These ideas provide a basis for understanding how Gauss–Legendre quadrature pursues accuracy in a different way.</p>
+</section>
+<section id="the-composite-midpoint-rule" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="the-composite-midpoint-rule"><span class="header-section-number">13.3</span> The composite midpoint rule</h2>
+<p>Divide <span class="math inline">\([a,b]\)</span> into <span class="math inline">\(n\)</span> subintervals,</p>
+<p><span class="math display">\[
+  a=x_0&lt;x_1&lt;\cdots&lt;x_n=b.
+\]</span></p>
+<p>On subinterval <span class="math inline">\([x_{i-1},x_i]\)</span>, define the midpoint</p>
+<p><span class="math display">\[
+  x_i^{\mathrm{mid}}
+  =
+  \frac{x_{i-1}+x_i}{2}
+\]</span></p>
+<p>and the subinterval width</p>
+<p><span class="math display">\[
+  \Delta x_i
+  =
+  x_i-x_{i-1}.
+\]</span></p>
+<p>The midpoint rule approximates the area under the function over each subinterval by the area of a rectangle whose height is the function value at the midpoint:</p>
+<p><span class="math display">\[
+  \boxed{
+  Q_{\mathrm{mid}}
+  =
+  \sum_{i=1}^{n}
+  \Delta x_i\,
+  f\!\left(x_i^{\mathrm{mid}}\right).
+  }
+\]</span></p>
+<p>The term <code>composite</code> in <code>composite midpoint rule</code> means that the rule is assembled from multiple elementary midpoint approximations, one on each subinterval as shown in the formula above.</p>
+<p>The integration points are the subinterval midpoints, and the weights are the subinterval widths. Consequently,</p>
+<p><span class="math display">\[
+  \sum_{i=1}^{n}\Delta x_i=b-a.
+\]</span></p>
+<p>For <span class="math inline">\(n\)</span> equal subintervals,</p>
+<p><span class="math display">\[
+  \Delta x_i=h=\frac{b-a}{n},
+\]</span></p>
+<p>and the rule becomes</p>
+<p><span class="math display">\[
+  Q_{\mathrm{mid}}
+  =
+  h\sum_{i=1}^{n}f\!\left(a+\left(i-\frac12\right)h\right).
+\]</span></p>
+<p>The midpoint rule integrates constant and linear functions exactly. For a general function, however, it produces an approximation.</p>
+<section id="midpoint-rule-for-a-quadratic-function" class="level3" data-number="13.3.1">
+<h3 data-number="13.3.1" class="anchored" data-anchor-id="midpoint-rule-for-a-quadratic-function"><span class="header-section-number">13.3.1</span> Midpoint rule for a quadratic function</h3>
+<p>Consider the quadratic function</p>
+<p><span class="math display">\[
+  f(x)=x^2+1,
+  \qquad
+  x\in[0,3].
+\]</span></p>
+<p>The exact integral is</p>
+<p><span class="math display">\[
+  I
+  =
+  \int_0^3(x^2+1)\,dx
+  =
+  \left[\frac{x^3}{3}+x\right]_0^3
+  =
+  12.
+\]</span></p>
+<p>The interval is divided into three equal subintervals giving <span class="math inline">\(h=1\)</span> and the midpoint locations</p>
+<p><span class="math display">\[
+  x_1^{\mathrm{mid}}=0.5,
+  \qquad
+  x_2^{\mathrm{mid}}=1.5,
+  \qquad
+  x_3^{\mathrm{mid}}=2.5.
+\]</span></p>
+<p><a href="#fig-composite-midpoint-example" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> shows the geometric construction of the composite midpoint rule. Each shaded rectangle has width <span class="math inline">\(h=1\)</span> and height equal to the value of the integrand at the corresponding subinterval midpoint. The sum of the three shaded areas gives the quadrature approximation.</p>
+<div id="fig-composite-midpoint-example" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-composite-midpoint-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/composite-midpoint-example.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-composite-midpoint-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.1: Composite midpoint rule for <span class="math inline">\(f(x)=x^2+1\)</span> on <span class="math inline">\([0,3]\)</span>, using three equal subintervals with <span class="math inline">\(h=1\)</span>. The integral is approximated by the total area of the three shaded rectangles, whose heights are evaluated at the subinterval midpoints.
+</figcaption>
+</figure>
+</div>
+<p>The approximation is therefore</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  Q_{\mathrm{mid}}
+  &amp;=
+  f(0.5)+f(1.5)+f(2.5)
+  \\
+  &amp;=
+  1.25+3.25+7.25
+  \\
+  &amp;=
+  11.75.
+  \end{aligned}
+\]</span></p>
+<p>The absolute error is</p>
+<p><span class="math display">\[
+  e_Q
+  =
+  |11.75-12|
+  =
+  0.25,
+\]</span></p>
+<p>and the relative error is approximately <span class="math inline">\(2.08\%\)</span>.</p>
+</section>
+<section id="accuracy-through-refinement" class="level3" data-number="13.3.2">
+<h3 data-number="13.3.2" class="anchored" data-anchor-id="accuracy-through-refinement"><span class="header-section-number">13.3.2</span> Accuracy through refinement</h3>
+<p>The preceding quadratic example also makes it possible to quantify how the approximation improves as the partition is refined.</p>
+<p>To do so, consider a quadratic function <span class="math inline">\(f(x)\)</span> on <span class="math inline">\([a,b]\)</span> and divide the interval into <span class="math inline">\(n\)</span> equal subintervals of width</p>
+<p><span class="math display">\[
+  h=\frac{b-a}{n}.
+\]</span></p>
+<p>Because <span class="math inline">\(f\)</span> is quadratic, its second derivative <span class="math inline">\(f''\)</span> is constant. For this class of functions, the difference between the exact integral and the composite midpoint approximation is</p>
+<p><span class="math display">\[
+  \boxed{
+  I-Q_{\mathrm{mid},n}
+  =
+  n\frac{f''h^3}{24}
+  =
+  \frac{f''(b-a)^3}{24n^2}.
+  }
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled" title="Deriving the midpoint-rule error for quadratic functions">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Deriving the midpoint-rule error for quadratic functions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider one subinterval and denote its midpoint by <span class="math inline">\(m_i\)</span>. The coordinate of any point in that subinterval can be written as</p>
+<p><span class="math display">\[
+  x=m_i+s,
+  \qquad
+  -\frac{h}{2}\leq s\leq\frac{h}{2}.
+\]</span></p>
+<p>Because <span class="math inline">\(f\)</span> is quadratic, all its derivatives of order three and higher vanish. Its second-order Taylor expansion about the midpoint therefore contains no remainder:</p>
+<p><span class="math display">\[
+  f(m_i+s)
+  =
+  f(m_i)
+  +
+  f'(m_i)s
+  +
+  \frac{1}{2}f''s^2.
+\]</span></p>
+<p>Note that this second-order Taylor polynomial is not merely a local approximation: it reproduces <span class="math inline">\(f(m_i+s)\)</span> exactly for every <span class="math inline">\(s\)</span> in the subinterval.</p>
+<p>The midpoint rule uses</p>
+<p><span class="math display">\[
+  hf(m_i)
+\]</span></p>
+<p>as the approximation over this subinterval. This is exactly the integral of the constant term in the Taylor expansion.</p>
+<p>The linear term produces no error because it is antisymmetric about the midpoint:</p>
+<p><span class="math display">\[
+  \int_{-h/2}^{h/2}f'(m_i)s\,ds=0.
+\]</span></p>
+<p>The first contribution not represented by the midpoint rectangle is therefore the quadratic term, whose coefficient contains <span class="math inline">\(f''\)</span>. Integrating the complete expansion gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  \int_{x_{i-1}}^{x_i}f(x)\,dx
+  &amp;=
+  \int_{-h/2}^{h/2}
+  \left[
+  f(m_i)
+  +
+  f'(m_i)s
+  +
+  \frac{1}{2}f''s^2
+  \right]ds
+  \\
+  &amp;=
+  hf(m_i)
+  +
+  \frac{f''h^3}{24}.
+  \end{aligned}
+\]</span></p>
+<p>The first term is exactly the midpoint-rule contribution. The error over one subinterval is consequently</p>
+<p><span class="math display">\[
+  \frac{f''h^3}{24}.
+\]</span></p>
+<p>Since <span class="math inline">\(f''\)</span> is constant for a quadratic function, every equal subinterval has the same error. Summing the <span class="math inline">\(n\)</span> subinterval errors produces the composite midpoint-rule error stated above.</p>
+</div>
+</div>
+<p>The error can be expressed either in terms of the number of subintervals <span class="math inline">\(n\)</span> or their width <span class="math inline">\(h\)</span>. Since</p>
+<p><span class="math display">\[
+  h=\frac{b-a}{n},
+\]</span></p>
+<p>on a fixed interval we have</p>
+<p><span class="math display">\[
+  \frac{1}{n^2}
+  =
+  \frac{h^2}{(b-a)^2}.
+\]</span></p>
+<p>Therefore, an error proportional to <span class="math inline">\(1/n^2\)</span> is equivalently proportional to <span class="math inline">\(h^2\)</span>. This behavior is written</p>
+<p><span class="math display">\[
+  e_Q=O(h^2),
+\]</span></p>
+<p>or, equivalently on a fixed interval,</p>
+<p><span class="math display">\[
+  e_Q=O(n^{-2}).
+\]</span></p>
+<p>The notation <span class="math inline">\(O(h^2)\)</span> (read “big <span class="math inline">\(O\)</span> of <span class="math inline">\(h\)</span> squared”) describes the <a href="../glossary.html#gls-asymptotic-behavior">asymptotic behavior</a> of the error as <span class="math inline">\(h\)</span> approaches zero: for sufficiently small <span class="math inline">\(h\)</span>, its magnitude is bounded by a constant times <span class="math inline">\(h^2\)</span>. More explicitly, there exist constants <span class="math inline">\(C&gt;0\)</span> and <span class="math inline">\(h_0&gt;0\)</span> such that</p>
+<p><span class="math display">\[
+  e_Q(h) \leq C h^2
+  \qquad
+  \text{whenever }0&lt;h&lt;h_0.
+\]</span></p>
+<p>Thus, once the subintervals are sufficiently small, <span class="math inline">\(Ch^2\)</span> provides an upper limit for the error magnitude. The constant <span class="math inline">\(C\)</span> does not change as the interval is refined. A quadrature rule with this behavior is said to be <strong>second-order accurate</strong> with respect to the subinterval width.</p>
+<p>Now apply this result to the quadratic function</p>
+<p><span class="math display">\[
+  f(x)=x^2+1
+\]</span></p>
+<p>on the interval <span class="math inline">\([0,3]\)</span>. For this function,</p>
+<p><span class="math display">\[
+  f''=2,
+  \qquad
+  b-a=3,
+  \qquad
+  h=\frac{3}{n}.
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  I-Q_{\mathrm{mid},n}
+  &amp;=
+  \frac{f''(b-a)^3}{24n^2}
+  \\
+  &amp;=
+  \frac{2\cdot3^3}{24n^2}
+  \\
+  &amp;=
+  \frac{2.25}{n^2}.
+  \end{aligned}
+\]</span></p>
+<p>The constant term <span class="math inline">\(1\)</span> in <span class="math inline">\(f(x)=x^2+1\)</span> contributes no quadrature error because the midpoint rule integrates constant functions exactly.</p>
+<p>As shown above, for any quadratic function this relationship is exact for every value of <span class="math inline">\(n\)</span>, not merely asymptotic. For the present example, <span class="math inline">\(b-a=3\)</span> and <span class="math inline">\(h=3/n\)</span>, so</p>
+<p><span class="math display">\[
+  e_Q
+  =
+  \frac{2.25}{n^2}
+  =
+  \frac{h^2}{4}.
+\]</span></p>
+<p>Consequently, doubling <span class="math inline">\(n\)</span> halves <span class="math inline">\(h\)</span> and reduces the midpoint-rule error by a factor of four.</p>
+<p>The exact identity above shows that the bound can be taken with</p>
+<p><span class="math display">\[
+  C=\frac{1}{4}
+\]</span></p>
+<p>for every admissible subinterval width <span class="math inline">\(h=3/n\)</span>. This is the smallest possible value of <span class="math inline">\(C\)</span> for this example, because equality holds in</p>
+<p><span class="math display">\[
+  e_Q(h)\leq C h^2.
+\]</span></p>
+<p>Any larger value of <span class="math inline">\(C\)</span> would also satisfy the bound, so the constant appearing in big-<span class="math inline">\(O\)</span> notation is not generally unique. What is special here is that the relationship</p>
+<p><span class="math display">\[
+  e_Q=\frac{h^2}{4}
+\]</span></p>
+<p>holds throughout the entire refinement sequence, not only after the subintervals have become sufficiently small.</p>
+<p>Since</p>
+<p><span class="math display">\[
+  I
+  =
+  \int_0^3(x^2+1)\,dx
+  =
+  12,
+\]</span></p>
+<p>the relative error is</p>
+<p><span class="math display">\[
+  \frac{|I-Q_{\mathrm{mid},n}|}{I}
+  =
+  \frac{2.25}{12n^2}
+  =
+  \frac{0.1875}{n^2}.
+\]</span></p>
+<p>To obtain a relative error no greater than <span class="math inline">\(1\%\)</span>, we require</p>
+<p><span class="math display">\[
+  \frac{0.1875}{n^2}
+  \leq
+  0.01,
+\]</span></p>
+<p>which gives</p>
+<p><span class="math display">\[
+  n\geq5.
+\]</span></p>
+<p>With five midpoint evaluations,</p>
+<p><span class="math display">\[
+  Q_{\mathrm{mid},5}
+  =
+  12-\frac{2.25}{5^2}
+  =
+  11.91,
+\]</span></p>
+<p>and the relative error is <span class="math inline">\(0.75\%\)</span>.</p>
+<p>This example illustrates one way of improving a composite rule such as the midpoint or trapezoidal rule: subdividing the interval more finely, which increases the number of integration points used. For these composite rules, refining the partition and increasing the point count are the same action. This is not true of quadrature rules in general: Gauss–Legendre quadrature, introduced later in this chapter, instead increases accuracy by using more points on a fixed interval.</p>
+</section>
+</section>
+<section id="the-composite-trapezoidal-rule" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="the-composite-trapezoidal-rule"><span class="header-section-number">13.4</span> The composite trapezoidal rule</h2>
+<p>The trapezoidal rule uses the function values at the endpoints of each subinterval. Over the subinterval <span class="math inline">\([x_{i-1},x_i]\)</span>, the function is replaced by the straight line joining</p>
+<p><span class="math display">\[
+  \bigl(x_{i-1},f(x_{i-1})\bigr)
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  \bigl(x_i,f(x_i)\bigr).
+\]</span></p>
+<p>Integrating this straight-line approximation over the subinterval gives the trapezoidal contribution. When the endpoint values are nonnegative, this contribution is geometrically the area of a trapezoid. Summing the contributions over all subintervals gives</p>
+<p><span class="math display">\[
+  \boxed{
+  Q_{\mathrm{trap}}
+  =
+  \sum_{i=1}^{n}
+  \Delta x_i
+  \frac{f(x_{i-1})+f(x_i)}{2}.
+  }
+\]</span></p>
+<p>For <span class="math inline">\(n\)</span> equal subintervals of width <span class="math inline">\(h\)</span>,</p>
+<p><span class="math display">\[
+  Q_{\mathrm{trap}}
+  =
+  h
+  \left[
+  \frac{f(x_0)}{2}
+  +
+  \sum_{i=1}^{n-1}f(x_i)
+  +
+  \frac{f(x_n)}{2}
+  \right].
+\]</span></p>
+<p>Like the midpoint rule, the trapezoidal rule integrates constant and linear functions exactly.</p>
+<section id="trapezoidal-rule-for-a-quadratic-function" class="level3" data-number="13.4.1">
+<h3 data-number="13.4.1" class="anchored" data-anchor-id="trapezoidal-rule-for-a-quadratic-function"><span class="header-section-number">13.4.1</span> Trapezoidal rule for a quadratic function</h3>
+<p>For</p>
+<p><span class="math display">\[
+  f(x)=x^2+1
+\]</span></p>
+<p>on <span class="math inline">\([0,3]\)</span>, three equal subintervals give the endpoint values</p>
+<p><span class="math display">\[
+  f(0)=1,
+  \qquad
+  f(1)=2,
+  \qquad
+  f(2)=5,
+  \qquad
+  f(3)=10.
+\]</span></p>
+<p><a href="#fig-composite-trapezoidal-example" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> shows the corresponding piecewise-linear approximation. The quadrature value is the total area of the shaded region beneath the three straight segments joining consecutive endpoint values.</p>
+<div id="fig-composite-trapezoidal-example" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-composite-trapezoidal-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/composite-trapezoidal-example.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-composite-trapezoidal-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.2: Composite trapezoidal rule for <span class="math inline">\(f(x)=x^2+1\)</span> on <span class="math inline">\([0,3]\)</span>, using three equal subintervals with <span class="math inline">\(h=1\)</span>. The integral is approximated by the area of the shaded region beneath the piecewise-linear interpolant.
+</figcaption>
+</figure>
+</div>
+<p>The trapezoidal approximation is therefore</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  Q_{\mathrm{trap}}
+  &amp;=
+  \frac{1}{2}f(0)+f(1)+f(2)+\frac{1}{2}f(3)
+  \\
+  &amp;=
+  \frac12+2+5+5
+  \\
+  &amp;=
+  12.5.
+  \end{aligned}
+\]</span></p>
+<p>This can now be set alongside the midpoint result obtained earlier for the same function and partition:</p>
+<p><span class="math display">\[
+  Q_{\mathrm{mid}}=11.75,
+  \qquad
+  I=12,
+  \qquad
+  Q_{\mathrm{trap}}=12.5.
+\]</span></p>
+<p>The function <span class="math inline">\(x^2+1\)</span> is strictly convex. In <a href="#fig-composite-trapezoidal-example" class="quarto-xref">Figure&nbsp;<span>13.2</span></a>, each straight segment coincides with the graph at the subinterval endpoints and lies above it in the interior. The trapezoidal rule therefore overestimates the integral. The midpoint rectangles in <a href="#fig-composite-midpoint-example" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> do not lie entirely below the graph: each rectangle intersects the graph at the corresponding midpoint. For a convex function, the average function value over a subinterval is greater than or equal to its value at the midpoint (<a href="https://en.wikipedia.org/wiki/Jensen%27s_inequality">Jensen’s inequality</a>). The inequality is strict for the present quadratic function, so the midpoint rule underestimates the integral.</p>
+</section>
+<section id="accuracy-of-the-composite-trapezoidal-rule" class="level3" data-number="13.4.2">
+<h3 data-number="13.4.2" class="anchored" data-anchor-id="accuracy-of-the-composite-trapezoidal-rule"><span class="header-section-number">13.4.2</span> Accuracy of the composite trapezoidal rule</h3>
+<p>As with the midpoint rule, consider a quadratic function <span class="math inline">\(f(x)\)</span> on <span class="math inline">\([a,b]\)</span>, divided into <span class="math inline">\(n\)</span> equal subintervals of width <span class="math inline">\(h=(b-a)/n\)</span>. Because <span class="math inline">\(f\)</span> is quadratic, <span class="math inline">\(f''\)</span> is constant, and the difference between the composite trapezoidal approximation and the exact integral is</p>
+<p><span class="math display">\[
+  \boxed{
+  Q_{\mathrm{trap},n}-I
+  =
+  n\frac{f''h^3}{12}
+  =
+  \frac{f''(b-a)^3}{12n^2}.
+  }
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled" title="Deriving the trapezoidal-rule error for quadratic functions">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Deriving the trapezoidal-rule error for quadratic functions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The endpoints of a subinterval correspond to <span class="math inline">\(s=-h/2\)</span> and <span class="math inline">\(s=h/2\)</span> in the exact midpoint-centered expansion</p>
+<p><span class="math display">\[
+  f(m_i+s)
+  =
+  f(m_i)
+  +
+  f'(m_i)s
+  +
+  \frac{1}{2}f''s^2
+\]</span></p>
+<p>derived above. The trapezoidal contribution over this subinterval is</p>
+<p><span class="math display">\[
+  Q_{\mathrm{trap},i}
+  =
+  \frac{h}{2}
+  \left[
+  f\left(m_i-\frac{h}{2}\right)
+  +
+  f\left(m_i+\frac{h}{2}\right)
+  \right].
+\]</span></p>
+<p>Substituting <span class="math inline">\(s=\mp h/2\)</span> into the expansion gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  Q_{\mathrm{trap},i}
+  &amp;=
+  \frac{h}{2}
+  \left[
+  f(m_i)
+  -
+  f'(m_i)\frac{h}{2}
+  +
+  \frac{f''h^2}{8}
+  \right.
+  \\
+  &amp;\qquad\qquad\left.
+  +
+  f(m_i)
+  +
+  f'(m_i)\frac{h}{2}
+  +
+  \frac{f''h^2}{8}
+  \right]
+  \\
+  &amp;=
+  hf(m_i)
+  +
+  \frac{f''h^3}{8}.
+  \end{aligned}
+\]</span></p>
+<p>The linear terms cancel between the two endpoints, leaving only the constant and quadratic contributions. The exact integral over the same subinterval was found previously to be</p>
+<p><span class="math display">\[
+  I_i
+  =
+  hf(m_i)
+  +
+  \frac{f''h^3}{24}.
+\]</span></p>
+<p>The trapezoidal-rule error over one subinterval is therefore</p>
+<p><span class="math display">\[
+  Q_{\mathrm{trap},i}-I_i
+  =
+  \frac{f''h^3}{12}.
+\]</span></p>
+<p>Since <span class="math inline">\(f''\)</span> is constant for a quadratic function, every equal subinterval has the same error. Summing the <span class="math inline">\(n\)</span> subinterval errors produces the composite trapezoidal-rule error stated above.</p>
+</div>
+</div>
+<p>As with the midpoint rule, this result is exact for any quadratic function, for every value of <span class="math inline">\(n\)</span> — not merely asymptotic. For the present example,</p>
+<p><span class="math display">\[
+  f''=2,
+  \qquad
+  b-a=3,
+  \qquad
+  h=\frac{3}{n},
+\]</span></p>
+<p>so</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  Q_{\mathrm{trap},n}-I
+  &amp;=
+  \frac{f''(b-a)^3}{12n^2}
+  \\
+  &amp;=
+  \frac{2\cdot3^3}{12n^2}
+  \\
+  &amp;=
+  \frac{4.5}{n^2}
+  \\
+  &amp;=
+  \frac{h^2}{2}.
+  \end{aligned}
+\]</span></p>
+<p>As with the midpoint rule, this error is proportional to <span class="math inline">\(h^2\)</span>, so the composite trapezoidal rule is also <strong>second-order accurate</strong> with respect to the subinterval width.</p>
+<p>With <span class="math inline">\(n=3\)</span>,</p>
+<p><span class="math display">\[
+  Q_{\mathrm{trap},3}-I
+  =
+  \frac{4.5}{3^2}
+  =
+  0.5,
+\]</span></p>
+<p>which agrees with the previously calculated values</p>
+<p><span class="math display">\[
+  Q_{\mathrm{trap},3}=12.5,
+  \qquad
+  I=12.
+\]</span></p>
+<p>For this example, the signed errors are</p>
+<p><span class="math display">\[
+  Q_{\mathrm{mid},n}-I=-\frac{h^2}{4},
+  \qquad
+  Q_{\mathrm{trap},n}-I=\frac{h^2}{2}.
+\]</span></p>
+<p>The signed trapezoidal error therefore has twice the magnitude of the signed midpoint error and the opposite sign: the midpoint rule underestimates the integral, while the trapezoidal rule overestimates it.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="What does 'sufficiently smooth' mean here?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What does ‘sufficiently smooth’ mean here?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The exact calculations above used a quadratic function, for which <span class="math inline">\(f''\)</span> is constant and all higher derivatives vanish. It is a standard result — not derived here — that the second-order accuracy established for quadratic functions extends to nonquadratic functions, provided their second derivative exists and is continuous on the closed interval <span class="math inline">\([a,b]\)</span>.</p>
+<p>Continuity on a closed interval ensures that <span class="math inline">\(f''\)</span> is bounded. We can therefore define</p>
+<p><span class="math display">\[
+  M_2
+  =
+  \max_{x\in[a,b]}|f''(x)|
+  &lt;
+  \infty.
+\]</span></p>
+<p>Under this condition, the composite-rule errors satisfy the bounds</p>
+<p><span class="math display">\[
+  e_{\mathrm{mid}}
+  \leq
+  \frac{(b-a)M_2}{24}h^2
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  e_{\mathrm{trap}}
+  \leq
+  \frac{(b-a)M_2}{12}h^2.
+\]</span></p>
+<p>The factors multiplying <span class="math inline">\(h^2\)</span> do not depend on <span class="math inline">\(h\)</span>. Consequently,</p>
+<p><span class="math display">\[
+  e_{\mathrm{mid}}=O(h^2),
+  \qquad
+  e_{\mathrm{trap}}=O(h^2).
+\]</span></p>
+<p>Thus, in the present context, “sufficiently smooth” means that <span class="math inline">\(f\)</span> has a continuous second derivative on the integration interval. This condition is enough to guarantee second-order accuracy of both composite rules.</p>
+</div>
+</div>
+<p>For this example, the exact identity</p>
+<p><span class="math display">\[
+  e_{\mathrm{trap}}=\frac{h^2}{2}
+\]</span></p>
+<p>shows that the general bound is attained with the exact choice</p>
+<p><span class="math display">\[
+  C=\frac{1}{2}.
+\]</span></p>
+<p>Indeed, the general coefficient is</p>
+<p><span class="math display">\[
+  \frac{(b-a)M_2}{12}
+  =
+  \frac{3\cdot2}{12}
+  =
+  \frac{1}{2}.
+\]</span></p>
+<p>As with the midpoint rule, this equality holds for every admissible width <span class="math inline">\(h=3/n\)</span>, not only after the integration interval has been refined.</p>
+<p>Since <span class="math inline">\(h=(b-a)/n\)</span> on a fixed interval, these results can equivalently be written as</p>
+<p><span class="math display">\[
+  e_{\mathrm{mid}}=O(n^{-2}),
+  \qquad
+  e_{\mathrm{trap}}=O(n^{-2}).
+\]</span></p>
+<p>The two rules have the same asymptotic order of accuracy, although the constants in their error bounds and the signs of <span class="math inline">\(Q-I\)</span> may differ.</p>
+</section>
+</section>
+<section id="why-consider-another-quadrature-rule" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="why-consider-another-quadrature-rule"><span class="header-section-number">13.5</span> Why consider another quadrature rule?</h2>
+<p>The composite midpoint and trapezoidal rules improve their accuracy by subdividing the integration interval. As the number of subintervals increases, their width decreases, and with it the quadrature error.</p>
+<p>Gauss–Legendre quadrature follows a different strategy. It treats both the integration-point positions and the weights as quantities that can be selected to maximize polynomial exactness. With <span class="math inline">\(n_g\)</span> points, this construction achieves degree of exactness</p>
+<p><span class="math display">\[
+  2n_g-1,
+\]</span></p>
+<p>which is the highest degree that can be guaranteed with an <span class="math inline">\(n_g\)</span>-point quadrature rule.</p>
+<p>Consequently, guaranteeing exact integration of every polynomial of degree <span class="math inline">\(p\)</span> requires</p>
+<p><span class="math display">\[
+  p\leq2n_g-1.
+\]</span></p>
+<p>A particular polynomial of higher degree may still be integrated exactly, for example because its odd terms vanish by symmetry. The degree of exactness is a guarantee for every polynomial up to the stated degree, not a claim that every higher-degree polynomial is integrated incorrectly.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Order of accuracy and degree of exactness">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Order of accuracy and degree of exactness
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The two parts of this chapter use two different descriptions of quadrature accuracy because they ask different questions.</p>
+<p>The <strong>order of accuracy</strong> describes how the error changes when a composite rule is refined. For example,</p>
+<p><span class="math display">\[
+  e_Q=O(h^2)
+\]</span></p>
+<p>means that, for sufficiently small <span class="math inline">\(h\)</span>, the error magnitude is bounded by a constant times <span class="math inline">\(h^2\)</span>.</p>
+<p>The <strong>degree of exactness</strong> concerns a fixed set of integration points and weights. It is the highest polynomial degree for which that rule is guaranteed to reproduce the exact integral.</p>
+<p>These concepts should not be treated as interchangeable. A rule described as second-order accurate does not necessarily have degree of exactness two. For example, the composite midpoint and trapezoidal rules are second-order accurate under refinement, but both have degree of exactness one. The two-point Gauss–Legendre rule introduced below has degree of exactness three.</p>
+</div>
+</div>
+<p>The Gauss–Legendre strategy is particularly attractive in the finite element method because evaluating an element integrand can be considerably more expensive than evaluating the simple scalar functions used in the preceding examples. Reducing the number of required integration points can therefore reduce the computational cost of a calculation.</p>
+</section>
+<section id="gausslegendre-quadrature-on-the-standard-integration-interval" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="gausslegendre-quadrature-on-the-standard-integration-interval"><span class="header-section-number">13.6</span> Gauss–Legendre quadrature on the standard integration interval</h2>
+<p>The one-dimensional Gauss–Legendre quadrature rules are defined on the standard integration interval</p>
+<p><span class="math display">\[
+  [-1,1].
+\]</span></p>
+<p>At this stage, <span class="math inline">\([-1,1]\)</span> is simply the interval on which the quadrature rules are defined. Its later use in describing a finite element, and the transformation from an arbitrary physical interval, are separate topics introduced in the next chapter.</p>
+<p>Consider</p>
+<p><span class="math display">\[
+  I
+  =
+  \int_{-1}^{1}h(\xi)\,d\xi,
+\]</span></p>
+<p>where <span class="math inline">\(h(\xi)\)</span> is a scalar function. A quadrature rule has the form</p>
+<p><span class="math display">\[
+  I
+  \approx
+  \sum_{g=1}^{n_g}w_g h(\xi_g).
+\]</span></p>
+<p>Many rules can be written in this form. Gauss–Legendre quadrature is one particular choice of points and weights and is the quadrature rule most commonly used in the finite element method.</p>
+<p>Once the number of Gauss–Legendre points <span class="math inline">\(n_g\)</span> has been selected, their positions <span class="math inline">\(\xi_g\)</span> and weights <span class="math inline">\(w_g\)</span> are fixed. The central question is therefore:</p>
+<blockquote class="blockquote">
+<p>How many Gauss–Legendre points are required to reproduce the exact integral of a given polynomial integrand?</p>
+</blockquote>
+</section>
+<section id="the-one-point-gausslegendre-rule" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="the-one-point-gausslegendre-rule"><span class="header-section-number">13.7</span> The one-point Gauss–Legendre rule</h2>
+<p>The one-point rule uses</p>
+<p><span class="math display">\[
+  \xi_1=0,
+  \qquad
+  w_1=2.
+\]</span></p>
+<p>Thus,</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}h(\xi)\,d\xi
+  \approx
+  2h(0).
+\]</span></p>
+<p>Consider a general linear polynomial,</p>
+<p><span class="math display">\[
+  h(\xi)=a+b\xi.
+\]</span></p>
+<p>Direct integration gives</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}(a+b\xi)\,d\xi
+  =
+  2a.
+\]</span></p>
+<p>The one-point rule gives the same result:</p>
+<p><span class="math display">\[
+  2h(0)=2a.
+\]</span></p>
+<p>Because <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are arbitrary, the rule is exact for every polynomial of degree at most one.</p>
+<p>To determine whether this exactness extends to degree two, consider</p>
+<p><span class="math display">\[
+  h(\xi)=\xi^2.
+\]</span></p>
+<p>Direct integration gives</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}\xi^2\,d\xi
+  =
+  \frac{2}{3},
+\]</span></p>
+<p>whereas the one-point rule gives</p>
+<p><span class="math display">\[
+  2h(0)=0.
+\]</span></p>
+<p>This counterexample shows that the one-point rule is not exact for every quadratic polynomial. The highest polynomial degree it is guaranteed to integrate exactly is therefore one.</p>
+</section>
+<section id="the-two-point-gausslegendre-rule" class="level2" data-number="13.8">
+<h2 data-number="13.8" class="anchored" data-anchor-id="the-two-point-gausslegendre-rule"><span class="header-section-number">13.8</span> The two-point Gauss–Legendre rule</h2>
+<p>The two-point rule uses</p>
+<p><span class="math display">\[
+  \xi_1=-\frac{1}{\sqrt{3}},
+  \qquad
+  \xi_2=\frac{1}{\sqrt{3}},
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+  w_1=w_2=1.
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}h(\xi)\,d\xi
+  \approx
+  h\!\left(-\frac{1}{\sqrt{3}}\right)
+  +
+  h\!\left(\frac{1}{\sqrt{3}}\right).
+\]</span></p>
+<section id="returning-to-the-quadratic-function" class="level3" data-number="13.8.1">
+<h3 data-number="13.8.1" class="anchored" data-anchor-id="returning-to-the-quadratic-function"><span class="header-section-number">13.8.1</span> Returning to the quadratic function</h3>
+<p>The one-point rule failed for</p>
+<p><span class="math display">\[
+  h(\xi)=\xi^2.
+\]</span></p>
+<p>Let</p>
+<p><span class="math display">\[
+  s=\frac{1}{\sqrt{3}}.
+\]</span></p>
+<p>The two-point rule gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  h(-s)+h(s)
+  &amp;=
+  (-s)^2+s^2
+  \\
+  &amp;=
+  2s^2
+  \\
+  &amp;=
+  \frac{2}{3}.
+  \end{aligned}
+\]</span></p>
+<p>This agrees with the exact integral. The two-point rule succeeds for the quadratic function that exposed the limitation of the one-point rule.</p>
+</section>
+<section id="comparison-with-composite-midpoint-refinement" class="level3" data-number="13.8.2">
+<h3 data-number="13.8.2" class="anchored" data-anchor-id="comparison-with-composite-midpoint-refinement"><span class="header-section-number">13.8.2</span> Comparison with composite midpoint refinement</h3>
+<p>The advantage of selecting the Gauss–Legendre integration points and weights together can now be demonstrated using the same integration problem for both approaches. Consider</p>
+<p><span class="math display">\[
+  I
+  =
+  \int_{-1}^{1}g(\xi)\,d\xi,
+  \qquad
+  g(\xi)=\xi^2+1.
+\]</span></p>
+<p>The exact value is</p>
+<p><span class="math display">\[
+  I
+  =
+  \frac{8}{3}.
+\]</span></p>
+<p>For the composite midpoint rule with <span class="math inline">\(n\)</span> equal subintervals, the error formula derived earlier gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  I-Q_{\mathrm{mid},n}
+  &amp;=
+  \frac{g''(b-a)^3}{24n^2}
+  \\
+  &amp;=
+  \frac{2\cdot2^3}{24n^2}
+  \\
+  &amp;=
+  \frac{2}{3n^2}.
+  \end{aligned}
+\]</span></p>
+<p>The relative error is therefore</p>
+<p><span class="math display">\[
+  \frac{|I-Q_{\mathrm{mid},n}|}{I}
+  =
+  \frac{1}{4n^2}.
+\]</span></p>
+<p>To obtain a relative error no greater than <span class="math inline">\(1\%\)</span>, the composite midpoint rule requires</p>
+<p><span class="math display">\[
+  \frac{1}{4n^2}\leq0.01,
+\]</span></p>
+<p>and hence</p>
+<p><span class="math display">\[
+  n\geq5.
+\]</span></p>
+<p>With five midpoint evaluations,</p>
+<p><span class="math display">\[
+  Q_{\mathrm{mid},5}
+  =
+  \frac{8}{3}
+  -
+  \frac{2}{3\cdot5^2}
+  =
+  2.64,
+\]</span></p>
+<p>which has a relative error of exactly <span class="math inline">\(1\%\)</span>.</p>
+<p>The two-point Gauss–Legendre rule instead gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  Q_{\mathrm{G},2}
+  &amp;=
+  g\left(-\frac{1}{\sqrt{3}}\right)
+  +
+  g\left(\frac{1}{\sqrt{3}}\right)
+  \\
+  &amp;=
+  \frac{4}{3}
+  +
+  \frac{4}{3}
+  \\
+  &amp;=
+  \frac{8}{3}.
+  \end{aligned}
+\]</span></p>
+<p>Thus, for this quadratic integrand, the composite midpoint rule requires five function evaluations to meet the prescribed tolerance, whereas the two-point Gauss–Legendre rule obtains the exact result with two function evaluations. This difference is the concrete payoff of the strategy described above: selecting the point positions and weights for polynomial exactness meets the prescribed tolerance with fewer function evaluations and, for this quadratic integrand, produces the exact result.</p>
+<p><a href="#fig-midpoint-gauss-comparison" class="quarto-xref">Figure&nbsp;<span>13.3</span></a> summarizes the locations and weights used by the two rules. It also makes the difference in computational effort visible: five midpoint evaluations meet the prescribed tolerance, whereas two Gauss–Legendre evaluations give the exact result.</p>
+<div id="fig-midpoint-gauss-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-midpoint-gauss-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/midpoint-gauss-comparison.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-midpoint-gauss-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.3: Composite midpoint and two-point Gauss–Legendre quadrature applied to <span class="math inline">\(g(\xi)=\xi^2+1\)</span> on <span class="math inline">\([-1,1]\)</span>. Five equally weighted midpoint evaluations give <span class="math inline">\(Q_{\mathrm{mid},5}=2.64\)</span>, whereas two Gauss–Legendre evaluations give the exact value <span class="math inline">\(Q_{\mathrm{G},2}=8/3\)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="a-general-cubic-polynomial" class="level3" data-number="13.8.3">
+<h3 data-number="13.8.3" class="anchored" data-anchor-id="a-general-cubic-polynomial"><span class="header-section-number">13.8.3</span> A general cubic polynomial</h3>
+<p>Consider now</p>
+<p><span class="math display">\[
+  h(\xi)
+  =
+  a+b\xi+c\xi^2+d\xi^3.
+\]</span></p>
+<p>Direct integration gives</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}h(\xi)\,d\xi
+  =
+  2a+\frac{2c}{3}.
+\]</span></p>
+<p>The two-point rule gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  h(-s)+h(s)
+  &amp;=
+  \left(a-bs+cs^2-ds^3\right)
+  +
+  \left(a+bs+cs^2+ds^3\right)
+  \\
+  &amp;=
+  2a+2cs^2
+  \\
+  &amp;=
+  2a+\frac{2c}{3}.
+  \end{aligned}
+\]</span></p>
+<p>Because <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>, and <span class="math inline">\(d\)</span> are arbitrary, the two-point rule is exact for every polynomial of degree at most three.</p>
+<p>To determine whether exactness extends to degree four, consider</p>
+<p><span class="math display">\[
+  h(\xi)=\xi^4.
+\]</span></p>
+<p>Direct integration gives</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}\xi^4\,d\xi
+  =
+  \frac{2}{5},
+\]</span></p>
+<p>whereas the two-point rule gives</p>
+<p><span class="math display">\[
+  h(-s)+h(s)
+  =
+  2s^4
+  =
+  \frac{2}{9}.
+\]</span></p>
+<p>The highest polynomial degree that the two-point rule is guaranteed to integrate exactly is therefore three.</p>
+</section>
+</section>
+<section id="degree-of-exactness" class="level2" data-number="13.9">
+<h2 data-number="13.9" class="anchored" data-anchor-id="degree-of-exactness"><span class="header-section-number">13.9</span> Degree of exactness</h2>
+<p>The previous calculations are special cases of the general property of Gauss–Legendre quadrature: an <span class="math inline">\(n_g\)</span>-point rule integrates every polynomial of degree <span class="math inline">\(p\)</span> exactly when</p>
+<p><span class="math display">\[
+  \boxed{
+  p\leq 2n_g-1.
+  }
+\]</span></p>
+<p>A quadrature rule has <strong>degree of exactness</strong> <span class="math inline">\(p\)</span> if it integrates exactly every polynomial of degree <span class="math inline">\(p\)</span> or lower, but not every polynomial of degree <span class="math inline">\(p+1\)</span>.</p>
+<p>Gauss–Legendre quadrature is not limited to one or two points. A rule can be defined for any positive number of points <span class="math inline">\(n_g\)</span>. For each <span class="math inline">\(n_g\)</span>, the point positions and weights are fixed, and the degree of exactness is <span class="math inline">\(2n_g-1\)</span>.</p>
+<p>The first four one-dimensional rules are summarized below.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 39%">
+<col style="width: 26%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(n_g\)</span></th>
+<th style="text-align: left;">Integration points <span class="math inline">\(\xi_g\)</span></th>
+<th style="text-align: left;">Weights <span class="math inline">\(w_g\)</span></th>
+<th style="text-align: right;">Degree of exactness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(2\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;"><span class="math inline">\(-1/\sqrt{3}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"></td>
+<td style="text-align: left;"><span class="math inline">\(+1/\sqrt{3}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;"><span class="math inline">\(-\sqrt{3/5}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(5/9\)</span></td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"></td>
+<td style="text-align: left;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(8/9\)</span></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"></td>
+<td style="text-align: left;"><span class="math inline">\(+\sqrt{3/5}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(5/9\)</span></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;"><span class="math inline">\(-\sqrt{(15+2\sqrt{30})/35}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((18-\sqrt{30})/36\)</span></td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"></td>
+<td style="text-align: left;"><span class="math inline">\(-\sqrt{(15-2\sqrt{30})/35}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((18+\sqrt{30})/36\)</span></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"></td>
+<td style="text-align: left;"><span class="math inline">\(+\sqrt{(15-2\sqrt{30})/35}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((18+\sqrt{30})/36\)</span></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"></td>
+<td style="text-align: left;"><span class="math inline">\(+\sqrt{(15+2\sqrt{30})/35}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((18-\sqrt{30})/36\)</span></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+<p>The symmetry of the point locations and the relative sizes of the weights are shown in <a href="#fig-gauss-legendre-rules" class="quarto-xref">Figure&nbsp;<span>13.4</span></a>. The height of each vertical stem represents the associated weight; the exact point locations and weights are given in the preceding table.</p>
+<div id="fig-gauss-legendre-rules" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gauss-legendre-rules-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/gauss-legendre-rules.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gauss-legendre-rules-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.4: Point locations and weights for the first four one-dimensional Gauss–Legendre rules on <span class="math inline">\([-1,1]\)</span>. The points are symmetric about the origin, and each vertical stem has a height proportional to its associated weight.
+</figcaption>
+</figure>
+</div>
+<p>The Gauss–Legendre points are generally not equally spaced. For an <span class="math inline">\(n_g\)</span>-point Gauss–Legendre rule, they are the roots of the <a href="https://en.wikipedia.org/wiki/Legendre_polynomials">Legendre polynomial</a> of degree <span class="math inline">\(n_g\)</span>. Once those positions have been fixed, the weights are determined by the exactness conditions.</p>
+<p>For every rule in the table,</p>
+<p><span class="math display">\[
+  \sum_{g=1}^{n_g}w_g=2,
+\]</span></p>
+<p>which is the length of the standard integration interval.</p>
+<section id="selecting-the-number-of-points" class="level3" data-number="13.9.1">
+<h3 data-number="13.9.1" class="anchored" data-anchor-id="selecting-the-number-of-points"><span class="header-section-number">13.9.1</span> Selecting the number of points</h3>
+<p>For a polynomial integrand of degree <span class="math inline">\(p\)</span>, choose <span class="math inline">\(n_g\)</span> so that</p>
+<p><span class="math display">\[
+  2n_g-1\geq p.
+\]</span></p>
+<p>Equivalently,</p>
+<p><span class="math display">\[
+  n_g\geq\frac{p+1}{2}.
+\]</span></p>
+<p>Since the number of points must be an integer, the minimum number is</p>
+<p><span class="math display">\[
+  \boxed{
+  n_g
+  =
+  \left\lceil
+  \frac{p+1}{2}
+  \right\rceil.
+  }
+\]</span></p>
+<p>The symbols <span class="math inline">\(\lceil\,\cdot\,\rceil\)</span> denote the <strong>ceiling function</strong>, which returns the smallest integer greater than or equal to its argument. For example,</p>
+<p><span class="math display">\[
+  p=2
+  \quad\Longrightarrow\quad
+  n_g
+  =
+  \left\lceil\frac{3}{2}\right\rceil
+  =
+  2,
+\]</span></p>
+<p>while</p>
+<p><span class="math display">\[
+  p=5
+  \quad\Longrightarrow\quad
+  n_g
+  =
+  \left\lceil\frac{6}{2}\right\rceil
+  =
+  3.
+\]</span></p>
+</section>
+</section>
+<section id="non-polynomial-integrands" class="level2" data-number="13.10">
+<h2 data-number="13.10" class="anchored" data-anchor-id="non-polynomial-integrands"><span class="header-section-number">13.10</span> Non-polynomial integrands</h2>
+<p>For a non-polynomial integrand, the degree of exactness alone provides no guarantee that a finite quadrature rule will be exact. The quadrature result is therefore generally an approximation.</p>
+<p>A useful example is the identity</p>
+<p><span class="math display">\[
+  \pi
+  =
+  4\int_0^1\frac{1}{1+x^2}\,dx.
+\]</span></p>
+<p>Because the integrand is an even function, the same identity can be written on the standard integration interval as</p>
+<p><span class="math display">\[
+  \pi
+  =
+  2\int_{-1}^{1}\frac{1}{1+\xi^2}\,d\xi.
+\]</span></p>
+<p>This form can be evaluated directly with the Gauss–Legendre rules already introduced, without requiring a change of coordinate. The first four rules give:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(n_g\)</span></th>
+<th style="text-align: right;">Approximation of <span class="math inline">\(\pi\)</span></th>
+<th style="text-align: right;">Relative error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;"><span class="math inline">\(4.000000\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(27.324\%\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;"><span class="math inline">\(3.000000\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4.507\%\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;"><span class="math inline">\(3.166667\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.798\%\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;"><span class="math inline">\(3.137255\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.138\%\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The approximations are not exact because</p>
+<p><span class="math display">\[
+  \frac{1}{1+\xi^2}
+\]</span></p>
+<p>is not a polynomial. Nevertheless, increasing the number of Gauss–Legendre points rapidly reduces the error in this example.</p>
+<p>For a non-polynomial integrand, increasing <span class="math inline">\(n_g\)</span> usually improves the result when the integrand is sufficiently smooth, but the polynomial degree-of-exactness formula no longer predicts exactness. Accuracy must instead be assessed by comparing successive quadrature results or, when available, by comparison with a known reference value.</p>
+<p>Applying the original integral on <span class="math inline">\([0,1]\)</span> directly with a standard Gauss–Legendre rule requires a change of coordinate. That operation is introduced in the next chapter.</p>
+</section>
+<section id="from-scalar-integrands-to-matrices-and-vectors" class="level2" data-number="13.11">
+<h2 data-number="13.11" class="anchored" data-anchor-id="from-scalar-integrands-to-matrices-and-vectors"><span class="header-section-number">13.11</span> From scalar integrands to matrices and vectors</h2>
+<p>The preceding rules were written for a scalar function <span class="math inline">\(h(\xi)\)</span>. In the finite element method, an integrand is often written in matrix or vector form. This notation does not require a new integration theory.</p>
+<p>Let <span class="math inline">\(\mathbf{H}(\xi)\)</span> be a matrix-valued function. Its integral is defined entry by entry:</p>
+<p><span class="math display">\[
+  \left[
+  \int_{-1}^{1}\mathbf{H}(\xi)\,d\xi
+  \right]_{ij}
+  =
+  \int_{-1}^{1}H_{ij}(\xi)\,d\xi.
+\]</span></p>
+<p>Applying the scalar quadrature rule to every entry gives</p>
+<p><span class="math display">\[
+  \left[
+  \int_{-1}^{1}\mathbf{H}(\xi)\,d\xi
+  \right]_{ij}
+  \approx
+  \sum_{g=1}^{n_g}w_gH_{ij}(\xi_g).
+\]</span></p>
+<p>Because every entry uses the same integration points and weights, the scalar sums can be written compactly as</p>
+<p><span class="math display">\[
+  \boxed{
+  \int_{-1}^{1}\mathbf{H}(\xi)\,d\xi
+  \approx
+  \sum_{g=1}^{n_g}w_g\mathbf{H}(\xi_g).
+  }
+\]</span></p>
+<p>For example, if</p>
+<p><span class="math display">\[
+  \mathbf{H}(\xi)
+  =
+  \begin{bmatrix}
+  H_{11}(\xi) &amp; H_{12}(\xi)\\
+  H_{21}(\xi) &amp; H_{22}(\xi)
+  \end{bmatrix},
+\]</span></p>
+<p>then</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}\mathbf{H}(\xi)\,d\xi
+  \approx
+  \begin{bmatrix}
+  \displaystyle\sum_gw_gH_{11}(\xi_g)
+  &amp;
+  \displaystyle\sum_gw_gH_{12}(\xi_g)
+  \\[8pt]
+  \displaystyle\sum_gw_gH_{21}(\xi_g)
+  &amp;
+  \displaystyle\sum_gw_gH_{22}(\xi_g)
+  \end{bmatrix}.
+\]</span></p>
+<p>The same statement applies to a vector-valued function. At each integration point, the complete matrix or vector integrand can be evaluated, multiplied by the scalar weight, and added to the accumulated result. This compact operation performs the corresponding scalar integrations entry by entry.</p>
+</section>
+<section id="exercises" class="level2" data-number="13.12">
+<h2 data-number="13.12" class="anchored" data-anchor-id="exercises"><span class="header-section-number">13.12</span> Exercises</h2>
+<ol type="1">
+<li><p>Apply the midpoint and trapezoidal rules with three equal subintervals to <span class="math inline">\(f(x)=x^3\)</span> on <span class="math inline">\([0,2]\)</span>. Compare both approximations with the exact integral.</p></li>
+<li><p>Verify directly that the one-point Gauss–Legendre rule integrates <span class="math inline">\(h(\xi)=4-3\xi\)</span> exactly and fails for <span class="math inline">\(h(\xi)=1+\xi+\xi^2\)</span>.</p></li>
+<li><p>Use the two-point rule to integrate a general quadratic polynomial <span class="math inline">\(a+b\xi+c\xi^2\)</span> and show that the result agrees with direct integration for arbitrary <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, and <span class="math inline">\(c\)</span>.</p></li>
+<li><p>Determine the minimum Gauss–Legendre rule required to integrate polynomials of degrees <span class="math inline">\(0\)</span>, <span class="math inline">\(1\)</span>, <span class="math inline">\(2\)</span>, <span class="math inline">\(3\)</span>, <span class="math inline">\(4\)</span>, <span class="math inline">\(5\)</span>, and <span class="math inline">\(8\)</span> exactly.</p></li>
+<li><p>Explain why the degree-of-exactness formula does not guarantee exact integration of</p>
+<p><span class="math display">\[
+  \frac{2}{1+\xi^2}
+\]</span></p>
+<p>over <span class="math inline">\([-1,1]\)</span> for any prescribed finite value of <span class="math inline">\(n_g\)</span>, even though the approximations shown in the preceding table move closer to <span class="math inline">\(\pi\)</span> as <span class="math inline">\(n_g\)</span> increases.</p></li>
+<li><p>Consider the vector-valued function</p>
+<p><span class="math display">\[
+  \mathbf{v}(\xi)
+  =
+  \begin{bmatrix}
+  1-\xi\\
+  1+\xi
+  \end{bmatrix}
+\]</span></p>
+<p>and the matrix-valued function</p>
+<p><span class="math display">\[
+  \mathbf{H}(\xi)
+  =
+  \mathbf{a}(\xi)\mathbf{a}^{\mathsf T}(\xi),
+  \qquad
+  \mathbf{a}(\xi)
+  =
+  \begin{bmatrix}
+  1\\
+  \xi
+  \end{bmatrix}.
+\]</span></p>
+<p>First write all entries of <span class="math inline">\(\mathbf{H}(\xi)\)</span> explicitly. Integrate <span class="math inline">\(\mathbf{v}(\xi)\)</span> over <span class="math inline">\([-1,1]\)</span> using the one-point Gauss–Legendre rule and integrate <span class="math inline">\(\mathbf{H}(\xi)\)</span> using the two-point rule. Verify both results by integrating every scalar entry directly, and identify the polynomial degree that determines the required rule in each case.</p></li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="Key points to remember">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Key points to remember
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Numerical quadrature approximates an integral by a weighted sum of function values.</li>
+<li>Composite midpoint and trapezoidal rules become more accurate as the interval is refined; for sufficiently smooth integrands, their errors are of order <span class="math inline">\(O(h^2)\)</span>.</li>
+<li>Order of accuracy describes convergence under refinement; degree of exactness identifies which polynomials a fixed rule integrates exactly.</li>
+<li>Gauss–Legendre quadrature chooses points and weights to maximize polynomial exactness: an <span class="math inline">\(n_g\)</span>-point rule is exact for polynomials up to degree <span class="math inline">\(2n_g-1\)</span>.</li>
+<li>For a non-polynomial integrand, the degree-of-exactness result does not generally guarantee exact integration with a prescribed finite rule; accuracy must be assessed.</li>
+<li>Scalar quadrature extends entry by entry to matrix- and vector-valued integrands.</li>
+<li>The standard Gauss–Legendre rules are defined on <span class="math inline">\([-1,1]\)</span>. Their application to an arbitrary physical interval requires the change of coordinate introduced in the next chapter.</li>
+</ul>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/shared-fem-assembly.html" class="pagination-link" aria-label="From repeated assembly to shared FEM operations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
