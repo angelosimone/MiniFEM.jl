@@ -1,4 +1,4 @@
-# Executable benchmark for a uniform one-dimensional axial bar.
+# Executable Gauss--Legendre benchmark for a uniform one-dimensional axial bar.
 
 # Physical layout: four equal bar elements with geometric node numbering.
 #
@@ -7,7 +7,8 @@
 #   node 1              node 2              node 3              node 4              node 5
 
 include("fem_assembly.jl")
-include("axial_bar_fem.jl")
+include("gauss_legendre_quadrature.jl")
+include("axial_bar_gauss_legendre_fem.jl")
 
 # -------------------------------
 # 1. Model data
@@ -41,11 +42,14 @@ applied_forces = [(3, P)]
 constrained_dofs = [1]
 prescribed_displacements = [0.0]
 
+# One point is exact here for constant E, A, and the uniform element load.
+num_gauss_legendre_points = 1
+
 # -------------------------------
 # 2. Finite element solution
 # -------------------------------
 
-u, reactions = solve_axial_bar(
+u, reactions = solve_axial_bar_gauss_legendre(
     node_coordinates,
     element_connectivity,
     element_E,
@@ -54,6 +58,7 @@ u, reactions = solve_axial_bar(
     applied_forces,
     constrained_dofs,
     prescribed_displacements,
+    num_gauss_legendre_points,
 )
 
 # -------------------------------
@@ -61,16 +66,18 @@ u, reactions = solve_axial_bar(
 # -------------------------------
 
 (
-element_displacement_increments,
-element_strain,
-element_stress,
-element_axial_force
-) = recover_axial_bar_response(
+gauss_point_reference_coordinates,
+gauss_point_coordinates,
+gauss_point_strain,
+gauss_point_stress,
+gauss_point_axial_force
+) = recover_axial_bar_response_gauss_legendre(
     node_coordinates,
     element_connectivity,
     element_E,
     element_A,
     u,
+    num_gauss_legendre_points,
 )
 
 # -------------------------------
@@ -82,8 +89,8 @@ EA = E * A
 num_nodes = length(node_coordinates)
 num_elements = size(element_connectivity, 1)
 u_exact = zeros(num_nodes)
-element_midpoints = zeros(num_elements)
-axial_force_exact_at_midpoints = zeros(num_elements)
+num_response_points = size(gauss_point_coordinates, 2)
+axial_force_exact_at_gauss_points = zeros(num_elements, num_response_points)
 
 for node in 1:num_nodes
     x = node_coordinates[node]
@@ -96,15 +103,14 @@ for node in 1:num_nodes
 end
 
 for e in 1:num_elements
-    element_nodes = element_connectivity[e, :]
-    x_e = node_coordinates[element_nodes]
-    x = (x_e[1] + x_e[2]) / 2
-    element_midpoints[e] = x
+    for g in 1:num_response_points
+        x_g = gauss_point_coordinates[e, g]
 
-    if x < a
-        axial_force_exact_at_midpoints[e] = q * (L - x) + P
-    else
-        axial_force_exact_at_midpoints[e] = q * (L - x)
+        if x_g < a
+            axial_force_exact_at_gauss_points[e, g] = q * (L - x_g) + P
+        else
+            axial_force_exact_at_gauss_points[e, g] = q * (L - x_g)
+        end
     end
 end
 
@@ -116,7 +122,9 @@ exact_force_jump = q * (L - a) - (q * (L - a) + P)
 # 5. Results
 # -------------------------------
 
-println("\n- Nodal displacements u [mm]:")
+println("\n- Gauss--Legendre points per element: ", num_gauss_legendre_points)
+
+println("- Nodal displacements u [mm]:")
 display(u)
 
 println("\n- Analytical nodal displacements [mm]:")
@@ -131,22 +139,25 @@ display(reactions)
 println("\n- Expected reaction at x = 0 [N]: ", reaction_expected)
 println("- Global equilibrium residual R + qL + P [N]: ", global_equilibrium_residual)
 
-println("\n- Element displacement increments [mm]:")
-display(element_displacement_increments)
+println("\n- Gauss-point reference coordinates xi:")
+display(gauss_point_reference_coordinates)
 
-println("\n- Element strains:")
-display(element_strain)
+println("\n- Gauss-point physical coordinates x [mm]:")
+display(gauss_point_coordinates)
 
-println("\n- Element stresses [N/mm^2]:")
-display(element_stress)
+println("\n- Gauss-point strains:")
+display(gauss_point_strain)
 
-println("\n- Recovered element axial forces [N]:")
-display(element_axial_force)
+println("\n- Gauss-point stresses [N/mm^2]:")
+display(gauss_point_stress)
 
-println("\n- Exact axial forces at element midpoints [N]:")
-display(axial_force_exact_at_midpoints)
+println("\n- Recovered Gauss-point axial forces [N]:")
+display(gauss_point_axial_force)
 
-println("\n- Element axial-force error at midpoints [N]:")
-display(element_axial_force - axial_force_exact_at_midpoints)
+println("\n- Exact axial forces at Gauss points [N]:")
+display(axial_force_exact_at_gauss_points)
+
+println("\n- Gauss-point axial-force error [N]:")
+display(gauss_point_axial_force - axial_force_exact_at_gauss_points)
 
 println("\n- Exact axial-force jump at x = L / 2 [N]: ", exact_force_jump)
