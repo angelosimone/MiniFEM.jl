@@ -314,12 +314,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Gauss–Legendre quadrature for the two-node bar</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/gauss-legendre-quadrature-implementation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Implementing Gauss–Legendre quadrature for the two-node bar</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../glossary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -411,7 +417,7 @@ window.Quarto = {
 <h2 data-number="8.2" class="anchored" data-anchor-id="verification-validation-and-regression-testing"><span class="header-section-number">8.2</span> Verification, validation, and regression testing</h2>
 <p>Verification and validation answer different questions. <em>Verification</em> asks whether the numerical implementation correctly solves the mathematical model. <em>Validation</em> asks whether that mathematical model represents the physical system sufficiently well for its intended use.</p>
 <p>The analytical two-spring solution used here provides a verification reference: it checks the finite element result against an independently derived solution of the same idealized spring model. Agreement establishes confidence in the formulation and implementation for this problem, but it does not validate the spring model against physical behavior.</p>
-<p>Regression testing asks a different question: does previously verified behavior still agree with the established reference after later changes? A passing regression test does not prove that every FEM formulation is generally correct. A failing test means that protected behavior no longer matches its reference; it does not by itself identify the cause or decide which version is correct.</p>
+<p><a href="../glossary.html#gls-regression-test">Regression testing</a> asks a different question: does previously verified behavior still agree with the established reference after later changes? A passing regression test does not prove that every FEM formulation is generally correct. A failing test means that protected behavior no longer matches its reference; it does not by itself identify the cause or decide which version is correct.</p>
 </section>
 <section id="separating-the-fem-implementation-from-the-benchmark" class="level2" data-number="8.3">
 <h2 data-number="8.3" class="anchored" data-anchor-id="separating-the-fem-implementation-from-the-benchmark"><span class="header-section-number">8.3</span> Separating the FEM implementation from the benchmark</h2>

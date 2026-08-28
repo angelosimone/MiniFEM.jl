@@ -1671,13 +1671,145 @@
     ]
   },
   {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "",
+    "text": "16.1 Start from the verified implementation\nIn this chapter, you will extend the existing two-node axial-bar implementation with a second implementation in which the element integrals are evaluated by Gauss–Legendre quadrature. The overall finite element workflow remains the same; the new work is concentrated in the evaluation of element quantities and in response sampling at Gauss points. You will first verify the quadrature rule on simple scalar integrals, then use the same ideas to construct the element stiffness matrix and consistent distributed-load vector, and finally integrate the numerically evaluated element formulation into the existing four-element axial-bar analysis.\nBefore making any changes, run the current regression suite:\nAll existing tests should pass. If they do not, resolve the problem before starting the Gauss–Legendre implementation.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#start-from-the-verified-implementation",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#start-from-the-verified-implementation",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "",
+    "text": "julia test/runtests.jl",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#plan-the-adaptation",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#plan-the-adaptation",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.2 Plan the adaptation",
+    "text": "16.2 Plan the adaptation\nBefore copying and adapting the files, identify the difference in responsibility. The following parts remain unchanged:\n\nthe physical benchmark and its model data;\nmesh and connectivity representation;\nglobal matrix and vector initialization;\nthe S06 shared assembly operations and global nodal-force addition;\nprescribed-displacement treatment and global solution;\ndisplacement, reaction, equilibrium, and analytical-verification structure.\n\nThe following parts are new or change because the local arrays are evaluated by quadrature:\n\nGauss–Legendre point-and-weight data;\nmapping from \\(\\xi_g\\) to the physical element and its Jacobian;\nshape functions and \\(\\mathbf B_g\\) at each integration point;\nstiffness-integrand and consistent-load-integrand evaluation;\nweighted accumulation into \\(\\mathbf K_e\\) and \\(\\mathbf f_e\\);\nselection of the number of Gauss–Legendre integration points; and\nGauss-point response sampling in the Gauss–Legendre implementation.\n\nThus, the new implementation changes only how the element stiffness matrix and consistent load vector are evaluated, and how element responses are sampled in post-processing:\nelement arrays\nclosed form:       element data -&gt; K_e and f_e\nGauss--Legendre:   element data -&gt; pointwise integrands -&gt; K_e and f_e\n\npost-processing\nclosed form:       element displacement -&gt; element response\nGauss--Legendre:   element displacement -&gt; response at Gauss points\n\nOnce the element stiffness matrix K_e, consistent load vector f_e, and dof_map are available, assemble them into the global system using assemble_matrix! and assemble_vector! from S06.\nThe matching structure is intentional: a diff between the two formulation files should show which differences arise from numerical integration rather than from unrelated reorganization.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#extract-point-and-weight-data",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#extract-point-and-weight-data",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.3 Extract point-and-weight data",
+    "text": "16.3 Extract point-and-weight data\nUnlike the axial-bar files, examples/gauss_legendre_quadrature.jl is a genuinely new S07 file. Create it with this target function:\ngauss_legendre_rule(num_points)\nnum_points is the requested number of Gauss–Legendre points. The function is responsible only for supplying the rule data and returns a vector of (xi_g, w_g) tuples on \\([-1,1]\\):\none point:  (0.0, 2.0)\ntwo points: (-1 / sqrt(3), 1.0), (1 / sqrt(3), 1.0)\nThis function stores quadrature-rule data only. It accepts an integer specifying the number of Gauss–Legendre points, currently limited to one or two, and reports an error for any other value.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#first-scalar-checks",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#first-scalar-checks",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.4 First scalar checks",
+    "text": "16.4 First scalar checks\nexamples/gauss_legendre_scalar_integration.jl is a genuinely new S07 file. Create it and collect the scalar integration examples described below in a plain function with the target interface evaluate_scalar_gauss_legendre_examples(), then call it at top level. The function takes no arguments and returns the four computed results: the one-point result for the linear polynomial, the one- and two-point results for the cubic polynomial, and the mapped two-point result.\nUse these examples to make the quadrature process explicit. At every Gauss point, identify xi_g and w_g, evaluate the integrand, form the weighted contribution, and accumulate the result with +=.\nBegin by integrating the linear polynomial\n\\[\n  2 + 3\\xi\n\\]\nover \\([-1,1]\\) with the one-point Gauss–Legendre rule. Its exact integral is \\(4\\). Because the one-point rule has degree of exactness one, it reproduces this result exactly.\nNext, integrate the cubic polynomial\n\\[\n  1 - 2\\xi + 3\\xi^2 + 4\\xi^3\n\\]\nover \\([-1,1]\\) and compare the one- and two-point rules. Its exact integral is also \\(4\\). The one-point rule is not sufficient because its degree of exactness does not include quadratic and cubic terms. The two-point rule has degree of exactness three and therefore reproduces the exact integral.\nFinally, apply the same quadrature procedure to the physical interval \\([0,3]\\) by integrating \\(x^2+1\\), whose exact integral is \\(12\\). Map each Gauss point from the reference interval using\nJ = (b - a) / 2\nx_g = (a + b) / 2 + J * xi_g\nThe mapping and Jacobian are exact; the numerical approximation enters only through the finite weighted sum used for integration. At each quadrature point, x_g identifies the physical location corresponding to xi_g and is therefore used to evaluate the mapped integrand.\nThis same reference-to-physical mapping will be used in the two-node bar element. In the present formulation, E_g and A_g are constant and q_g is interpolated from its endpoint values, but x_g is still computed explicitly. Its role becomes essential when material properties, geometry, loading, or recovered fields vary with physical position.\n\n\n\n\n\n\nNoteExact quadrature and floating-point arithmetic\n\n\n\nThe two-point rule is mathematically exact for the mapped quadratic polynomial, but the script may display 12.000000000000002 rather than 12.0. This is ordinary Float64 roundoff from arithmetic and mapping operations. Exact quadrature does not imply bitwise equality in floating-point arithmetic, so the regression tests use isapprox rather than exact == comparison.\n\n\n\n\n\n\n\n\nTipExercise — From a scalar to a vector contribution\n\n\n\nUsing the one-point Gauss–Legendre rule, evaluate\n\\[\n  \\int_{-1}^{1}\n  \\begin{bmatrix}\n  1-\\xi\\\\\n  1+\\xi\n  \\end{bmatrix}\n  \\,d\\xi\n  =\n  \\begin{bmatrix}\n  2\\\\\n  2\n  \\end{bmatrix}.\n\\]\nInitialize a two-entry result vector with zeros. Then loop over the Gauss points and weights. At each point, evaluate the two functions at xi_g and collect them in a two-entry vector, for example\nintegrand_value = [\n    1.0 - xi_g,\n    1.0 + xi_g,\n]\nMultiply this vector by the Gauss weight to obtain the weighted contribution, then accumulate it into the result vector with +=.\nThe structure is therefore the same as in the scalar examples:\nscalar:  integrand value  -&gt; weighted scalar contribution -&gt; scalar result\nvector:  integrand vector -&gt; weighted vector contribution -&gt; vector result\nCheck that the final vector is [2.0, 2.0].\nThis is the pattern used later for the consistent element load vector. The stiffness matrix follows the same idea, except that the quantity evaluated and accumulated at each Gauss point is a matrix rather than a scalar or vector.\nThe next step is to apply this Gauss–Legendre accumulation pattern to the two-node bar, for both the element stiffness matrix and the consistent load vector.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#adapt-local-bar-array-evaluation",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#adapt-local-bar-array-evaluation",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.5 Adapt local bar-array evaluation",
+    "text": "16.5 Adapt local bar-array evaluation\nCopy examples/axial_bar_fem.jl, rename the copy examples/axial_bar_gauss_legendre_fem.jl, then replace only the closed-form element-evaluation and Gauss-point response-sampling operations. Keep the established assembly, nodal-force, prescribed-displacement, global-solve, and reaction-recovery operations structurally aligned with the original file. This remains a second, explicit two-node axial-bar implementation.\nThe first target function is:\nintegrate_two_node_bar_gauss_legendre(x_e, E_e, A_e, q_1, q_2, num_gauss_legendre_points)\nHere x_e contains the two physical endpoint coordinates; E_e and A_e are the element material and cross-sectional data; q_1 and q_2 are the endpoint distributed-load values; and num_gauss_legendre_points selects the rule. The function constructs the local stiffness matrix and consistent distributed-load vector, returning K_e, f_e. Equal q_1 and q_2 represent a uniform load; unequal values describe a linearly varying load.\nInitialize a \\(2\\times2\\) matrix K_e and a two-entry vector f_e. For each (xi_g, w_g), map xi_g to x_g, evaluate J, construct \\(\\mathbf N_g\\) and \\(\\mathbf B_g\\), use \\(E_g=E_e\\) and \\(A_g=A_e\\), and interpolate \\(q_g=N_{g,1}q_1+N_{g,2}q_2\\). Use explicit local loops to accumulate:\n\\[\n  K_{e,ij}\\mathrel{+}=w_gB_{g,i}E_gA_gB_{g,j}J,\n  \\qquad\n  f_{e,i}\\mathrel{+}=w_gN_{g,i}q_gJ.\n\\]\nUse one quadrature loop. At each Gauss–Legendre point:\n\nmap xi_g to the physical element and compute J;\nevaluate N_g and B_g;\nevaluate the element data needed at that point;\ncompute the contribution to each entry of K_e and add it to the current value;\ncompute the contribution to each entry of f_e and add it to the current value.\n\nKeep these steps explicit in the code:\nfor (xi_g, w_g) in gauss_legendre_rule(num_gauss_legendre_points)\n    # Map xi_g to the physical element and compute J.\n    # Evaluate N_g and B_g.\n    # Evaluate the element data at this point.\n    # Compute and add the contribution to K_e.\n    # Compute and add the contribution to f_e.\nend\nThe closed-form implementation keeps bar_stiffness(...) and bar_distributed_load(...) as conceptually separate element contributions. In the Gauss–Legendre implementation, integrate_two_node_bar_gauss_legendre(...) constructs both K_e and f_e inside one quadrature loop because both contributions use the same points, weights, affine mapping, and Jacobian. The stiffness and consistent distributed-load accumulations remain visibly separate within that loop.\nComputing both K_e and f_e in the same quadrature loop does not mean that the matrix and vector are the same mathematical object. They remain distinct element quantities, but their evaluation follows the same sequence at each Gauss point: mapping, evaluation of the required quantities, weighting, and accumulation. Keeping these closely related operations together is consistent with the Single Responsibility Principle: one coherent responsibility does not have to consist of only one small calculation.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#check-special-cases",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#check-special-cases",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.6 Check special cases",
+    "text": "16.6 Check special cases\nFor constant \\(E_e\\) and \\(A_e\\), one point gives exactly:\n\\[\n  \\mathbf K_e=\\frac{E_eA_e}{L_e}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix}.\n\\]\nFor uniform \\(q_e\\), one point also gives exactly:\n\\[\n  \\mathbf f_e^q=\\frac{q_eL_e}{2}\\begin{bmatrix}1\\\\1\\end{bmatrix}.\n\\]\nCompare quadrature arrays with these closed-form references. For \\(L_e=3\\), \\(q_1=2\\), and \\(q_2=8\\), both rules give resultant \\(15\\). One point gives \\([7.5,7.5]^{\\mathsf T}\\), but two points give the exact consistent distribution \\([6,9]^{\\mathsf T}\\). A correct resultant is not the same as an exact nodal distribution.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#adapt-assembly-and-solution",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#adapt-assembly-and-solution",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.7 Adapt assembly and solution",
+    "text": "16.7 Adapt assembly and solution\nNext adapt the corresponding closed-form functions. Use these target interfaces:\nassemble_axial_bar_gauss_legendre!(\n    K,\n    f,\n    node_coordinates,\n    element_connectivity,\n    element_E,\n    element_A,\n    element_q,\n    num_gauss_legendre_points,\n)\n\nsolve_axial_bar_gauss_legendre(\n    node_coordinates,\n    element_connectivity,\n    element_E,\n    element_A,\n    element_q,\n    applied_forces,\n    constrained_dofs,\n    prescribed_displacements,\n    num_gauss_legendre_points,\n)\nFor the assembly function, K and f are the global stiffness matrix and load vector to modify; node_coordinates and element_connectivity define the mesh; element_E, element_A, and element_q provide one value per element; and num_gauss_legendre_points selects the integration rule. The function modifies K and f in place and therefore does not return a value. Keep the established element-data extraction, dof_map, and calls to assemble_matrix! and assemble_vector!. Change only the local-array construction: use equal endpoint values q_1 = q_e and q_2 = q_e for the current scalar element load, then call the quadrature function.\nFor the solver, the coordinate, connectivity, and three element-data arguments again define the mesh and element properties/load; applied_forces contains forces already specified at global DOFs; constrained_dofs and prescribed_displacements define the displacement constraints; and num_gauss_legendre_points selects the integration rule. It performs the established partitioned solve and reaction recovery, returning the complete displacement vector u and the reactions at the constrained DOFs.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#adapt-the-executable-benchmark",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#adapt-the-executable-benchmark",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.8 Adapt the executable benchmark",
+    "text": "16.8 Adapt the executable benchmark\nCopy examples/four_element_axial_bar.jl and rename the copy examples/four_element_axial_bar_gauss_legendre.jl. Keep the original closed-form driver unchanged so that the two implementations can be compared using the same physical benchmark.\nIn the new driver, change only what is needed for Gauss–Legendre quadrature:\n\ninclude fem_assembly.jl, gauss_legendre_quadrature.jl, and axial_bar_gauss_legendre_fem.jl, in this order. This ordering follows the dependencies of the implementation: the axial-bar functions use the shared assembly operations and the Gauss–Legendre rule. Although Julia does not require this particular include order for these function definitions, keeping dependencies before the code that uses them makes the structure easier to read and understand;\ndefine the number of Gauss–Legendre points;\ncall solve_axial_bar_gauss_legendre(...); and\nuse Gauss-point response sampling instead of the closed-form response recovery used by the original benchmark.\n\nFor the reference four-element benchmark, use\nnum_gauss_legendre_points = 1\nand pass this value to the quadrature-based solve and response-recovery functions. One Gauss point is sufficient for the constant material and section properties and the uniform distributed loading used in this benchmark.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#recover-responses-at-gauss-points",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#recover-responses-at-gauss-points",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.9 Recover responses at Gauss points",
+    "text": "16.9 Recover responses at Gauss points\nThe Gauss–Legendre implementation uses a separate response-recovery function from the closed-form implementation:\nrecover_axial_bar_response_gauss_legendre(\n    node_coordinates,\n    element_connectivity,\n    element_E,\n    element_A,\n    u,\n    num_gauss_legendre_points,\n)\nThe function receives the mesh, element material and cross-sectional data, the computed global displacement vector, and the response-sampling rule. For each element and each point from that rule, evaluate xi_g, x_g, the shape functions, B_g, and then compute\n\\[\n  \\varepsilon_g=\\mathbf B_g\\mathbf u_e,\n  \\qquad\n  \\sigma_g=E_g\\varepsilon_g,\n  \\qquad\n  N_g=A_g\\sigma_g.\n\\]\nThese are response samples at physical Gauss-point locations, not quadrature integrals. Do not multiply strain, stress, or axial force by a weight or by the Jacobian, and do not accumulate them. The function returns simple element-by- Gauss-point arrays for the reference coordinates, physical coordinates, strain, stress, and axial force, in that order:\ngauss_point_reference_coordinates,\ngauss_point_coordinates,\ngauss_point_strain,\ngauss_point_stress,\ngauss_point_axial_force\nFor this two-node linear bar with constant E and A, strain, stress, and axial force are constant within an element. The finite element response sampled at the two Gauss points of a single element therefore has the same value. This, however, does not make the finite element response exact at every sampled location. In fact, the exact axial force varies linearly within each element under the uniform distributed load, so its values at the two physical Gauss-point coordinates are generally different. Therefore, evaluating the same linear-element response at more points does not increase its interpolation order or improve its accuracy.\nThe one-point benchmark is a special case. Its Gauss–Legendre point has xi = 0, which maps to the physical midpoint of an affine two-node element. The previously established midpoint agreement is therefore recovered when the response is sampled at one point. With two sampling points, instead, the finite element axial force remains constant within the element, while the exact axial force is generally different at the two physical locations.\nThe concentrated force introduces a separate consideration. Since the force is applied at a mesh node, the jump in the exact derivative occurs at the boundary between two elements. Each element therefore lies within one smooth branch of the exact solution, and its interior Gauss points do not sample across the discontinuity. This does not, however, make the finite element derivative exact throughout the element.\n\n\n\n\n\n\nTipExercise — Change from one to two Gauss points\n\n\n\nThe four-element benchmark deliberately uses num_gauss_legendre_points = 1: one point already integrates the current constant-property stiffness and uniform distributed-load contributions exactly. Change only this setting to 2, adapt the output if necessary so that all relevant results are displayed, run the benchmark again, and investigate the following questions before drawing conclusions.\nFor element integration and construction:\n\nDo the global displacement vector and support reaction change?\nDo the element stiffness matrices change?\nDo the consistent distributed-load vectors change for the current uniform q?\nWhat do the polynomial degrees of the present integrands say about the required quadrature order?\n\nFor response sampling and post-processing:\n\nHow many response locations now occur in each element?\nWhat are their reference coordinates, and where do they map in physical space?\nAre the two finite element strains, stresses, and axial forces in one element different? Why or why not?\n\nFinally, evaluate the exact axial force at both physical Gauss-point coordinates. How do those values compare with the two sampled finite element axial forces? Explain what changed by using two points: numerical-integration accuracy, the finite element approximation space, the number of response sampling locations, or some combination of these. Relate your answer to the one-point case, where \\(\\xi_g=0\\) maps to the midpoint and gives the previously observed midpoint agreement.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#verify-the-gausslegendre-implementation",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#verify-the-gausslegendre-implementation",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.10 Verify the Gauss–Legendre implementation",
+    "text": "16.10 Verify the Gauss–Legendre implementation\nThe S07 regression tests are supplied reference material, not a student coding task in this chapter. After completing the implementation, study test/runtests.jl to see how the expected numerical behavior is turned into automated regression checks.\nFocus on what each group of tests protects:\n\npreviously accepted MiniFEM results that must remain unchanged;\nthe Gauss–Legendre point-and-weight rules and their expected degree of exactness;\nmapped scalar integration;\nagreement with the closed-form element stiffness matrix and consistent load vector where exact reference results are available;\nthe different behavior of one- and two-point quadrature for a linearly varying distributed load;\nthe displacement, support reaction, and Gauss-point response values of the four-element benchmark.\n\nNotice also how the tests use isapprox for floating-point comparisons rather than requiring bitwise equality.\nThe four-element regression test deliberately uses different numbers of Gauss–Legendre points for element integration and response sampling. The global finite element solution is computed with one Gauss point, as in the reference benchmark:\nnum_gauss_legendre_points = 1\nAfter the displacement solution has been obtained, the response is sampled separately at two Gauss points per element:\nrecover_axial_bar_response_gauss_legendre(..., 2)\nThe two points used for response sampling do not recompute the global solution. They only provide two locations at which the already-computed finite element response is evaluated. The tests then verify that strain, stress, and axial force have the same finite element value at both locations within each linear bar element, even though the exact axial force generally has different values at the two corresponding physical coordinates.\nThis distinction is important: the number of Gauss points used for element integration and the number of points used for response sampling need not be the same.\nThe tests are a worked example of regression-test design. They turn analytical results and previously verified numerical behavior into automated checks that can be rerun after later changes to the code. Regression tests protect accepted behavior: they do not replace independent analytical verification or physical validation.\nRun:\njulia test/runtests.jl\njulia examples/gauss_legendre_scalar_integration.jl\njulia examples/four_element_axial_bar.jl\njulia examples/four_element_axial_bar_gauss_legendre.jl",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/gauss-legendre-quadrature-implementation.html#reflection-and-what-comes-next",
+    "href": "chapters/gauss-legendre-quadrature-implementation.html#reflection-and-what-comes-next",
+    "title": "16  Implementing Gauss–Legendre quadrature for the two-node bar",
+    "section": "16.11 Reflection and what comes next",
+    "text": "16.11 Reflection and what comes next\nThe closed-form and Gauss–Legendre implementations describe the same two-node bar element. They differ only in how the element stiffness matrix and consistent load vector are evaluated. Keeping both implementations available makes their differences easy to compare and prepares for later problems in which closed-form integration is no longer practical.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Implementing Gauss--Legendre quadrature for the two-node bar</span>"
+    ]
+  },
+  {
     "objectID": "glossary.html",
     "href": "glossary.html",
     "title": "Glossary",
     "section": "",
     "text": "A",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1687,7 +1819,7 @@
     "section": "",
     "text": "Abstraction\nIn programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.\nSimilar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.\nFurther details: Wikipedia — Abstraction (computer science).\n\n\nAffine mapping\nA one-dimensional coordinate transformation of the form\n\\[\n  x(\\xi)=a_0+a_1\\xi,\n\\]\nwhich combines a constant scaling with a translation. For a two-node bar element extending from \\(x_1\\) to \\(x_2&gt;x_1\\), the affine mapping from the standard interval \\(\\xi\\in[-1,1]\\) to the physical element is\n\\[\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2\n  =\n  \\frac{x_1+x_2}{2}\n  +\n  \\frac{L_e}{2}\\xi,\n\\]\nwhere \\(L_e=x_2-x_1&gt;0\\). This mapping sends \\(\\xi=-1\\) to \\(x_1\\) and \\(\\xi=1\\) to \\(x_2\\). Its Jacobian is constant and equal to\n\\[\n  J=\\frac{dx}{d\\xi}=\\frac{L_e}{2}.\n\\]\nThe mapping and its Jacobian belong to an exact change of coordinate, as developed in 14  Standard and physical coordinates. Numerical approximation begins only when a quadrature rule is subsequently applied to the transformed integral.\n\n\nAsymptotic behavior\nThe behavior of a quantity as a parameter approaches a limiting value. An asymptotic statement describes what happens near that limit; it does not generally claim that the stated relationship is an exact equality for every value of the parameter.\nIn numerical integration, for example,\n\\[\n  e_Q(h)=O(h^2)\n\\]\nas \\(h\\) approaches zero means that there are constants \\(C&gt;0\\) and \\(h_0&gt;0\\), independent of \\(h\\), such that\n\\[\n  e_Q(h)\\leq Ch^2\n\\]\nwhenever \\(0&lt;h\\leq h_0\\). Thus, once the subinterval width is sufficiently small, the error is bounded above by a constant times \\(h^2\\).\nThe big-\\(O\\) statement specifies this asymptotic bound; it does not by itself claim that\n\\[\n  e_Q(h)=Ch^2\n\\]\nor prescribe an exact error-reduction factor. If, more specifically, the error approaches a nonzero multiple of \\(h^2\\), halving \\(h\\) reduces the error by approximately a factor of four once the asymptotic behavior has been reached.\nOn a fixed integration interval divided into \\(n\\) equal subintervals,\n\\[\n  h=\\frac{b-a}{n},\n\\]\nso the same asymptotic bound may be written as\n\\[\n  e_Q=O(n^{-2})\n\\]\nas \\(n\\) increases.\nThe quadratic midpoint-rule example in 13  Numerical integration in one dimension is stronger than this general asymptotic statement. For that particular function and interval, its error satisfies the exact relationship\n\\[\n  e_Q=\\frac{h^2}{4}\n\\]\nfor every positive integer \\(n\\). Consequently, doubling \\(n\\) and therefore halving \\(h\\) reduces the error by exactly a factor of four in that example.",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1697,7 +1829,7 @@
     "section": "C",
     "text": "C\n\nCohesion\nThe degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Cohesion (computer science).\n\n\nCoupling\nThe degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.\nFurther details: Wikipedia — Coupling (computer programming).",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1707,7 +1839,7 @@
     "section": "D",
     "text": "D\n\nDeclarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.\n\n\nDon’t Repeat Yourself (DRY)\nA design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Don’t repeat yourself.",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1717,7 +1849,7 @@
     "section": "I",
     "text": "I\n\nImmutable object\nAn object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.\nSee also: Mutable object; Modified in place.\n\n\nImperative programming\nA programming paradigm in which a computation is expressed as an explicit sequence of commands that describe how a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.\nSee also: Declarative programming. Further details: Wikipedia — Imperative programming.",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1727,7 +1859,7 @@
     "section": "M",
     "text": "M\n\nModified in place\nDescribes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.\nFor example, in Julia, integers are immutable:\nx = 4\nx = x + 1\nHere, x is not modified in place. Instead, x is rebound from the value 4 to the new value 5.\nBy contrast, an array is mutable:\nx = [4]\nx[1] += 1\nHere, the existing array is modified in place, changing its contents from [4] to [5].\nSee also: Mutable object; Immutable object.\n\n\nMutable object\nAn object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.\nSee also: Immutable object; Modified in place.",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1735,9 +1867,9 @@
     "href": "glossary.html#r",
     "title": "Glossary",
     "section": "R",
-    "text": "R\n\nRefactoring\nRestructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.",
+    "text": "R\n\nRefactoring\nRestructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.\n\n\nRegression test\nAn automated test that checks whether previously accepted behavior remains unchanged after modifications to the code. A regression test compares current results with established reference values or properties so that unintended changes can be detected.\nIn MiniFEM, regression tests may protect previously verified displacements, reactions, element quantities, quadrature properties, or other numerical results while new functionality is introduced. They support verification of later code changes, but they do not replace independent analytical verification or physical validation.",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -1747,7 +1879,7 @@
     "section": "S",
     "text": "S\n\nSeparation of concerns\nA software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.\nFurther details: Wikipedia — Separation of concerns.\n\n\nSingle Responsibility Principle\nA design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Single-responsibility principle.",
     "crumbs": [
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
