@@ -39,11 +39,12 @@ the same idealized spring model. Agreement establishes confidence in the
 formulation and implementation for this problem, but it does not validate the
 spring model against physical behavior.
 
-Regression testing asks a different question: does previously verified behavior
-still agree with the established reference after later changes? A passing
-regression test does not prove that every FEM formulation is generally correct.
-A failing test means that protected behavior no longer matches its reference; it
-does not by itself identify the cause or decide which version is correct.
+[Regression testing](../glossary.qmd#gls-regression-test) asks a different
+question: does previously verified behavior still agree with the established
+reference after later changes? A passing regression test does not prove that
+every FEM formulation is generally correct. A failing test means that protected
+behavior no longer matches its reference; it does not by itself identify the
+cause or decide which version is correct.
 
 ## Separating the FEM implementation from the benchmark
 

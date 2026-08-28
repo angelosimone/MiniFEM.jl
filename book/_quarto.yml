@@ -31,6 +31,7 @@ book:
         - chapters/numerical-integration-one-dimension.qmd
         - chapters/standard-and-physical-coordinates.qmd
         - chapters/gauss-quadrature-two-node-bar.qmd
+        - chapters/gauss-legendre-quadrature-implementation.qmd
     - glossary.qmd
     - references.qmd
 

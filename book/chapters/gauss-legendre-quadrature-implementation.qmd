@@ -1,0 +1,564 @@
+# Implementing Gauss--Legendre quadrature for the two-node bar {#sec-gauss-legendre-quadrature-implementation}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S06-shared-fem-assembly`\
+**Target snapshot:** `2026-27/S07-gauss-legendre-quadrature`
+:::
+
+::: {.callout-important}
+## Task: Adapt the verified axial-bar implementation to Gauss--Legendre quadrature
+
+Start from the verified closed-form two-node axial-bar implementation. Adapt
+only the operations that numerical integration changes, while keeping the
+closed-form implementation active as a reference. Then verify that the new
+implementation reproduces the established results.
+:::
+
+In this chapter, you will extend the existing two-node axial-bar implementation
+with a second implementation in which the element integrals are evaluated by
+Gauss--Legendre quadrature. The overall finite element workflow remains the
+same; the new work is concentrated in the evaluation of element quantities and
+in response sampling at Gauss points. You will first verify the quadrature rule
+on simple scalar integrals, then use the same ideas to construct the element
+stiffness matrix and consistent distributed-load vector, and finally integrate
+the numerically evaluated element formulation into the existing four-element
+axial-bar analysis.
+
+## Start from the verified implementation
+
+Before making any changes, run the current regression suite:
+
+```text
+julia test/runtests.jl
+```
+
+All existing tests should pass. If they do not, resolve the problem before
+starting the Gauss--Legendre implementation.
+
+## Plan the adaptation
+
+Before copying and adapting the files, identify the difference in
+responsibility. The following parts remain unchanged:
+
+- the physical benchmark and its model data;
+- mesh and connectivity representation;
+- global matrix and vector initialization;
+- the S06 shared assembly operations and global nodal-force addition;
+- prescribed-displacement treatment and global solution;
+- displacement, reaction, equilibrium, and analytical-verification structure.
+
+The following parts are new or change because the local arrays are evaluated by
+quadrature:
+
+- Gauss--Legendre point-and-weight data;
+- mapping from $\xi_g$ to the physical element and its Jacobian;
+- shape functions and $\mathbf B_g$ at each integration point;
+- stiffness-integrand and consistent-load-integrand evaluation;
+- weighted accumulation into $\mathbf K_e$ and $\mathbf f_e$;
+- selection of the number of Gauss--Legendre integration points; and
+- Gauss-point response sampling in the Gauss--Legendre implementation.
+
+Thus, the new implementation changes only how the element stiffness matrix and
+consistent load vector are evaluated, and how element responses are sampled in
+post-processing:
+
+```text
+element arrays
+closed form:       element data -> K_e and f_e
+Gauss--Legendre:   element data -> pointwise integrands -> K_e and f_e
+
+post-processing
+closed form:       element displacement -> element response
+Gauss--Legendre:   element displacement -> response at Gauss points
+
+```
+
+Once the element stiffness matrix `K_e`, consistent load vector `f_e`, and
+`dof_map` are available, assemble them into the global system using
+`assemble_matrix!` and `assemble_vector!` from S06.
+
+The matching structure is intentional: a diff between the two formulation files
+should show which differences arise from numerical integration rather than from
+unrelated reorganization.
+
+## Extract point-and-weight data
+
+Unlike the axial-bar files, `examples/gauss_legendre_quadrature.jl` is a
+genuinely new S07 file. Create it with this target function:
+
+```julia
+gauss_legendre_rule(num_points)
+```
+
+`num_points` is the requested number of Gauss--Legendre points. The function is
+responsible only for supplying the rule data and returns a vector of
+`(xi_g, w_g)` tuples on $[-1,1]$:
+
+```text
+one point:  (0.0, 2.0)
+two points: (-1 / sqrt(3), 1.0), (1 / sqrt(3), 1.0)
+```
+
+This function stores quadrature-rule data only. It accepts an integer specifying
+the number of Gauss--Legendre points, currently limited to one or two, and
+reports an error for any other value.
+
+## First scalar checks
+
+`examples/gauss_legendre_scalar_integration.jl` is a genuinely new S07 file.
+Create it and collect the scalar integration examples described below in a plain
+function with the target interface `evaluate_scalar_gauss_legendre_examples()`,
+then call it at top level. The function takes no arguments and returns the four
+computed results: the one-point result for the linear polynomial, the one- and
+two-point results for the cubic polynomial, and the mapped two-point result.
+
+Use these examples to make the quadrature process explicit. At every Gauss
+point, identify `xi_g` and `w_g`, evaluate the integrand, form the weighted
+contribution, and accumulate the result with `+=`.
+
+Begin by integrating the linear polynomial
+
+$$
+  2 + 3\xi
+$$
+
+over $[-1,1]$ with the one-point Gauss--Legendre rule. Its exact integral is
+$4$. Because the one-point rule has degree of exactness one, it reproduces this
+result exactly.
+
+Next, integrate the cubic polynomial
+
+$$
+  1 - 2\xi + 3\xi^2 + 4\xi^3
+$$
+
+over $[-1,1]$ and compare the one- and two-point rules. Its exact integral is
+also $4$. The one-point rule is not sufficient because its degree of exactness
+does not include quadratic and cubic terms. The two-point rule has degree of
+exactness three and therefore reproduces the exact integral.
+
+Finally, apply the same quadrature procedure to the physical interval $[0,3]$ by
+integrating $x^2+1$, whose exact integral is $12$. Map each Gauss point from the
+reference interval using
+
+```julia
+J = (b - a) / 2
+x_g = (a + b) / 2 + J * xi_g
+```
+
+The mapping and Jacobian are exact; the numerical approximation enters only
+through the finite weighted sum used for integration. At each quadrature point,
+`x_g` identifies the physical location corresponding to `xi_g` and is therefore
+used to evaluate the mapped integrand.
+
+This same reference-to-physical mapping will be used in the two-node bar
+element. In the present formulation, `E_g` and `A_g` are constant and `q_g` is
+interpolated from its endpoint values, but `x_g` is still computed explicitly.
+Its role becomes essential when material properties, geometry, loading, or
+recovered fields vary with physical position.
+
+::: {.callout-note title="Exact quadrature and floating-point arithmetic"}
+The two-point rule is mathematically exact for the mapped quadratic polynomial,
+but the script may display `12.000000000000002` rather than `12.0`. This is
+ordinary `Float64` roundoff from arithmetic and mapping operations. Exact
+quadrature does not imply bitwise equality in floating-point arithmetic, so the
+regression tests use `isapprox` rather than exact `==` comparison.
+:::
+
+::: {.callout-tip}
+## Exercise --- From a scalar to a vector contribution
+
+Using the one-point Gauss--Legendre rule, evaluate
+
+$$
+  \int_{-1}^{1}
+  \begin{bmatrix}
+  1-\xi\\
+  1+\xi
+  \end{bmatrix}
+  \,d\xi
+  =
+  \begin{bmatrix}
+  2\\
+  2
+  \end{bmatrix}.
+$$
+
+Initialize a two-entry result vector with zeros. Then loop over the Gauss points
+and weights. At each point, evaluate the two functions at `xi_g` and collect
+them in a two-entry vector, for example
+
+```julia
+integrand_value = [
+    1.0 - xi_g,
+    1.0 + xi_g,
+]
+```
+
+Multiply this vector by the Gauss weight to obtain the weighted contribution,
+then accumulate it into the result vector with `+=`.
+
+The structure is therefore the same as in the scalar examples:
+
+```text
+scalar:  integrand value  -> weighted scalar contribution -> scalar result
+vector:  integrand vector -> weighted vector contribution -> vector result
+```
+
+Check that the final vector is `[2.0, 2.0]`.
+
+This is the pattern used later for the consistent element load vector. The
+stiffness matrix follows the same idea, except that the quantity evaluated and
+accumulated at each Gauss point is a matrix rather than a scalar or vector.
+
+The next step is to apply this Gauss--Legendre accumulation pattern to the
+two-node bar, for both the element stiffness matrix and the consistent load
+vector.
+:::
+
+## Adapt local bar-array evaluation
+
+Copy `examples/axial_bar_fem.jl`, rename the copy
+`examples/axial_bar_gauss_legendre_fem.jl`, then replace only the closed-form
+element-evaluation and Gauss-point response-sampling operations. Keep the
+established assembly, nodal-force, prescribed-displacement, global-solve, and
+reaction-recovery operations structurally aligned with the original file. This
+remains a second, explicit two-node axial-bar implementation.
+
+The first target function is:
+
+```julia
+integrate_two_node_bar_gauss_legendre(x_e, E_e, A_e, q_1, q_2, num_gauss_legendre_points)
+```
+
+Here `x_e` contains the two physical endpoint coordinates; `E_e` and `A_e` are
+the element material and cross-sectional data; `q_1` and `q_2` are the endpoint
+distributed-load values; and `num_gauss_legendre_points` selects the rule. The
+function constructs the local stiffness matrix and consistent distributed-load
+vector, returning `K_e, f_e`. Equal `q_1` and `q_2` represent a uniform load;
+unequal values describe a linearly varying load.
+
+Initialize a $2\times2$ matrix `K_e` and a two-entry vector `f_e`. For each
+`(xi_g, w_g)`, map `xi_g` to `x_g`, evaluate `J`, construct $\mathbf N_g$ and
+$\mathbf B_g$, use $E_g=E_e$ and $A_g=A_e$, and interpolate
+$q_g=N_{g,1}q_1+N_{g,2}q_2$. Use explicit local loops to accumulate:
+
+$$
+  K_{e,ij}\mathrel{+}=w_gB_{g,i}E_gA_gB_{g,j}J,
+  \qquad
+  f_{e,i}\mathrel{+}=w_gN_{g,i}q_gJ.
+$$
+
+Use one quadrature loop. At each Gauss--Legendre point:
+
+1. map `xi_g` to the physical element and compute `J`;
+2. evaluate `N_g` and `B_g`;
+3. evaluate the element data needed at that point;
+4. compute the contribution to each entry of `K_e` and add it to the current
+   value;
+5. compute the contribution to each entry of `f_e` and add it to the current
+   value.
+
+Keep these steps explicit in the code:
+
+```julia
+for (xi_g, w_g) in gauss_legendre_rule(num_gauss_legendre_points)
+    # Map xi_g to the physical element and compute J.
+    # Evaluate N_g and B_g.
+    # Evaluate the element data at this point.
+    # Compute and add the contribution to K_e.
+    # Compute and add the contribution to f_e.
+end
+```
+
+The closed-form implementation keeps `bar_stiffness(...)` and
+`bar_distributed_load(...)` as conceptually separate element contributions. In
+the Gauss--Legendre implementation, `integrate_two_node_bar_gauss_legendre(...)`
+constructs both `K_e` and `f_e` inside one quadrature loop because both
+contributions use the same points, weights, affine mapping, and Jacobian. The
+stiffness and consistent distributed-load accumulations remain visibly separate
+within that loop.
+
+Computing both `K_e` and `f_e` in the same quadrature loop does not mean that
+the matrix and vector are the same mathematical object. They remain distinct
+element quantities, but their evaluation follows the same sequence at each Gauss
+point: mapping, evaluation of the required quantities, weighting, and
+accumulation. Keeping these closely related operations together is consistent
+with the [Single Responsibility
+Principle](../glossary.qmd#gls-single-responsibility-principle): one coherent
+responsibility does not have to consist of only one small calculation.
+
+## Check special cases
+
+For constant $E_e$ and $A_e$, one point gives exactly:
+
+$$
+  \mathbf K_e=\frac{E_eA_e}{L_e}\begin{bmatrix}1&-1\\-1&1\end{bmatrix}.
+$$
+
+For uniform $q_e$, one point also gives exactly:
+
+$$
+  \mathbf f_e^q=\frac{q_eL_e}{2}\begin{bmatrix}1\\1\end{bmatrix}.
+$$
+
+Compare quadrature arrays with these closed-form references. For $L_e=3$,
+$q_1=2$, and $q_2=8$, both rules give resultant $15$. One point gives
+$[7.5,7.5]^{\mathsf T}$, but two points give the exact consistent distribution
+$[6,9]^{\mathsf T}$. A correct resultant is not the same as an exact nodal
+distribution.
+
+## Adapt assembly and solution
+
+Next adapt the corresponding closed-form functions. Use these target interfaces:
+
+```julia
+assemble_axial_bar_gauss_legendre!(
+    K,
+    f,
+    node_coordinates,
+    element_connectivity,
+    element_E,
+    element_A,
+    element_q,
+    num_gauss_legendre_points,
+)
+
+solve_axial_bar_gauss_legendre(
+    node_coordinates,
+    element_connectivity,
+    element_E,
+    element_A,
+    element_q,
+    applied_forces,
+    constrained_dofs,
+    prescribed_displacements,
+    num_gauss_legendre_points,
+)
+```
+
+For the assembly function, `K` and `f` are the global stiffness matrix and load
+vector to modify; `node_coordinates` and `element_connectivity` define the mesh;
+`element_E`, `element_A`, and `element_q` provide one value per element; and
+`num_gauss_legendre_points` selects the integration rule. The function modifies
+`K` and `f` in place and therefore does not return a value. Keep the established
+element-data extraction, `dof_map`, and calls to `assemble_matrix!` and
+`assemble_vector!`. Change only the local-array construction: use equal endpoint
+values `q_1 = q_e` and `q_2 = q_e` for the current scalar element load, then
+call the quadrature function.
+
+For the solver, the coordinate, connectivity, and three element-data arguments
+again define the mesh and element properties/load; `applied_forces` contains
+forces already specified at global DOFs; `constrained_dofs` and
+`prescribed_displacements` define the displacement constraints; and
+`num_gauss_legendre_points` selects the integration rule. It performs the
+established partitioned solve and reaction recovery, returning the complete
+displacement vector `u` and the reactions at the constrained DOFs.
+
+## Adapt the executable benchmark
+
+Copy `examples/four_element_axial_bar.jl` and rename the copy
+`examples/four_element_axial_bar_gauss_legendre.jl`. Keep the original
+closed-form driver unchanged so that the two implementations can be compared
+using the same physical benchmark.
+
+In the new driver, change only what is needed for Gauss--Legendre quadrature:
+
+- include `fem_assembly.jl`, `gauss_legendre_quadrature.jl`, and
+  `axial_bar_gauss_legendre_fem.jl`, in this order. This ordering follows the
+  dependencies of the implementation: the axial-bar functions use the shared
+  assembly operations and the Gauss--Legendre rule. Although Julia does not
+  require this particular include order for these function definitions, keeping
+  dependencies before the code that uses them makes the structure easier to read
+  and understand;
+- define the number of Gauss--Legendre points;
+- call `solve_axial_bar_gauss_legendre(...)`; and
+- use Gauss-point response sampling instead of the closed-form response recovery
+  used by the original benchmark.
+
+For the reference four-element benchmark, use
+
+```julia
+num_gauss_legendre_points = 1
+```
+
+and pass this value to the quadrature-based solve and response-recovery
+functions. One Gauss point is sufficient for the constant material and section
+properties and the uniform distributed loading used in this benchmark.
+
+## Recover responses at Gauss points
+
+The Gauss--Legendre implementation uses a separate response-recovery function
+from the closed-form implementation:
+
+```julia
+recover_axial_bar_response_gauss_legendre(
+    node_coordinates,
+    element_connectivity,
+    element_E,
+    element_A,
+    u,
+    num_gauss_legendre_points,
+)
+```
+
+The function receives the mesh, element material and cross-sectional data, the
+computed global displacement vector, and the response-sampling rule. For each
+element and each point from that rule, evaluate `xi_g`, `x_g`, the shape
+functions, `B_g`, and then compute
+
+$$
+  \varepsilon_g=\mathbf B_g\mathbf u_e,
+  \qquad
+  \sigma_g=E_g\varepsilon_g,
+  \qquad
+  N_g=A_g\sigma_g.
+$$
+
+These are response samples at physical Gauss-point locations, not quadrature
+integrals. Do not multiply strain, stress, or axial force by a weight or by the
+Jacobian, and do not accumulate them. The function returns simple element-by-
+Gauss-point arrays for the reference coordinates, physical coordinates, strain,
+stress, and axial force, in that order:
+
+```julia
+gauss_point_reference_coordinates,
+gauss_point_coordinates,
+gauss_point_strain,
+gauss_point_stress,
+gauss_point_axial_force
+```
+
+For this two-node linear bar with constant `E` and `A`, strain, stress, and
+axial force are constant within an element. The finite element response sampled
+at the two Gauss points of a single element therefore has the same value. This,
+however, does not make the finite element response exact at every sampled
+location. In fact, the exact axial force varies linearly within each element
+under the uniform distributed load, so its values at the two physical
+Gauss-point coordinates are generally different. Therefore, evaluating the same
+linear-element response at more points does not increase its interpolation order
+or improve its accuracy.
+
+The one-point benchmark is a special case. Its Gauss--Legendre point has
+`xi = 0`, which maps to the physical midpoint of an affine two-node element. The
+previously established midpoint agreement is therefore recovered when the
+response is sampled at one point. With two sampling points, instead, the finite
+element axial force remains constant within the element, while the exact axial
+force is generally different at the two physical locations.
+
+The concentrated force introduces a separate consideration. Since the force is
+applied at a mesh node, the jump in the exact derivative occurs at the boundary
+between two elements. Each element therefore lies within one smooth branch of
+the exact solution, and its interior Gauss points do not sample across the
+discontinuity. This does not, however, make the finite element derivative exact
+throughout the element.
+
+::: {.callout-tip}
+## Exercise --- Change from one to two Gauss points
+
+The four-element benchmark deliberately uses `num_gauss_legendre_points = 1`:
+one point already integrates the current constant-property stiffness and uniform
+distributed-load contributions exactly. Change only this setting to `2`, adapt
+the output if necessary so that all relevant results are displayed, run the
+benchmark again, and investigate the following questions before drawing
+conclusions.
+
+For element integration and construction:
+
+- Do the global displacement vector and support reaction change?
+- Do the element stiffness matrices change?
+- Do the consistent distributed-load vectors change for the current uniform `q`?
+- What do the polynomial degrees of the present integrands say about the
+  required quadrature order?
+
+For response sampling and post-processing:
+
+- How many response locations now occur in each element?
+- What are their reference coordinates, and where do they map in physical space?
+- Are the two finite element strains, stresses, and axial forces in one element
+  different? Why or why not?
+
+Finally, evaluate the exact axial force at both physical Gauss-point
+coordinates. How do those values compare with the two sampled finite element
+axial forces? Explain what changed by using two points: numerical-integration
+accuracy, the finite element approximation space, the number of response
+sampling locations, or some combination of these. Relate your answer to the
+one-point case, where $\xi_g=0$ maps to the midpoint and gives the previously
+observed midpoint agreement.
+:::
+
+## Verify the Gauss--Legendre implementation
+
+The S07 [regression tests](../glossary.qmd#gls-regression-test) are supplied
+reference material, not a student coding task in this chapter. After completing
+the implementation, study `test/runtests.jl` to see how the expected numerical
+behavior is turned into automated regression checks.
+
+Focus on what each group of tests protects:
+
+- previously accepted MiniFEM results that must remain unchanged;
+- the Gauss--Legendre point-and-weight rules and their expected degree of
+  exactness;
+- mapped scalar integration;
+- agreement with the closed-form element stiffness matrix and consistent load
+  vector where exact reference results are available;
+- the different behavior of one- and two-point quadrature for a linearly varying
+  distributed load;
+- the displacement, support reaction, and Gauss-point response values of the
+  four-element benchmark.
+
+Notice also how the tests use `isapprox` for floating-point comparisons rather
+than requiring bitwise equality.
+
+The four-element regression test deliberately uses different numbers of
+Gauss--Legendre points for element integration and response sampling. The global
+finite element solution is computed with one Gauss point, as in the reference
+benchmark:
+
+```julia
+num_gauss_legendre_points = 1
+```
+
+After the displacement solution has been obtained, the response is sampled
+separately at two Gauss points per element:
+
+```julia
+recover_axial_bar_response_gauss_legendre(..., 2)
+```
+
+The two points used for response sampling do not recompute the global solution.
+They only provide two locations at which the already-computed finite element
+response is evaluated. The tests then verify that strain, stress, and axial
+force have the same finite element value at both locations within each linear
+bar element, even though the exact axial force generally has different values at
+the two corresponding physical coordinates.
+
+This distinction is important: the number of Gauss points used for element
+integration and the number of points used for response sampling need not be the
+same.
+
+The tests are a worked example of regression-test design. They turn analytical
+results and previously verified numerical behavior into automated checks that
+can be rerun after later changes to the code. Regression tests protect accepted
+behavior: they do not replace independent analytical verification or physical
+validation.
+
+Run:
+
+```text
+julia test/runtests.jl
+julia examples/gauss_legendre_scalar_integration.jl
+julia examples/four_element_axial_bar.jl
+julia examples/four_element_axial_bar_gauss_legendre.jl
+```
+
+## Reflection and what comes next
+
+The closed-form and Gauss--Legendre implementations describe the same two-node
+bar element. They differ only in how the element stiffness matrix and consistent
+load vector are evaluated. Keeping both implementations available makes their
+differences easy to compare and prepares for later problems in which closed-form
+integration is no longer practical.

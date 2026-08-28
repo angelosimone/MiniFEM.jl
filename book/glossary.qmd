@@ -244,6 +244,19 @@ place](#gls-modified-in-place).
 Restructuring existing code to improve its organization, readability, or reuse
 while preserving its intended computational behavior.
 
+### Regression test {#gls-regression-test}
+
+An automated test that checks whether previously accepted behavior remains
+unchanged after modifications to the code. A regression test compares current
+results with established reference values or properties so that unintended
+changes can be detected.
+
+In MiniFEM, regression tests may protect previously verified displacements,
+reactions, element quantities, quadrature properties, or other numerical results
+while new functionality is introduced. They support verification of later code
+changes, but they do not replace independent analytical verification or physical
+validation.
+
 ## S
 
 ### Separation of concerns {#gls-separation-of-concerns}
