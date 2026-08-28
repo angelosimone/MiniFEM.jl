@@ -1113,7 +1113,7 @@ Figure&nbsp;11.1: Comparison between the analytical solution and the 4-element F
 <section id="add-focused-regression-coverage" class="level2" data-number="11.11">
 <h2 data-number="11.11" class="anchored" data-anchor-id="add-focused-regression-coverage"><span class="header-section-number">11.11</span> Add focused regression coverage</h2>
 <p>S04 introduced regression tests as a way to preserve the accepted numerical behavior of a verified MiniFEM example. After establishing the axial-bar reference solution independently in this chapter, extend <code>test/runtests.jl</code> with a focused regression test for the new analysis.</p>
-<p>The test should include <code>axial_bar_fem.jl</code> and construct the same canonical mesh, element properties, nodal load, constrained DOFs, and prescribed displacements used by the executable benchmark.</p>
+<p>The test should include <code>axial_bar_fem.jl</code> and construct the same mesh, element properties, nodal load, constrained DOFs, and prescribed displacements used by the executable benchmark.</p>
 <p>Use the regression tests to check two accepted outputs of <code>solve_axial_bar</code>:</p>
 <ul>
 <li>the complete nodal displacement vector <span class="math inline">\(\mathbf u\)</span>;</li>

@@ -1451,7 +1451,25 @@ Figure&nbsp;4.8: Local-to-global mapping for element 1. Local degrees of freedom
 <li>post-process the solution to obtain relevant mechanical quantities;</li>
 <li>verify the numerical results using independent checks.</li>
 </ol>
-<p>The next chapter translates this procedure into Julia code for the two-spring assembly, using the mechanical formulation developed here.</p>
+<p>This procedure supplies the mechanical formulation that can be translated into an explicit computational analysis.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Key points to remember">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Key points to remember
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>The direct stiffness method assembles element stiffness contributions into the global equilibrium system <span class="math inline">\(\mathbf{K}\mathbf{u}=\mathbf{f}\)</span>.</li>
+<li>Connectivity and the local-to-global DOF map determine where each element contribution is scattered into the global matrix and vector.</li>
+<li>Prescribed displacements modify the algebraic system used for the solve; reactions and physical strain energy must be recovered from the original assembled equilibrium relation.</li>
+<li>Independent checks include dimensional consistency, equilibrium, internal spring forces, reactions, and equivalent strain-energy expressions.</li>
+</ul>
+</div>
+</div>
 
 
 </section>

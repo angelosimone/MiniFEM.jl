@@ -350,8 +350,8 @@ window.Quarto = {
   <li><a href="#introducing-test" id="toc-introducing-test" class="nav-link" data-scroll-target="#introducing-test"><span class="header-section-number">8.4</span> Introducing Test</a></li>
   <li><a href="#the-regression-tests" id="toc-the-regression-tests" class="nav-link" data-scroll-target="#the-regression-tests"><span class="header-section-number">8.5</span> The regression tests</a>
   <ul class="collapse">
-  <li><a href="#canonical-regression-case" id="toc-canonical-regression-case" class="nav-link" data-scroll-target="#canonical-regression-case"><span class="header-section-number">8.5.1</span> Canonical regression case</a></li>
-  <li><a href="#noncanonical-regression-case" id="toc-noncanonical-regression-case" class="nav-link" data-scroll-target="#noncanonical-regression-case"><span class="header-section-number">8.5.2</span> Noncanonical regression case</a></li>
+  <li><a href="#reference-regression-case" id="toc-reference-regression-case" class="nav-link" data-scroll-target="#reference-regression-case"><span class="header-section-number">8.5.1</span> Reference regression case</a></li>
+  <li><a href="#additional-regression-case" id="toc-additional-regression-case" class="nav-link" data-scroll-target="#additional-regression-case"><span class="header-section-number">8.5.2</span> Additional regression case</a></li>
   </ul></li>
   <li><a href="#running-the-tests" id="toc-running-the-tests" class="nav-link" data-scroll-target="#running-the-tests"><span class="header-section-number">8.6</span> Running the tests</a></li>
   <li><a href="#what-changed" id="toc-what-changed" class="nav-link" data-scroll-target="#what-changed"><span class="header-section-number">8.7</span> What changed?</a></li>
@@ -408,10 +408,10 @@ window.Quarto = {
 <p>Use Julia’s <code>Test</code> standard library to check that the previously verified two-spring results remain unchanged as the implementation evolves.</p>
 </div>
 </div>
+<p>The callable S03 analysis has already been independently checked against the analytical spring solution. This chapter keeps that verification and adds a small automated suite that protects the accepted behavior through later source changes.</p>
 <section id="starting-point" class="level2" data-number="8.1">
 <h2 data-number="8.1" class="anchored" data-anchor-id="starting-point"><span class="header-section-number">8.1</span> Starting point</h2>
-<p>In <a href="two-springs-callable-analysis.html" class="quarto-xref"><span>Chapter 7</span></a>, the complete two-spring analysis became callable through <code>solve_two_springs</code>. The executable benchmark still presents its final results and compares them with analytical reference values.</p>
-<p>That analytical comparison is a manual verification step. The example is run, the result is inspected, and a judgement is made about whether it agrees with the independent reference. S04 keeps that verification in the executable benchmark and adds automated regression tests alongside it.</p>
+<p>Start from the verified callable analysis in <a href="two-springs-callable-analysis.html" class="quarto-xref"><span>Chapter 7</span></a>. Its executable benchmark remains responsible for the analytical comparison; the new tests check that the established results continue to agree with their stored references after future changes.</p>
 </section>
 <section id="verification-validation-and-regression-testing" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="verification-validation-and-regression-testing"><span class="header-section-number">8.2</span> Verification, validation, and regression testing</h2>
@@ -421,7 +421,7 @@ window.Quarto = {
 </section>
 <section id="separating-the-fem-implementation-from-the-benchmark" class="level2" data-number="8.3">
 <h2 data-number="8.3" class="anchored" data-anchor-id="separating-the-fem-implementation-from-the-benchmark"><span class="header-section-number">8.3</span> Separating the FEM implementation from the benchmark</h2>
-<p>In S03, the reusable finite element functions, <code>solve_two_springs</code>, and the executable canonical benchmark all lived in <code>examples/two_springs.jl</code>. This was appropriate while the file was used only as an executable example.</p>
+<p>In S03, the reusable finite element functions, <code>solve_two_springs</code>, and the executable reference benchmark all lived in <code>examples/two_springs.jl</code>. This was appropriate while the file was used only as an executable example.</p>
 <p>Regression testing creates a new requirement. The tests need to call <code>solve_two_springs</code> without also executing the benchmark presentation and analytical verification contained in <code>two_springs.jl</code>.</p>
 <p>S04 therefore separates the reusable finite element implementation from the executable benchmark:</p>
 <pre class="text"><code>two_springs_fem.jl
@@ -455,7 +455,7 @@ test/runtests.jl
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    atol <span class="op">=</span> <span class="fl">1.0e-12</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    rtol <span class="op">=</span> <span class="fl">1.0e-12</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Canonical two-spring benchmark</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Reference two-spring benchmark</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    k_1 <span class="op">=</span> <span class="fl">1.0</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    k_2 <span class="op">=</span> <span class="fl">2.0</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    applied_force <span class="op">=</span> <span class="fl">10.0</span></span>
@@ -472,7 +472,7 @@ test/runtests.jl
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        rtol<span class="op">=</span>rtol,</span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Noncanonical two-spring benchmark</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Additional two-spring case</span></span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    k_1 <span class="op">=</span> <span class="fl">2.0</span></span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    k_2 <span class="op">=</span> <span class="fl">3.0</span></span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    applied_force <span class="op">=</span> <span class="fl">12.0</span></span>
@@ -489,13 +489,13 @@ test/runtests.jl
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        rtol<span class="op">=</span>rtol,</span>
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<section id="canonical-regression-case" class="level3" data-number="8.5.1">
-<h3 data-number="8.5.1" class="anchored" data-anchor-id="canonical-regression-case"><span class="header-section-number">8.5.1</span> Canonical regression case</h3>
+<section id="reference-regression-case" class="level3" data-number="8.5.1">
+<h3 data-number="8.5.1" class="anchored" data-anchor-id="reference-regression-case"><span class="header-section-number">8.5.1</span> Reference regression case</h3>
 <p>The first case protects the established two-spring benchmark. It tests both the complete displacement vector <code>u</code> and <code>strain_energy_global</code>.</p>
-<p>The displacement-vector test covers the assembled and constrained solution. The strain-energy test additionally covers the preservation and use of <code>K_original</code> before the constraint modification.</p>
+<p>The displacement-vector test covers the assembled and constrained solution. The strain-energy test additionally covers making and using the <code>K_original</code> copy before the constraint modification.</p>
 </section>
-<section id="noncanonical-regression-case" class="level3" data-number="8.5.2">
-<h3 data-number="8.5.2" class="anchored" data-anchor-id="noncanonical-regression-case"><span class="header-section-number">8.5.2</span> Noncanonical regression case</h3>
+<section id="additional-regression-case" class="level3" data-number="8.5.2">
+<h3 data-number="8.5.2" class="anchored" data-anchor-id="additional-regression-case"><span class="header-section-number">8.5.2</span> Additional regression case</h3>
 <p>The second case calls:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_two_springs</span>(<span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">12.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Before using its results as regression references, establish them independently from the analytical two-spring solution. With <span class="math inline">\(F=12\ \mathrm{N}\)</span>, <span class="math inline">\(k_1=2\ \mathrm{N/mm}\)</span>, and <span class="math inline">\(k_2=3\ \mathrm{N/mm}\)</span>,</p>
@@ -521,7 +521,7 @@ test/runtests.jl
   U=\frac{F^2}{2}\left(\frac{1}{k_1}+\frac{1}{k_2}\right)
    =60\ \mathrm{N\,mm}.
 \]</span></p>
-<p>These independently established values are stored in the test file as the expected regression references. The case then checks that the callable analysis works for physical inputs other than the historical canonical benchmark.</p>
+<p>These independently established values are stored in the test file as the expected regression references. The case then checks that the callable analysis works for physical inputs other than the original reference benchmark.</p>
 </section>
 </section>
 <section id="running-the-tests" class="level2" data-number="8.6">

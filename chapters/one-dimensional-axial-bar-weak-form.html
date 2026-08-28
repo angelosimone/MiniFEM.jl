@@ -851,6 +851,24 @@ Figure&nbsp;9.3: Bimaterial axial bar with <span class="math inline">\(q=0\)</sp
 <p>This is a Galerkin approximation. In the standard displacement-based finite element method used here, the trial and test functions are constructed from the same finite-dimensional family of basis functions, after accounting for the essential boundary conditions. This choice is known as the <strong>Bubnov–Galerkin method</strong>.</p>
 <p>Other formulations may use different approximation spaces for the trial and test functions; these are generally referred to as <strong>Petrov–Galerkin methods</strong>.</p>
 <p>The remaining question is how those finite-dimensional spaces should be constructed so that the weak problem becomes a computable finite element model.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Key points to remember">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Key points to remember
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>The strong form combines axial equilibrium, the constitutive relation, and essential and natural boundary conditions.</li>
+<li>The weak form is obtained by weighting the residual and integrating by parts, which lowers the regularity required of the displacement field.</li>
+<li>Essential boundary conditions define the admissible trial and test spaces; natural boundary conditions enter the load functional.</li>
+<li>A Galerkin finite element approximation replaces the infinite-dimensional trial and test spaces by finite-dimensional subspaces, typically with continuous piecewise-polynomial displacement fields.</li>
+</ul>
+</div>
+</div>
 
 
 </section>

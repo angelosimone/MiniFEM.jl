@@ -344,36 +344,35 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#purpose-of-the-example" id="toc-purpose-of-the-example" class="nav-link active" data-scroll-target="#purpose-of-the-example"><span class="header-section-number">5.1</span> Purpose of the example</a></li>
-  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link" data-scroll-target="#learning-objectives"><span class="header-section-number">5.2</span> Learning objectives</a></li>
-  <li><a href="#running-the-example" id="toc-running-the-example" class="nav-link" data-scroll-target="#running-the-example"><span class="header-section-number">5.3</span> Running the example</a></li>
-  <li><a href="#mathematical-specification-used-by-the-script" id="toc-mathematical-specification-used-by-the-script" class="nav-link" data-scroll-target="#mathematical-specification-used-by-the-script"><span class="header-section-number">5.4</span> Mathematical specification used by the script</a></li>
-  <li><a href="#from-mathematical-objects-to-julia-data" id="toc-from-mathematical-objects-to-julia-data" class="nav-link" data-scroll-target="#from-mathematical-objects-to-julia-data"><span class="header-section-number">5.5</span> From mathematical objects to Julia data</a></li>
-  <li><a href="#pseudocode-summary-of-the-finite-element-procedure" id="toc-pseudocode-summary-of-the-finite-element-procedure" class="nav-link" data-scroll-target="#pseudocode-summary-of-the-finite-element-procedure"><span class="header-section-number">5.6</span> Pseudocode summary of the finite element procedure</a></li>
-  <li><a href="#walkthrough-of-the-julia-script" id="toc-walkthrough-of-the-julia-script" class="nav-link" data-scroll-target="#walkthrough-of-the-julia-script"><span class="header-section-number">5.7</span> Walkthrough of the Julia script</a>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">5.1</span> Learning objectives</a></li>
+  <li><a href="#running-the-example" id="toc-running-the-example" class="nav-link" data-scroll-target="#running-the-example"><span class="header-section-number">5.2</span> Running the example</a></li>
+  <li><a href="#mathematical-specification-used-by-the-script" id="toc-mathematical-specification-used-by-the-script" class="nav-link" data-scroll-target="#mathematical-specification-used-by-the-script"><span class="header-section-number">5.3</span> Mathematical specification used by the script</a></li>
+  <li><a href="#from-mathematical-objects-to-julia-data" id="toc-from-mathematical-objects-to-julia-data" class="nav-link" data-scroll-target="#from-mathematical-objects-to-julia-data"><span class="header-section-number">5.4</span> From mathematical objects to Julia data</a></li>
+  <li><a href="#pseudocode-summary-of-the-finite-element-procedure" id="toc-pseudocode-summary-of-the-finite-element-procedure" class="nav-link" data-scroll-target="#pseudocode-summary-of-the-finite-element-procedure"><span class="header-section-number">5.5</span> Pseudocode summary of the finite element procedure</a></li>
+  <li><a href="#walkthrough-of-the-julia-script" id="toc-walkthrough-of-the-julia-script" class="nav-link" data-scroll-target="#walkthrough-of-the-julia-script"><span class="header-section-number">5.6</span> Walkthrough of the Julia script</a>
   <ul class="collapse">
-  <li><a href="#model-dimensions-and-input-data" id="toc-model-dimensions-and-input-data" class="nav-link" data-scroll-target="#model-dimensions-and-input-data"><span class="header-section-number">5.7.1</span> Model dimensions and input data</a></li>
-  <li><a href="#global-arrays" id="toc-global-arrays" class="nav-link" data-scroll-target="#global-arrays"><span class="header-section-number">5.7.2</span> Global arrays</a></li>
-  <li><a href="#element-loop" id="toc-element-loop" class="nav-link" data-scroll-target="#element-loop"><span class="header-section-number">5.7.3</span> Element loop</a></li>
-  <li><a href="#constructing-the-element-matrix" id="toc-constructing-the-element-matrix" class="nav-link" data-scroll-target="#constructing-the-element-matrix"><span class="header-section-number">5.7.4</span> Constructing the element matrix</a></li>
-  <li><a href="#building-the-local-to-global-map" id="toc-building-the-local-to-global-map" class="nav-link" data-scroll-target="#building-the-local-to-global-map"><span class="header-section-number">5.7.5</span> Building the local-to-global map</a></li>
-  <li><a href="#assembling-the-global-stiffness-matrix" id="toc-assembling-the-global-stiffness-matrix" class="nav-link" data-scroll-target="#assembling-the-global-stiffness-matrix"><span class="header-section-number">5.7.6</span> Assembling the global stiffness matrix</a></li>
-  <li><a href="#preserving-the-assembled-matrix" id="toc-preserving-the-assembled-matrix" class="nav-link" data-scroll-target="#preserving-the-assembled-matrix"><span class="header-section-number">5.7.7</span> Preserving the assembled matrix</a></li>
-  <li><a href="#assembling-the-applied-force" id="toc-assembling-the-applied-force" class="nav-link" data-scroll-target="#assembling-the-applied-force"><span class="header-section-number">5.7.8</span> Assembling the applied force</a></li>
-  <li><a href="#imposing-the-homogeneous-displacement-constraint" id="toc-imposing-the-homogeneous-displacement-constraint" class="nav-link" data-scroll-target="#imposing-the-homogeneous-displacement-constraint"><span class="header-section-number">5.7.9</span> Imposing the homogeneous displacement constraint</a></li>
-  <li><a href="#solving-the-linear-system" id="toc-solving-the-linear-system" class="nav-link" data-scroll-target="#solving-the-linear-system"><span class="header-section-number">5.7.10</span> Solving the linear system</a></li>
-  <li><a href="#comparing-displacement-results" id="toc-comparing-displacement-results" class="nav-link" data-scroll-target="#comparing-displacement-results"><span class="header-section-number">5.7.11</span> Comparing displacement results</a></li>
-  <li><a href="#computing-the-internal-strain-energy" id="toc-computing-the-internal-strain-energy" class="nav-link" data-scroll-target="#computing-the-internal-strain-energy"><span class="header-section-number">5.7.12</span> Computing the internal strain energy</a></li>
+  <li><a href="#model-dimensions-and-input-data" id="toc-model-dimensions-and-input-data" class="nav-link" data-scroll-target="#model-dimensions-and-input-data"><span class="header-section-number">5.6.1</span> Model dimensions and input data</a></li>
+  <li><a href="#global-arrays" id="toc-global-arrays" class="nav-link" data-scroll-target="#global-arrays"><span class="header-section-number">5.6.2</span> Global arrays</a></li>
+  <li><a href="#element-loop" id="toc-element-loop" class="nav-link" data-scroll-target="#element-loop"><span class="header-section-number">5.6.3</span> Element loop</a></li>
+  <li><a href="#constructing-the-element-matrix" id="toc-constructing-the-element-matrix" class="nav-link" data-scroll-target="#constructing-the-element-matrix"><span class="header-section-number">5.6.4</span> Constructing the element matrix</a></li>
+  <li><a href="#building-the-local-to-global-map" id="toc-building-the-local-to-global-map" class="nav-link" data-scroll-target="#building-the-local-to-global-map"><span class="header-section-number">5.6.5</span> Building the local-to-global map</a></li>
+  <li><a href="#assembling-the-global-stiffness-matrix" id="toc-assembling-the-global-stiffness-matrix" class="nav-link" data-scroll-target="#assembling-the-global-stiffness-matrix"><span class="header-section-number">5.6.6</span> Assembling the global stiffness matrix</a></li>
+  <li><a href="#keeping-a-copy-of-the-assembled-matrix" id="toc-keeping-a-copy-of-the-assembled-matrix" class="nav-link" data-scroll-target="#keeping-a-copy-of-the-assembled-matrix"><span class="header-section-number">5.6.7</span> Keeping a copy of the assembled matrix</a></li>
+  <li><a href="#assembling-the-applied-force" id="toc-assembling-the-applied-force" class="nav-link" data-scroll-target="#assembling-the-applied-force"><span class="header-section-number">5.6.8</span> Assembling the applied force</a></li>
+  <li><a href="#imposing-the-homogeneous-displacement-constraint" id="toc-imposing-the-homogeneous-displacement-constraint" class="nav-link" data-scroll-target="#imposing-the-homogeneous-displacement-constraint"><span class="header-section-number">5.6.9</span> Imposing the homogeneous displacement constraint</a></li>
+  <li><a href="#solving-the-linear-system" id="toc-solving-the-linear-system" class="nav-link" data-scroll-target="#solving-the-linear-system"><span class="header-section-number">5.6.10</span> Solving the linear system</a></li>
+  <li><a href="#comparing-displacement-results" id="toc-comparing-displacement-results" class="nav-link" data-scroll-target="#comparing-displacement-results"><span class="header-section-number">5.6.11</span> Comparing displacement results</a></li>
+  <li><a href="#computing-the-internal-strain-energy" id="toc-computing-the-internal-strain-energy" class="nav-link" data-scroll-target="#computing-the-internal-strain-energy"><span class="header-section-number">5.6.12</span> Computing the internal strain energy</a></li>
   </ul></li>
-  <li><a href="#verification" id="toc-verification" class="nav-link" data-scroll-target="#verification"><span class="header-section-number">5.8</span> Verification</a>
+  <li><a href="#verification" id="toc-verification" class="nav-link" data-scroll-target="#verification"><span class="header-section-number">5.7</span> Verification</a>
   <ul class="collapse">
-  <li><a href="#assembled-stiffness-matrix" id="toc-assembled-stiffness-matrix" class="nav-link" data-scroll-target="#assembled-stiffness-matrix"><span class="header-section-number">5.8.1</span> Assembled stiffness matrix</a></li>
-  <li><a href="#displacements" id="toc-displacements" class="nav-link" data-scroll-target="#displacements"><span class="header-section-number">5.8.2</span> Displacements</a></li>
-  <li><a href="#element-elongations-and-spring-forces" id="toc-element-elongations-and-spring-forces" class="nav-link" data-scroll-target="#element-elongations-and-spring-forces"><span class="header-section-number">5.8.3</span> Element elongations and spring forces</a></li>
-  <li><a href="#internal-strain-energy" id="toc-internal-strain-energy" class="nav-link" data-scroll-target="#internal-strain-energy"><span class="header-section-number">5.8.4</span> Internal strain energy</a></li>
+  <li><a href="#assembled-stiffness-matrix" id="toc-assembled-stiffness-matrix" class="nav-link" data-scroll-target="#assembled-stiffness-matrix"><span class="header-section-number">5.7.1</span> Assembled stiffness matrix</a></li>
+  <li><a href="#displacements" id="toc-displacements" class="nav-link" data-scroll-target="#displacements"><span class="header-section-number">5.7.2</span> Displacements</a></li>
+  <li><a href="#element-elongations-and-spring-forces" id="toc-element-elongations-and-spring-forces" class="nav-link" data-scroll-target="#element-elongations-and-spring-forces"><span class="header-section-number">5.7.3</span> Element elongations and spring forces</a></li>
+  <li><a href="#internal-strain-energy" id="toc-internal-strain-energy" class="nav-link" data-scroll-target="#internal-strain-energy"><span class="header-section-number">5.7.4</span> Internal strain energy</a></li>
   </ul></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5.9</span> Exercises</a></li>
-  <li><a href="#what-comes-next" id="toc-what-comes-next" class="nav-link" data-scroll-target="#what-comes-next"><span class="header-section-number">5.10</span> What comes next</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5.8</span> Exercises</a></li>
+  <li><a href="#what-comes-next" id="toc-what-comes-next" class="nav-link" data-scroll-target="#what-comes-next"><span class="header-section-number">5.9</span> What comes next</a></li>
   </ul>
 </nav>
     </div>
@@ -414,14 +413,11 @@ window.Quarto = {
 <p>This is the initial code snapshot. There is no preceding snapshot.</p>
 </div>
 </div>
-<section id="purpose-of-the-example" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="purpose-of-the-example"><span class="header-section-number">5.1</span> Purpose of the example</h2>
 <p>This chapter accompanies <code>two_springs.jl</code>, the first pure-Julia MiniFEM example, which applies the direct stiffness method to the two-spring system shown in <a href="two-springs-direct-stiffness.html#fig-carts-springs" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>.</p>
 <p>The mechanical formulation, hand assembly, and analytical solution were derived in <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>. In this chapter, the mathematical objects and finite element operations are mapped to their corresponding Julia representations.</p>
-<p>The script is intentionally written as a top-level, dependency-free program. Every finite element operation remains visible, and only the basic Julia constructs introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a> are used. The implementation favours explicit, <a href="../glossary.html#gls-imperative-programming">imperative logic</a> over compact syntax or custom abstractions, so that the program can be read in the same order as the hand calculation.</p>
-</section>
-<section id="learning-objectives" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">5.2</span> Learning objectives</h2>
+<p>The script is intentionally written as a top-level, dependency-free program. Every finite element operation remains visible, and only the basic Julia constructs introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a> are used. The implementation favors explicit, <a href="../glossary.html#gls-imperative-programming">imperative logic</a> over compact syntax or custom abstractions, so that the program can be read in the same order as the hand calculation.</p>
+<section id="learning-objectives" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">5.1</span> Learning objectives</h2>
 <p>After completing this chapter, you should be able to:</p>
 <ul>
 <li>relate the mathematical formulation of the two-spring problem to its Julia implementation;</li>
@@ -430,13 +426,13 @@ window.Quarto = {
 <li>verify the numerical results against independently derived reference values.</li>
 </ul>
 </section>
-<section id="running-the-example" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="running-the-example"><span class="header-section-number">5.3</span> Running the example</h2>
+<section id="running-the-example" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="running-the-example"><span class="header-section-number">5.2</span> Running the example</h2>
 <p>Run the example from the directory containing the file:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">julia</span> two_springs.jl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="mathematical-specification-used-by-the-script" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="mathematical-specification-used-by-the-script"><span class="header-section-number">5.4</span> Mathematical specification used by the script</h2>
+<section id="mathematical-specification-used-by-the-script" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="mathematical-specification-used-by-the-script"><span class="header-section-number">5.3</span> Mathematical specification used by the script</h2>
 <p>The code implements the formulation derived in <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>. The mathematical information required by the script is summarized below.</p>
 <p>For every spring element,</p>
 <p><span class="math display">\[
@@ -458,7 +454,7 @@ window.Quarto = {
 <p><span class="math display">\[
   \mathbf{K}\mathbf{u}=\mathbf{f}.
 \]</span></p>
-<p>Here, <code>K</code> and <code>f</code> denote the modified algebraic system used by the solver. The original assembled stiffness matrix is preserved as <code>K_original</code>, so that physical quantities such as the support reaction and strain energy can be later recovered from the unmodified system.</p>
+<p>Here, <code>K</code> and <code>f</code> denote the modified algebraic system used by the solver. A copy of the original assembled stiffness matrix is stored as <code>K_original</code>, so that physical quantities such as the support reaction and strain energy can be later recovered from the unmodified system.</p>
 <p>For the present model,</p>
 <p><span class="math display">\[
   k_1=1\ \mathrm{N/mm},
@@ -487,8 +483,8 @@ window.Quarto = {
   U_{\mathrm{reference}}=75\ \mathrm{N\,mm}.
 \]</span></p>
 </section>
-<section id="from-mathematical-objects-to-julia-data" class="level2" data-number="5.5">
-<h2 data-number="5.5" class="anchored" data-anchor-id="from-mathematical-objects-to-julia-data"><span class="header-section-number">5.5</span> From mathematical objects to Julia data</h2>
+<section id="from-mathematical-objects-to-julia-data" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="from-mathematical-objects-to-julia-data"><span class="header-section-number">5.4</span> From mathematical objects to Julia data</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 42%">
@@ -561,8 +557,8 @@ window.Quarto = {
 </table>
 <p>Nodal coordinates are not stored in this first implementation because the spring stiffnesses are supplied directly and the coordinates are not required for the numerical calculation. They remain useful for describing and plotting the physical model and will be introduced when later element formulations require geometric information.</p>
 </section>
-<section id="pseudocode-summary-of-the-finite-element-procedure" class="level2" data-number="5.6">
-<h2 data-number="5.6" class="anchored" data-anchor-id="pseudocode-summary-of-the-finite-element-procedure"><span class="header-section-number">5.6</span> Pseudocode summary of the finite element procedure</h2>
+<section id="pseudocode-summary-of-the-finite-element-procedure" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="pseudocode-summary-of-the-finite-element-procedure"><span class="header-section-number">5.5</span> Pseudocode summary of the finite element procedure</h2>
 <p>The program follows three main stages: pre-processing, processing, and post-processing. The processing stage is further divided into assembly, application of the boundary conditions, and solution.</p>
 <pre class="pseudocode"><code>1. Pre-processing: Input Data
    - Define the number of nodes and displacement degrees of freedom per node
@@ -602,11 +598,11 @@ window.Quarto = {
    - Compute the analytical strain energy
    - Compare the numerical and analytical energy values</code></pre>
 </section>
-<section id="walkthrough-of-the-julia-script" class="level2" data-number="5.7">
-<h2 data-number="5.7" class="anchored" data-anchor-id="walkthrough-of-the-julia-script"><span class="header-section-number">5.7</span> Walkthrough of the Julia script</h2>
+<section id="walkthrough-of-the-julia-script" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="walkthrough-of-the-julia-script"><span class="header-section-number">5.6</span> Walkthrough of the Julia script</h2>
 <p>The Julia language features used below were introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>. In this walkthrough we identify the finite element meaning of each data structure and computational step.</p>
-<section id="model-dimensions-and-input-data" class="level3" data-number="5.7.1">
-<h3 data-number="5.7.1" class="anchored" data-anchor-id="model-dimensions-and-input-data"><span class="header-section-number">5.7.1</span> Model dimensions and input data</h3>
+<section id="model-dimensions-and-input-data" class="level3" data-number="5.6.1">
+<h3 data-number="5.6.1" class="anchored" data-anchor-id="model-dimensions-and-input-data"><span class="header-section-number">5.6.1</span> Model dimensions and input data</h3>
 <p>The model dimensions are</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>num_nodes <span class="op">=</span> <span class="fl">3</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dofs_per_node <span class="op">=</span> <span class="fl">1</span></span>
@@ -700,15 +696,15 @@ u[3] = displacement of the internal node</code></pre>
 </div>
 </div>
 </section>
-<section id="global-arrays" class="level3" data-number="5.7.2">
-<h3 data-number="5.7.2" class="anchored" data-anchor-id="global-arrays"><span class="header-section-number">5.7.2</span> Global arrays</h3>
+<section id="global-arrays" class="level3" data-number="5.6.2">
+<h3 data-number="5.6.2" class="anchored" data-anchor-id="global-arrays"><span class="header-section-number">5.6.2</span> Global arrays</h3>
 <p>The global stiffness matrix and force vector are initialized as zero-filled arrays:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="fu">zeros</span>(total_dofs, total_dofs)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">zeros</span>(total_dofs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For this problem, <code>K</code> is a <code>3 x 3</code> matrix and <code>f</code> is a vector with three entries. They begin at zero because element stiffness contributions and applied nodal forces will be accumulated into them.</p>
 </section>
-<section id="element-loop" class="level3" data-number="5.7.3">
-<h3 data-number="5.7.3" class="anchored" data-anchor-id="element-loop"><span class="header-section-number">5.7.3</span> Element loop</h3>
+<section id="element-loop" class="level3" data-number="5.6.3">
+<h3 data-number="5.6.3" class="anchored" data-anchor-id="element-loop"><span class="header-section-number">5.6.3</span> Element loop</h3>
 <p>The assembly stage visits each spring element in turn. The computational part of the element loop is</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="cn">e</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>num_elements</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    k_e <span class="op">=</span> element_stiffness[<span class="cn">e</span>]</span>
@@ -729,8 +725,8 @@ u[3] = displacement of the internal node</code></pre>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For each element, the script retrieves its stiffness, constructs its element stiffness matrix, builds the local-to-global degree-of-freedom map, and adds the element contribution to the global stiffness matrix. One iteration of this loop therefore performs the element-level operations required by the direct stiffness procedure.</p>
 </section>
-<section id="constructing-the-element-matrix" class="level3" data-number="5.7.4">
-<h3 data-number="5.7.4" class="anchored" data-anchor-id="constructing-the-element-matrix"><span class="header-section-number">5.7.4</span> Constructing the element matrix</h3>
+<section id="constructing-the-element-matrix" class="level3" data-number="5.6.4">
+<h3 data-number="5.6.4" class="anchored" data-anchor-id="constructing-the-element-matrix"><span class="header-section-number">5.6.4</span> Constructing the element matrix</h3>
 <p>For the current element, the stiffness value is retrieved with</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>k_e <span class="op">=</span> element_stiffness[<span class="cn">e</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>and the mathematical element matrix</p>
@@ -748,8 +744,8 @@ u[3] = displacement of the internal node</code></pre>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>K_e</code> contains the stiffness matrix of the current element and must not be confused with the assembled global matrix <code>K</code>.</p>
 </section>
-<section id="building-the-local-to-global-map" class="level3" data-number="5.7.5">
-<h3 data-number="5.7.5" class="anchored" data-anchor-id="building-the-local-to-global-map"><span class="header-section-number">5.7.5</span> Building the local-to-global map</h3>
+<section id="building-the-local-to-global-map" class="level3" data-number="5.6.5">
+<h3 data-number="5.6.5" class="anchored" data-anchor-id="building-the-local-to-global-map"><span class="header-section-number">5.6.5</span> Building the local-to-global map</h3>
 <p>For element <code>e</code>, the global degrees of freedom are read from the connectivity matrix:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dof_map <span class="op">=</span> [element_connectivity[<span class="cn">e</span>, <span class="fl">1</span>], element_connectivity[<span class="cn">e</span>, <span class="fl">2</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The resulting maps are</p>
@@ -758,8 +754,8 @@ element 2: dof_map = [3, 1]</code></pre>
 <p>Because the model has one degree of freedom per node, the connected node numbers are also the global degree-of-freedom numbers. This equivalence will no longer hold automatically when several degrees of freedom are attached to each node.</p>
 <p>The two entries of <code>dof_map</code> correspond, in order, to local degrees of freedom 1 and 2. The map therefore identifies the global rows and columns into which the entries of <code>K_e</code> are assembled.</p>
 </section>
-<section id="assembling-the-global-stiffness-matrix" class="level3" data-number="5.7.6">
-<h3 data-number="5.7.6" class="anchored" data-anchor-id="assembling-the-global-stiffness-matrix"><span class="header-section-number">5.7.6</span> Assembling the global stiffness matrix</h3>
+<section id="assembling-the-global-stiffness-matrix" class="level3" data-number="5.6.6">
+<h3 data-number="5.6.6" class="anchored" data-anchor-id="assembling-the-global-stiffness-matrix"><span class="header-section-number">5.6.6</span> Assembling the global stiffness matrix</h3>
 <p>The element matrix must be transferred from its local ordering to the global matrix ordering. Suppose that the local degrees of freedom <span class="math inline">\(\{1,2\}\)</span> correspond to the global degrees of freedom <span class="math inline">\(\{2,3\}\)</span>:</p>
 <pre class="text"><code>local degree of freedom:   1   2
 global degree of freedom:  2   3</code></pre>
@@ -832,15 +828,15 @@ global degree of freedom:  2   3</code></pre>
 </div>
 </div>
 </section>
-<section id="preserving-the-assembled-matrix" class="level3" data-number="5.7.7">
-<h3 data-number="5.7.7" class="anchored" data-anchor-id="preserving-the-assembled-matrix"><span class="header-section-number">5.7.7</span> Preserving the assembled matrix</h3>
-<p>Before the displacement condition modifies the global matrix, the script preserves the assembled physical stiffness matrix:</p>
+<section id="keeping-a-copy-of-the-assembled-matrix" class="level3" data-number="5.6.7">
+<h3 data-number="5.6.7" class="anchored" data-anchor-id="keeping-a-copy-of-the-assembled-matrix"><span class="header-section-number">5.6.7</span> Keeping a copy of the assembled matrix</h3>
+<p>Before the displacement condition modifies the global matrix, the script keeps a copy of the assembled physical stiffness matrix for the strain-energy calculation:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>K_original <span class="op">=</span> <span class="fu">copy</span>(K)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This distinction is important mechanically. <code>K_original</code> represents the assembled stiffness matrix before the displacement constraint is imposed, whereas <code>K</code> will subsequently be modified into the algebraic system matrix used by the solver. The original matrix is required for the strain-energy computation and can also be used to recover reactions.</p>
+<p>This distinction is important mechanically. <code>K_original</code> is a copy of the assembled stiffness matrix before the displacement constraint is imposed, whereas <code>K</code> will subsequently be modified into the algebraic system matrix used by the solver. The copied matrix is required for the strain-energy computation and can also be used to recover reactions.</p>
 <p>The Julia semantics of <code>copy</code> were introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>; here its purpose is to keep the original physical operator available after <code>K</code> is modified.</p>
 </section>
-<section id="assembling-the-applied-force" class="level3" data-number="5.7.8">
-<h3 data-number="5.7.8" class="anchored" data-anchor-id="assembling-the-applied-force"><span class="header-section-number">5.7.8</span> Assembling the applied force</h3>
+<section id="assembling-the-applied-force" class="level3" data-number="5.6.8">
+<h3 data-number="5.6.8" class="anchored" data-anchor-id="assembling-the-applied-force"><span class="header-section-number">5.6.8</span> Assembling the applied force</h3>
 <p>The applied nodal-force data are transferred into the global vector with</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dof, value) <span class="kw">in</span> applied_forces</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    f[dof] <span class="op">+=</span> value</span>
@@ -855,8 +851,8 @@ global degree of freedom:  2   3</code></pre>
 \]</span></p>
 <p>The support reaction is not entered as an applied load because it is unknown. It can be recovered after the displacement solution from the original equilibrium equations.</p>
 </section>
-<section id="imposing-the-homogeneous-displacement-constraint" class="level3" data-number="5.7.9">
-<h3 data-number="5.7.9" class="anchored" data-anchor-id="imposing-the-homogeneous-displacement-constraint"><span class="header-section-number">5.7.9</span> Imposing the homogeneous displacement constraint</h3>
+<section id="imposing-the-homogeneous-displacement-constraint" class="level3" data-number="5.6.9">
+<h3 data-number="5.6.9" class="anchored" data-anchor-id="imposing-the-homogeneous-displacement-constraint"><span class="header-section-number">5.6.9</span> Imposing the homogeneous displacement constraint</h3>
 <p>The zero displacement at degree of freedom 2 is imposed with</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> dof <span class="kw">in</span> constrained_dofs</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>total_dofs</span>
@@ -898,8 +894,8 @@ global degree of freedom:  2   3</code></pre>
 </div>
 </div>
 </section>
-<section id="solving-the-linear-system" class="level3" data-number="5.7.10">
-<h3 data-number="5.7.10" class="anchored" data-anchor-id="solving-the-linear-system"><span class="header-section-number">5.7.10</span> Solving the linear system</h3>
+<section id="solving-the-linear-system" class="level3" data-number="5.6.10">
+<h3 data-number="5.6.10" class="anchored" data-anchor-id="solving-the-linear-system"><span class="header-section-number">5.6.10</span> Solving the linear system</h3>
 <p>The modified system is solved with</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> K <span class="op">\</span> f</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>which computes the solution of</p>
@@ -908,14 +904,14 @@ global degree of freedom:  2   3</code></pre>
 \]</span></p>
 <p>The backslash operator was introduced in <a href="julia-essentials.html" class="quarto-xref"><span>Chapter 2</span></a>. Its finite element role here is simply to solve the constrained global equilibrium system for the unknown nodal displacements.</p>
 </section>
-<section id="comparing-displacement-results" class="level3" data-number="5.7.11">
-<h3 data-number="5.7.11" class="anchored" data-anchor-id="comparing-displacement-results"><span class="header-section-number">5.7.11</span> Comparing displacement results</h3>
+<section id="comparing-displacement-results" class="level3" data-number="5.6.11">
+<h3 data-number="5.6.11" class="anchored" data-anchor-id="comparing-displacement-results"><span class="header-section-number">5.6.11</span> Comparing displacement results</h3>
 <p>The reference displacement vector is stored in global order:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>u_analytical <span class="op">=</span> [<span class="fl">15.0</span>, <span class="fl">0.0</span>, <span class="fl">10.0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>and is displayed alongside the numerical solution for comparison.</p>
 </section>
-<section id="computing-the-internal-strain-energy" class="level3" data-number="5.7.12">
-<h3 data-number="5.7.12" class="anchored" data-anchor-id="computing-the-internal-strain-energy"><span class="header-section-number">5.7.12</span> Computing the internal strain energy</h3>
+<section id="computing-the-internal-strain-energy" class="level3" data-number="5.6.12">
+<h3 data-number="5.6.12" class="anchored" data-anchor-id="computing-the-internal-strain-energy"><span class="header-section-number">5.6.12</span> Computing the internal strain energy</h3>
 <p>The numerical internal strain energy is computed with the original assembled matrix:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>strain_energy_global <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fu">transpose</span>(u) <span class="op">*</span> K_original <span class="op">*</span> u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This is the Julia representation of</p>
@@ -930,11 +926,11 @@ global degree of freedom:  2   3</code></pre>
 <p>The derivation of this expression is given in <a href="two-springs-direct-stiffness.html" class="quarto-xref"><span>Chapter 4</span></a>. The important point here is that the numerical energy uses the original assembled stiffness matrix, not the matrix after the displacement constraint has been inserted.</p>
 </section>
 </section>
-<section id="verification" class="level2" data-number="5.8">
-<h2 data-number="5.8" class="anchored" data-anchor-id="verification"><span class="header-section-number">5.8</span> Verification</h2>
+<section id="verification" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="verification"><span class="header-section-number">5.7</span> Verification</h2>
 <p>A program result should not be accepted merely because the script runs. The present example provides several checks against quantities already derived independently.</p>
-<section id="assembled-stiffness-matrix" class="level3" data-number="5.8.1">
-<h3 data-number="5.8.1" class="anchored" data-anchor-id="assembled-stiffness-matrix"><span class="header-section-number">5.8.1</span> Assembled stiffness matrix</h3>
+<section id="assembled-stiffness-matrix" class="level3" data-number="5.7.1">
+<h3 data-number="5.7.1" class="anchored" data-anchor-id="assembled-stiffness-matrix"><span class="header-section-number">5.7.1</span> Assembled stiffness matrix</h3>
 <p>Before boundary conditions, the expected global matrix is</p>
 <p><span class="math display">\[
   \mathbf{K}_{\mathrm{expected}}=
@@ -947,8 +943,8 @@ global degree of freedom:  2   3</code></pre>
 \]</span></p>
 <p>The matrix should be symmetric, and each row should sum to zero before displacement constraints are imposed, reflecting the rigid-translation mode of the unconstrained assembly.</p>
 </section>
-<section id="displacements" class="level3" data-number="5.8.2">
-<h3 data-number="5.8.2" class="anchored" data-anchor-id="displacements"><span class="header-section-number">5.8.2</span> Displacements</h3>
+<section id="displacements" class="level3" data-number="5.7.2">
+<h3 data-number="5.7.2" class="anchored" data-anchor-id="displacements"><span class="header-section-number">5.7.2</span> Displacements</h3>
 <p>The numerical solution should be</p>
 <p><span class="math display">\[
   \mathbf{u}=
@@ -959,8 +955,8 @@ global degree of freedom:  2   3</code></pre>
 \]</span></p>
 <p>Remember that the entries are in global numerical order. The rightmost node is the first entry, the fixed left node is the second, and the internal node is the third.</p>
 </section>
-<section id="element-elongations-and-spring-forces" class="level3" data-number="5.8.3">
-<h3 data-number="5.8.3" class="anchored" data-anchor-id="element-elongations-and-spring-forces"><span class="header-section-number">5.8.3</span> Element elongations and spring forces</h3>
+<section id="element-elongations-and-spring-forces" class="level3" data-number="5.7.3">
+<h3 data-number="5.7.3" class="anchored" data-anchor-id="element-elongations-and-spring-forces"><span class="header-section-number">5.7.3</span> Element elongations and spring forces</h3>
 <p>Using the element connectivity,</p>
 <p><span class="math display">\[
   \delta_1=u_3-u_2=10\ \mathrm{mm},
@@ -975,8 +971,8 @@ global degree of freedom:  2   3</code></pre>
 \]</span></p>
 <p>The equal internal spring forces confirm equilibrium at the internal node.</p>
 </section>
-<section id="internal-strain-energy" class="level3" data-number="5.8.4">
-<h3 data-number="5.8.4" class="anchored" data-anchor-id="internal-strain-energy"><span class="header-section-number">5.8.4</span> Internal strain energy</h3>
+<section id="internal-strain-energy" class="level3" data-number="5.7.4">
+<h3 data-number="5.7.4" class="anchored" data-anchor-id="internal-strain-energy"><span class="header-section-number">5.7.4</span> Internal strain energy</h3>
 <p>Both the global quadratic form and the independent spring expression should give</p>
 <p><span class="math display">\[
   U=75\ \mathrm{N\,mm}.
@@ -985,8 +981,8 @@ global degree of freedom:  2   3</code></pre>
 <p>Recovery of the support reaction provides one further equilibrium check and is left as Exercise 3.</p>
 </section>
 </section>
-<section id="exercises" class="level2" data-number="5.9">
-<h2 data-number="5.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">5.9</span> Exercises</h2>
+<section id="exercises" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="exercises"><span class="header-section-number">5.8</span> Exercises</h2>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1072,8 +1068,8 @@ global degree of freedom:  2   3</code></pre>
 </div>
 </div>
 </section>
-<section id="what-comes-next" class="level2" data-number="5.10">
-<h2 data-number="5.10" class="anchored" data-anchor-id="what-comes-next"><span class="header-section-number">5.10</span> What comes next</h2>
+<section id="what-comes-next" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="what-comes-next"><span class="header-section-number">5.9</span> What comes next</h2>
 <p>This first snapshot exposes the core direct stiffness calculation in a single script. Later snapshots will progressively separate recurring operations from problem-specific data and make the implementation easier to reuse and verify.</p>
 
 

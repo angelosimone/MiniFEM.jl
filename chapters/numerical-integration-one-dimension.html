@@ -339,7 +339,6 @@ window.Quarto = {
   </ul></li>
   <li><a href="#non-polynomial-integrands" id="toc-non-polynomial-integrands" class="nav-link" data-scroll-target="#non-polynomial-integrands"><span class="header-section-number">13.10</span> Non-polynomial integrands</a></li>
   <li><a href="#from-scalar-integrands-to-matrices-and-vectors" id="toc-from-scalar-integrands-to-matrices-and-vectors" class="nav-link" data-scroll-target="#from-scalar-integrands-to-matrices-and-vectors"><span class="header-section-number">13.11</span> From scalar integrands to matrices and vectors</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">13.12</span> Exercises</a></li>
   </ul>
 </nav>
     </div>
@@ -1087,7 +1086,7 @@ Figure&nbsp;13.2: Composite trapezoidal rule for <span class="math inline">\(f(x
 <p><span class="math display">\[
   [-1,1].
 \]</span></p>
-<p>At this stage, <span class="math inline">\([-1,1]\)</span> is simply the interval on which the quadrature rules are defined. Its later use in describing a finite element, and the transformation from an arbitrary physical interval, are separate topics introduced in the next chapter.</p>
+<p>At this stage, <span class="math inline">\([-1,1]\)</span> is simply the interval on which the quadrature rules are defined. Its later use in describing a finite element, and the transformation from an arbitrary physical interval, are separate topics introduced in <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a>.</p>
 <p>Consider</p>
 <p><span class="math display">\[
   I
@@ -1536,7 +1535,7 @@ Figure&nbsp;13.4: Point locations and weights for the first four one-dimensional
 \]</span></p>
 <p>is not a polynomial. Nevertheless, increasing the number of Gauss–Legendre points rapidly reduces the error in this example.</p>
 <p>For a non-polynomial integrand, increasing <span class="math inline">\(n_g\)</span> usually improves the result when the integrand is sufficiently smooth, but the polynomial degree-of-exactness formula no longer predicts exactness. Accuracy must instead be assessed by comparing successive quadrature results or, when available, by comparison with a known reference value.</p>
-<p>Applying the original integral on <span class="math inline">\([0,1]\)</span> directly with a standard Gauss–Legendre rule requires a change of coordinate. That operation is introduced in the next chapter.</p>
+<p>Applying the original integral on <span class="math inline">\([0,1]\)</span> directly with a standard Gauss–Legendre rule requires a change of coordinate. That operation is introduced in <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a>.</p>
 </section>
 <section id="from-scalar-integrands-to-matrices-and-vectors" class="level2" data-number="13.11">
 <h2 data-number="13.11" class="anchored" data-anchor-id="from-scalar-integrands-to-matrices-and-vectors"><span class="header-section-number">13.11</span> From scalar integrands to matrices and vectors</h2>
@@ -1589,9 +1588,16 @@ Figure&nbsp;13.4: Point locations and weights for the first four one-dimensional
   \end{bmatrix}.
 \]</span></p>
 <p>The same statement applies to a vector-valued function. At each integration point, the complete matrix or vector integrand can be evaluated, multiplied by the scalar weight, and added to the accumulated result. This compact operation performs the corresponding scalar integrations entry by entry.</p>
-</section>
-<section id="exercises" class="level2" data-number="13.12">
-<h2 data-number="13.12" class="anchored" data-anchor-id="exercises"><span class="header-section-number">13.12</span> Exercises</h2>
+<div class="callout callout-style-default callout-tip callout-titled" title="Exercises">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercises
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li><p>Apply the midpoint and trapezoidal rules with three equal subintervals to <span class="math inline">\(f(x)=x^3\)</span> on <span class="math inline">\([0,2]\)</span>. Compare both approximations with the exact integral.</p></li>
 <li><p>Verify directly that the one-point Gauss–Legendre rule integrates <span class="math inline">\(h(\xi)=4-3\xi\)</span> exactly and fails for <span class="math inline">\(h(\xi)=1+\xi+\xi^2\)</span>.</p></li>
@@ -1626,6 +1632,8 @@ Figure&nbsp;13.4: Point locations and weights for the first four one-dimensional
 \]</span></p>
 <p>First write all entries of <span class="math inline">\(\mathbf{H}(\xi)\)</span> explicitly. Integrate <span class="math inline">\(\mathbf{v}(\xi)\)</span> over <span class="math inline">\([-1,1]\)</span> using the one-point Gauss–Legendre rule and integrate <span class="math inline">\(\mathbf{H}(\xi)\)</span> using the two-point rule. Verify both results by integrating every scalar entry directly, and identify the polynomial degree that determines the required rule in each case.</p></li>
 </ol>
+</div>
+</div>
 <div class="callout callout-style-default callout-important callout-titled" title="Key points to remember">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1643,7 +1651,7 @@ Figure&nbsp;13.4: Point locations and weights for the first four one-dimensional
 <li>Gauss–Legendre quadrature chooses points and weights to maximize polynomial exactness: an <span class="math inline">\(n_g\)</span>-point rule is exact for polynomials up to degree <span class="math inline">\(2n_g-1\)</span>.</li>
 <li>For a non-polynomial integrand, the degree-of-exactness result does not generally guarantee exact integration with a prescribed finite rule; accuracy must be assessed.</li>
 <li>Scalar quadrature extends entry by entry to matrix- and vector-valued integrands.</li>
-<li>The standard Gauss–Legendre rules are defined on <span class="math inline">\([-1,1]\)</span>. Their application to an arbitrary physical interval requires the change of coordinate introduced in the next chapter.</li>
+<li>The standard Gauss–Legendre rules are defined on <span class="math inline">\([-1,1]\)</span>. Their application to an arbitrary physical interval requires the change of coordinate introduced in <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a>.</li>
 </ul>
 </div>
 </div>

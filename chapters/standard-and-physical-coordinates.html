@@ -324,7 +324,6 @@ window.Quarto = {
   <li><a href="#shape-functions-in-the-reference-coordinate" id="toc-shape-functions-in-the-reference-coordinate" class="nav-link" data-scroll-target="#shape-functions-in-the-reference-coordinate"><span class="header-section-number">14.6</span> Shape functions in the reference coordinate</a></li>
   <li><a href="#transforming-shape-function-derivatives" id="toc-transforming-shape-function-derivatives" class="nav-link" data-scroll-target="#transforming-shape-function-derivatives"><span class="header-section-number">14.7</span> Transforming shape-function derivatives</a></li>
   <li><a href="#what-the-mapping-has-accomplished" id="toc-what-the-mapping-has-accomplished" class="nav-link" data-scroll-target="#what-the-mapping-has-accomplished"><span class="header-section-number">14.8</span> What the mapping has accomplished</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">14.9</span> Exercises</a></li>
   </ul>
 </nav>
     </div>
@@ -773,7 +772,7 @@ Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="m
   \int_{x_1}^{x_2}
   \mathbf{B}^{\mathsf T}EA\mathbf{B}\,dx,
 \]</span></p>
-<p>is likewise written in the physical coordinate. The next chapter evaluates this integral using Gauss–Legendre quadrature on the standard interval. Before that rule can be applied, both the integration measure <span class="math inline">\(dx\)</span> and the physical derivatives contained in <span class="math inline">\(\mathbf{B}\)</span> must therefore be expressed exactly in terms of the standard coordinate <span class="math inline">\(\xi\)</span>.</p>
+<p>is likewise written in the physical coordinate. <a href="gauss-quadrature-two-node-bar.html" class="quarto-xref"><span>Chapter 15</span></a> evaluates this integral using Gauss–Legendre quadrature on the standard interval. Before that rule can be applied, both the integration measure <span class="math inline">\(dx\)</span> and the physical derivatives contained in <span class="math inline">\(\mathbf{B}\)</span> must therefore be expressed exactly in terms of the standard coordinate <span class="math inline">\(\xi\)</span>.</p>
 <p>At this point, it is natural to ask why the standard coordinate is needed at all. For the present two-node bar, the shape functions are already available as simple explicit functions of <span class="math inline">\(x\)</span>. Their physical derivatives can be computed directly, and the stiffness integral could also be evaluated directly over the physical interval. This is a special advantage of such a simple element and mapping, however, rather than the general finite element procedure.</p>
 <p>In finite element theory and implementation, shape functions are customarily defined directly on a standard element. The functions <span class="math inline">\(N_i(\xi)\)</span> are then fixed polynomials, independent of the position and size of any particular physical element. The geometry of each element is introduced separately through the mapping <span class="math inline">\(x(\xi)\)</span>. This separation makes it possible to use the same shape functions, differentiation procedure, and selected quadrature rule for every element of the same type, while the mapping accounts for the geometry of the individual physical element.</p>
 <p>In <a href="two-node-linear-bar-element.html" class="quarto-xref"><span>Chapter 10</span></a>, the two-node shape functions were derived in the physical coordinate as <span class="math inline">\(N_i(x)\)</span>. In this chapter, they were rewritten as <span class="math inline">\(N_i(\xi)\)</span> by substituting the affine mapping. This order makes the connection between the physical and standard descriptions especially transparent. In the general formulation, however, <span class="math inline">\(N_i(\xi)\)</span> is normally introduced directly, without first constructing an explicit expression for <span class="math inline">\(N_i(x)\)</span>. The physical shape function is then known through the composition of <span class="math inline">\(N_i(\xi)\)</span> with the inverse of the element mapping.</p>
@@ -872,10 +871,17 @@ Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="m
 </tr>
 </tbody>
 </table>
-<p>No numerical approximation has yet been made in deriving these relationships. They allow element integrals and derivatives to be expressed using one standard coordinate system. The next chapter combines these exact transformations with Gauss–Legendre quadrature to evaluate the stiffness matrix and consistent distributed-load vector of the two-node bar.</p>
-</section>
-<section id="exercises" class="level2" data-number="14.9">
-<h2 data-number="14.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">14.9</span> Exercises</h2>
+<p>No numerical approximation has yet been made in deriving these relationships. They allow element integrals and derivatives to be expressed using one standard coordinate system. <a href="gauss-quadrature-two-node-bar.html" class="quarto-xref"><span>Chapter 15</span></a> combines these exact transformations with Gauss–Legendre quadrature to evaluate the stiffness matrix and consistent distributed-load vector of the two-node bar.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Exercises">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercises
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Derive the affine mapping from <span class="math inline">\([-1,1]\)</span> to <span class="math inline">\([2,8]\)</span> and its inverse, verify both endpoint correspondences, and calculate the Jacobian.</li>
 <li>Map the standard points <span class="math inline">\(\xi=-1/\sqrt{3}\)</span> and <span class="math inline">\(\xi=1/\sqrt{3}\)</span> to the physical interval <span class="math inline">\([2,8]\)</span>.</li>
@@ -884,6 +890,8 @@ Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="m
 <li>For a bar element with <span class="math inline">\(x_1=7\)</span> and <span class="math inline">\(x_2=11\)</span>, calculate <span class="math inline">\(x(0)\)</span>, <span class="math inline">\(J\)</span>, <span class="math inline">\(dN_1/dx\)</span>, and <span class="math inline">\(dN_2/dx\)</span>.</li>
 <li>Explain why the equality introduced by the coordinate transformation must be distinguished from the approximation introduced by quadrature.</li>
 </ol>
+</div>
+</div>
 <div class="callout callout-style-default callout-important callout-titled" title="Key points to remember">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
