@@ -17,41 +17,26 @@ justify a shared implementation, while keeping the element-specific finite
 element formulation visible.
 :::
 
-## Establish the verified baseline
+The spring and axial-bar analyses are already verified. S06 changes only their
+organization: compare the visible repeated work, share the assembly operations
+that have earned an abstraction boundary, and use the existing regression suite
+to confirm that the accepted numerical behavior remains unchanged.
 
-The two-spring and four-element axial-bar analyses have already been formulated,
-implemented, and independently verified. Their accepted numerical results are
-also checked by the regression tests introduced in
-@sec-two-springs-regression-tests. S06 therefore focuses on
-[*refactoring*](../glossary.qmd#gls-refactoring): the code organization will
-change, but the mathematical problems and accepted numerical behavior must
-remain unchanged.
+## Start from the verified baseline
 
-Before proceeding, run the regression tests:
+Before refactoring, run the regression tests:
 
 ```text
 julia test/runtests.jl
 ```
 
-The expected baseline results are:
+All existing tests should pass before you continue. This checkpoint makes the
+refactoring safe to assess: the mathematical problems and accepted numerical
+behavior must remain unchanged as the code organization changes.
 
-```text
-Two-spring regression tests: 4 pass
-Four-element axial-bar regression tests: 2 pass
-```
-
-This checkpoint is important before refactoring because the regression tests
-provide a reliable reference against which to check that the numerical behavior
-remains unchanged as the code is reorganized.
-
-The aim of S06 is therefore not to eliminate every instance of repeated code,
-but to use the repeated assembly patterns to identify FEM operations that are
-stable and sufficiently independent of the element formulation to justify a
-shared implementation.
-
-S06 starts from the completed S05 state. Begin by comparing the two existing
-finite element implementations and the regression tests that establish their
-accepted numerical behavior:
+The aim is not to eliminate every repeated line. Compare the two verified
+formulations to identify FEM operations that are stable and sufficiently
+independent of the element formulation to justify a shared implementation:
 
 ```text
 two_springs_fem.jl
@@ -61,12 +46,8 @@ axial_bar_fem.jl
     two-node axial-bar formulation and analysis
 
 test/runtests.jl
-    regression tests for both analyses
+    regression tests protecting both analyses
 ```
-
-The first implementation step in S06 is to create `examples/fem_assembly.jl`;
-this file will contain the FEM assembly operations that the comparison shows are
-appropriate to share.
 
 ## Compare the S05 element loops
 
@@ -631,9 +612,8 @@ S06 has introduced the first shared MiniFEM assembly operations. The
 element-specific FEM calculations remain visible, and the current source still
 shows which responsibilities have not yet earned a shared abstraction.
 
-The next step returns to the finite element formulation. Before numerical
-integration is introduced in the code, the theory chapter will develop Gauss
-quadrature and show how it can be used to evaluate integrals numerically. The
-following coding task will then apply that theory to the axial-bar element,
-replacing the closed-form evaluation of element contributions with numerical
-integration.
+Attention now shifts from code organization back to element formulation. The
+following theory chapters develop the coordinate transformations and
+Gauss--Legendre quadrature needed to evaluate element integrals numerically. A
+later coding task will then adapt the verified axial-bar implementation by
+adding a quadrature-based route alongside its existing closed-form evaluation.

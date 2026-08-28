@@ -1069,9 +1069,9 @@ behavior of a verified MiniFEM example. After establishing the axial-bar
 reference solution independently in this chapter, extend `test/runtests.jl` with
 a focused regression test for the new analysis.
 
-The test should include `axial_bar_fem.jl` and construct the same canonical
-mesh, element properties, nodal load, constrained DOFs, and prescribed
-displacements used by the executable benchmark.
+The test should include `axial_bar_fem.jl` and construct the same mesh, element
+properties, nodal load, constrained DOFs, and prescribed displacements used by
+the executable benchmark.
 
 Use the regression tests to check two accepted outputs of `solve_axial_bar`:
 

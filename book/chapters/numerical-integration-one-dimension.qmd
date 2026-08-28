@@ -997,8 +997,8 @@ $$
 
 At this stage, $[-1,1]$ is simply the interval on which the quadrature rules are
 defined. Its later use in describing a finite element, and the transformation
-from an arbitrary physical interval, are separate topics introduced in the next
-chapter.
+from an arbitrary physical interval, are separate topics introduced in
+@sec-standard-physical-coordinates.
 
 Consider
 
@@ -1491,7 +1491,7 @@ comparison with a known reference value.
 
 Applying the original integral on $[0,1]$ directly with a standard
 Gauss--Legendre rule requires a change of coordinate. That operation is
-introduced in the next chapter.
+introduced in @sec-standard-physical-coordinates.
 
 ## From scalar integrands to matrices and vectors
 
@@ -1563,8 +1563,7 @@ point, the complete matrix or vector integrand can be evaluated, multiplied by
 the scalar weight, and added to the accumulated result. This compact operation
 performs the corresponding scalar integrations entry by entry.
 
-## Exercises
-
+::: {.callout-tip title="Exercises"}
 1. Apply the midpoint and trapezoidal rules with three equal subintervals to
    $f(x)=x^3$ on $[0,2]$. Compare both approximations with the exact integral.
 
@@ -1620,6 +1619,7 @@ performs the corresponding scalar integrations entry by entry.
    integrate $\mathbf{H}(\xi)$ using the two-point rule. Verify both results by
    integrating every scalar entry directly, and identify the polynomial degree
    that determines the required rule in each case.
+:::
 
 ::: {.callout-important title="Key points to remember"}
 - Numerical quadrature approximates an integral by a weighted sum of function
@@ -1638,5 +1638,5 @@ performs the corresponding scalar integrations entry by entry.
   integrands.
 - The standard Gauss--Legendre rules are defined on $[-1,1]$. Their application
   to an arbitrary physical interval requires the change of coordinate introduced
-  in the next chapter.
+  in @sec-standard-physical-coordinates.
 :::

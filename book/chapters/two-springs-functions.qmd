@@ -16,6 +16,12 @@ implemented as Julia functions, while preserving the existing finite element
 calculation and numerical results.
 :::
 
+The explicit S01 script is the verified baseline. This chapter
+[refactors](../glossary.qmd#gls-refactoring) its implementation by first
+extracting its existing FEM operations literally into functions and then
+considering their interfaces after the numerical work has been safely organized.
+The mechanical problem and accepted results do not change.
+
 ## Starting point
 
 In @sec-two-springs-code, the direct stiffness procedure was translated into the
@@ -36,23 +42,7 @@ K_e = [
 
 Similarly, global assembly, force assembly, application of the displacement
 constraint, and strain-energy computation are all written directly where they
-are used.
-
-We will use the final code from the previous snapshot as our starting point and
-[refactor](../glossary.qmd#gls-refactoring) its implementation without changing
-the finite element calculation.
-
-## Goal of this snapshot
-
-The goal of this snapshot is to refactor the existing two-spring program using
-Julia functions.
-
-The mechanical problem, finite element formulation, input data, boundary
-conditions, and numerical results will remain unchanged. The implementation will
-be reorganized into functions, and some diagnostic output will be simplified.
-
-By the end of the snapshot, the following finite element operations will have
-their own functions:
+are used. The target function set is:
 
 ```text
 spring_stiffness
@@ -61,13 +51,6 @@ assemble_forces!
 apply_homogeneous_constraints!
 strain_energy
 ```
-
-The top-level part of the script will then describe the overall finite element
-workflow by calling the higher-level functions, while `assemble_stiffness!` will
-use `spring_stiffness` internally.
-
-The refactored program must reproduce exactly the same numerical results as the
-starting snapshot. We will verify this after completing the refactoring.
 
 ## From operations to functions
 
@@ -566,7 +549,7 @@ Pre-processing
 
 Processing
     assemble_stiffness!(...)
-    preserve K_original
+    make a copy of K as K_original for strain energy
     assemble_forces!(...)
     apply_homogeneous_constraints!(...)
     solve K * u = f

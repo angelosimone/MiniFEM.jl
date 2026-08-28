@@ -66,7 +66,8 @@ function solve_two_springs(k_1, k_2, applied_force)
 
     assemble_springs!(K, element_connectivity, element_stiffness)
 
-    # Preserve the physical stiffness matrix before Dirichlet modification.
+    # Keep a copy of the assembled stiffness matrix for the
+    # strain-energy calculation.
     K_original = copy(K)
 
     add_nodal_forces!(f, applied_forces)

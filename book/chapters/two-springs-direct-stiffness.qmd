@@ -1393,5 +1393,17 @@ element program must perform the following stages:
 6. post-process the solution to obtain relevant mechanical quantities;
 7. verify the numerical results using independent checks.
 
-The next chapter translates this procedure into Julia code for the two-spring
-assembly, using the mechanical formulation developed here.
+This procedure supplies the mechanical formulation that can be translated into
+an explicit computational analysis.
+
+::: {.callout-important title="Key points to remember"}
+- The direct stiffness method assembles element stiffness contributions into
+  the global equilibrium system $\mathbf{K}\mathbf{u}=\mathbf{f}$.
+- Connectivity and the local-to-global DOF map determine where each element
+  contribution is scattered into the global matrix and vector.
+- Prescribed displacements modify the algebraic system used for the solve;
+  reactions and physical strain energy must be recovered from the original
+  assembled equilibrium relation.
+- Independent checks include dimensional consistency, equilibrium, internal
+  spring forces, reactions, and equivalent strain-energy expressions.
+:::

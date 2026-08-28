@@ -1,7 +1,5 @@
 # Gauss--Legendre quadrature for the two-node bar {#sec-gauss-quadrature-two-node-bar}
 
-## Motivation
-
 The preceding chapters developed two separate ideas:
 
 1. Gauss--Legendre quadrature approximates an integral on $[-1,1]$ by a weighted
@@ -1018,8 +1016,7 @@ though that rule recovers their correct aggregate force. The two-point rule
 reproduces the closed-form consistent load vector and therefore recovers both
 the total force and its correct nodal distribution.
 
-## Exercises
-
+::: {.callout-tip title="Exercises"}
 1. Expand every entry of $\mathbf{B}^{\mathsf T}EA\mathbf{B}J$ for constant $EA$
    and verify its polynomial degree in $\xi$.
 2. Evaluate the constant-$EA$ stiffness matrix using the two-point rule and
@@ -1035,6 +1032,7 @@ the total force and its correct nodal distribution.
 6. Suppose $EA$ is constant and $q(\xi)$ is quadratic. Determine the degree of
    each consistent load-vector integrand and the minimum exact Gauss--Legendre
    rule.
+:::
 
 ::: {.callout-important title="Key points to remember"}
 - Rewriting an element integral from $x$ to $\xi$, transforming $dx=J\,d\xi$,

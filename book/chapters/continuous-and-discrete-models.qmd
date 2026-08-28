@@ -133,9 +133,16 @@ springs, which are already discrete, and use them to develop the fundamental
 algebraic ingredients of the method: equilibrium, element stiffness matrices,
 assembly, boundary conditions, and the global system of equations.
 
-The next chapter applies these ideas to two springs in series and derives the
-direct stiffness system
+These discrete ingredients provide the algebraic setting in which the direct
+stiffness method can be developed.
 
-$$
-  \mathbf{K}\mathbf{u}=\mathbf{f}.
-$$
+::: {.callout-important title="Key points to remember"}
+- A continuous model describes fields, such as $u(x)$, at every point of a
+  domain; a discrete model has a finite set of state variables.
+- For the one-dimensional bar, axial strain, stress, and internal force follow
+  from $\varepsilon=du/dx$, $\sigma=E\varepsilon$, and $N=EA\,du/dx$.
+- A spring is already discrete: its deformation and internal force depend on
+  the end displacements through $\delta=u_2-u_1$ and $F_s=k_s\delta$.
+- Finite elements approximate a continuous field with a finite set of unknowns;
+  springs provide a direct route to the associated algebraic ideas.
+:::

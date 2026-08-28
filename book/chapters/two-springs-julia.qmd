@@ -9,8 +9,6 @@
 This is the initial code snapshot. There is no preceding snapshot.
 :::
 
-## Purpose of the example
-
 This chapter accompanies `two_springs.jl`, the first pure-Julia MiniFEM example,
 which applies the direct stiffness method to the two-spring system shown in
 @fig-carts-springs.
@@ -22,7 +20,7 @@ element operations are mapped to their corresponding Julia representations.
 The script is intentionally written as a top-level, dependency-free program.
 Every finite element operation remains visible, and only the basic Julia
 constructs introduced in @sec-julia-essentials are used. The implementation
-favours explicit, [imperative logic](../glossary.qmd#gls-imperative-programming)
+favors explicit, [imperative logic](../glossary.qmd#gls-imperative-programming)
 over compact syntax or custom abstractions, so that the program can be read in
 the same order as the hand calculation.
 
@@ -82,10 +80,10 @@ $$
   \mathbf{K}\mathbf{u}=\mathbf{f}.
 $$
 
-Here, `K` and `f` denote the modified algebraic system used by the solver. The
-original assembled stiffness matrix is preserved as `K_original`, so that
-physical quantities such as the support reaction and strain energy can be later
-recovered from the unmodified system.
+Here, `K` and `f` denote the modified algebraic system used by the solver. A
+copy of the original assembled stiffness matrix is stored as `K_original`, so
+that physical quantities such as the support reaction and strain energy can be
+later recovered from the unmodified system.
 
 For the present model,
 
@@ -511,19 +509,20 @@ analytical displacement later in the script corresponds to the original
 stiffness values.
 :::
 
-### Preserving the assembled matrix
+### Keeping a copy of the assembled matrix
 
-Before the displacement condition modifies the global matrix, the script
-preserves the assembled physical stiffness matrix:
+Before the displacement condition modifies the global matrix, the script keeps a
+copy of the assembled physical stiffness matrix for the strain-energy
+calculation:
 
 ```julia
 K_original = copy(K)
 ```
 
-This distinction is important mechanically. `K_original` represents the
+This distinction is important mechanically. `K_original` is a copy of the
 assembled stiffness matrix before the displacement constraint is imposed,
 whereas `K` will subsequently be modified into the algebraic system matrix used
-by the solver. The original matrix is required for the strain-energy computation
+by the solver. The copied matrix is required for the strain-energy computation
 and can also be used to recover reactions.
 
 The Julia semantics of `copy` were introduced in @sec-julia-essentials; here its

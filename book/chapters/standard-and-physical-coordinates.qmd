@@ -563,11 +563,11 @@ $$
   \mathbf{B}^{\mathsf T}EA\mathbf{B}\,dx,
 $$
 
-is likewise written in the physical coordinate. The next chapter evaluates this
-integral using Gauss--Legendre quadrature on the standard interval. Before that
-rule can be applied, both the integration measure $dx$ and the physical
-derivatives contained in $\mathbf{B}$ must therefore be expressed exactly in
-terms of the standard coordinate $\xi$.
+is likewise written in the physical coordinate.
+@sec-gauss-quadrature-two-node-bar evaluates this integral using Gauss--Legendre
+quadrature on the standard interval. Before that rule can be applied, both the
+integration measure $dx$ and the physical derivatives contained in $\mathbf{B}$
+must therefore be expressed exactly in terms of the standard coordinate $\xi$.
 
 At this point, it is natural to ask why the standard coordinate is needed at
 all. For the present two-node bar, the shape functions are already available as
@@ -692,12 +692,11 @@ The affine mapping provides the following relationships:
 
 No numerical approximation has yet been made in deriving these relationships.
 They allow element integrals and derivatives to be expressed using one standard
-coordinate system. The next chapter combines these exact transformations with
-Gauss--Legendre quadrature to evaluate the stiffness matrix and consistent
-distributed-load vector of the two-node bar.
+coordinate system. @sec-gauss-quadrature-two-node-bar combines these exact
+transformations with Gauss--Legendre quadrature to evaluate the stiffness matrix
+and consistent distributed-load vector of the two-node bar.
 
-## Exercises
-
+::: {.callout-tip title="Exercises"}
 1. Derive the affine mapping from $[-1,1]$ to $[2,8]$ and its inverse, verify
    both endpoint correspondences, and calculate the Jacobian.
 2. Map the standard points $\xi=-1/\sqrt{3}$ and $\xi=1/\sqrt{3}$ to the
@@ -709,6 +708,7 @@ distributed-load vector of the two-node bar.
    $dN_1/dx$, and $dN_2/dx$.
 6. Explain why the equality introduced by the coordinate transformation must be
    distinguished from the approximation introduced by quadrature.
+:::
 
 ::: {.callout-important title="Key points to remember"}
 - The affine mapping relates the standard interval $\xi\in[-1,1]$ to a physical

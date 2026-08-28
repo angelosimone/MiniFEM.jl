@@ -15,16 +15,17 @@ Use Julia's `Test` standard library to check that the previously verified
 two-spring results remain unchanged as the implementation evolves.
 :::
 
+The callable S03 analysis has already been independently checked against the
+analytical spring solution. This chapter keeps that verification and adds a
+small automated suite that protects the accepted behavior through later source
+changes.
+
 ## Starting point
 
-In @sec-two-springs-callable-analysis, the complete two-spring analysis became
-callable through `solve_two_springs`. The executable benchmark still presents
-its final results and compares them with analytical reference values.
-
-That analytical comparison is a manual verification step. The example is run,
-the result is inspected, and a judgement is made about whether it agrees with
-the independent reference. S04 keeps that verification in the executable
-benchmark and adds automated regression tests alongside it.
+Start from the verified callable analysis in @sec-two-springs-callable-analysis.
+Its executable benchmark remains responsible for the analytical comparison; the
+new tests check that the established results continue to agree with their stored
+references after future changes.
 
 ## Verification, validation, and regression testing
 
@@ -49,7 +50,7 @@ cause or decide which version is correct.
 ## Separating the FEM implementation from the benchmark
 
 In S03, the reusable finite element functions, `solve_two_springs`, and the
-executable canonical benchmark all lived in `examples/two_springs.jl`. This was
+executable reference benchmark all lived in `examples/two_springs.jl`. This was
 appropriate while the file was used only as an executable example.
 
 Regression testing creates a new requirement. The tests need to call
@@ -111,7 +112,7 @@ include("../examples/two_springs_fem.jl")
     atol = 1.0e-12
     rtol = 1.0e-12
 
-    # Canonical two-spring benchmark
+    # Reference two-spring benchmark
     k_1 = 1.0
     k_2 = 2.0
     applied_force = 10.0
@@ -128,7 +129,7 @@ include("../examples/two_springs_fem.jl")
         rtol=rtol,
     )
 
-    # Noncanonical two-spring benchmark
+    # Additional two-spring case
     k_1 = 2.0
     k_2 = 3.0
     applied_force = 12.0
@@ -147,16 +148,16 @@ include("../examples/two_springs_fem.jl")
 end
 ```
 
-### Canonical regression case
+### Reference regression case
 
 The first case protects the established two-spring benchmark. It tests both the
 complete displacement vector `u` and `strain_energy_global`.
 
 The displacement-vector test covers the assembled and constrained solution. The
-strain-energy test additionally covers the preservation and use of `K_original`
+strain-energy test additionally covers making and using the `K_original` copy
 before the constraint modification.
 
-### Noncanonical regression case
+### Additional regression case
 
 The second case calls:
 
@@ -199,7 +200,7 @@ $$
 
 These independently established values are stored in the test file as the
 expected regression references. The case then checks that the callable analysis
-works for physical inputs other than the historical canonical benchmark.
+works for physical inputs other than the original reference benchmark.
 
 ## Running the tests
 

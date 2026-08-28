@@ -16,7 +16,7 @@ include("fem_assembly.jl")
 include("two_springs_fem.jl")
 
 # -------------------------------
-# Canonical two-spring benchmark
+# Reference two-spring benchmark
 # -------------------------------
 
 k_1 = 1.0

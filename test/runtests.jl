@@ -10,7 +10,7 @@ include("../examples/axial_bar_gauss_legendre_fem.jl")
     atol = 1.0e-12
     rtol = 1.0e-12
 
-    # Canonical two-spring benchmark
+    # Reference two-spring benchmark
     k_1 = 1.0
     k_2 = 2.0
     applied_force = 10.0
@@ -27,7 +27,7 @@ include("../examples/axial_bar_gauss_legendre_fem.jl")
         rtol=rtol,
     )
 
-    # Noncanonical two-spring benchmark
+    # Additional two-spring case
     k_1 = 2.0
     k_2 = 3.0
     applied_force = 12.0
@@ -228,6 +228,12 @@ end
         -1 / sqrt(3) 1 / sqrt(3);
         -1 / sqrt(3) 1 / sqrt(3)
     ]
+    physical_coordinate_expected = [
+        125.0 - 125.0 / sqrt(3) 125.0 + 125.0 / sqrt(3);
+        375.0 - 125.0 / sqrt(3) 375.0 + 125.0 / sqrt(3);
+        625.0 - 125.0 / sqrt(3) 625.0 + 125.0 / sqrt(3);
+        875.0 - 125.0 / sqrt(3) 875.0 + 125.0 / sqrt(3)
+    ]
     strain_gauss_point_expected = [
         0.001875 0.001875;
         0.001625 0.001625;
@@ -264,6 +270,12 @@ end
     @test isapprox(
         gauss_point_reference_coordinates,
         reference_coordinate_expected;
+        atol=atol,
+        rtol=rtol,
+    )
+    @test isapprox(
+        gauss_point_coordinates,
+        physical_coordinate_expected;
         atol=atol,
         rtol=rtol,
     )

@@ -788,3 +788,15 @@ functions; these are generally referred to as **Petrov--Galerkin methods**.
 
 The remaining question is how those finite-dimensional spaces should be
 constructed so that the weak problem becomes a computable finite element model.
+
+::: {.callout-important title="Key points to remember"}
+- The strong form combines axial equilibrium, the constitutive relation, and
+  essential and natural boundary conditions.
+- The weak form is obtained by weighting the residual and integrating by parts,
+  which lowers the regularity required of the displacement field.
+- Essential boundary conditions define the admissible trial and test spaces;
+  natural boundary conditions enter the load functional.
+- A Galerkin finite element approximation replaces the infinite-dimensional
+  trial and test spaces by finite-dimensional subspaces, typically with
+  continuous piecewise-polynomial displacement fields.
+:::

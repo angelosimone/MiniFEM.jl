@@ -16,31 +16,19 @@ problem-specific callable function. Preserve the mechanical model, finite
 element formulation, and numerical results exactly.
 :::
 
+The S02 helper functions already organize the element-level operations. This
+snapshot groups the complete, still problem-specific analysis behind one
+callable interface, while leaving the reference benchmark and its analytical
+verification visible at top level.
+
 ## Starting point
 
 In @sec-two-springs-functions, the operations used by the two-spring finite
-element calculation were organized into functions. The script can now assemble
-the stiffness matrix, assemble forces, apply the homogeneous displacement
-constraint, and compute strain energy through named operations.
-
-The complete analysis, however, is still performed by top-level statements. To
-solve the same problem with different spring stiffnesses or applied forces, a
-program would need to duplicate or manually edit that whole top-level workflow.
-
-This snapshot addresses that remaining limitation. We will keep the established
-finite element operations and organize the complete two-spring calculation into
-one callable analysis.
-
-## Why make the complete analysis callable?
-
-Calling a complete analysis makes it possible to request results for new
-physical input values without repeating the finite element workflow at every
-call site. The analysis remains visible in the code, but it is now grouped
-together as one operation with a defined interface.
-
-This organization will also be useful later. A repeated study, such as a
-parametric study, can call the same analysis many times, and automated
-regression tests can request meaningful numerical results directly.
+element calculation were organized into functions. Begin from that verified
+script and move its top-level numerical workflow into one callable analysis.
+Calling the analysis makes it possible to request results for new physical input
+values without repeating the workflow at every call site; it also prepares the
+results for later parameter studies and regression tests.
 
 ## What varies and what remains fixed
 
@@ -95,7 +83,8 @@ function solve_two_springs(k_1, k_2, applied_force)
 
     assemble_stiffness!(K, element_connectivity, element_stiffness)
 
-    # Preserve the physical stiffness matrix before Dirichlet modification.
+    # Keep a copy of the assembled stiffness matrix for the
+    # strain-energy calculation.
     K_original = copy(K)
 
     assemble_forces!(f, applied_forces)
@@ -141,9 +130,9 @@ and do not print intermediate results. Any presentation of the results remains
 at top level, after the analysis has returned. This keeps the numerical function
 reusable and its outputs explicit.
 
-## The canonical benchmark
+## The reference benchmark
 
-The top-level script still defines the canonical physical inputs:
+The top-level script still defines the benchmark inputs:
 
 ```julia
 k_1 = 1.0
@@ -154,15 +143,15 @@ u, strain_energy_global = solve_two_springs(k_1, k_2, applied_force)
 ```
 
 It can then display the final displacement vector and total strain energy. The
-same canonical problem therefore remains visible at the end of the script, while
-the complete finite element workflow is now callable.
+same benchmark therefore remains visible at the end of the script, while the
+complete finite element workflow is now callable.
 
 ## Analytical verification
 
 The analytical comparison remains outside `solve_two_springs` because it is used
 only to check the numerical result for this benchmark.
 
-For the canonical inputs, the displacement vector remains
+For these inputs, the displacement vector remains
 
 $$
   \mathbf{u}=

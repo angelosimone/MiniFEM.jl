@@ -1504,6 +1504,19 @@ The two-node linear bar element is now fully defined: its displacement
 interpolation, stiffness matrix, load vector, and strain and stress recovery
 relations are known.
 
-The next chapter uses these ingredients to construct a complete one-dimensional
-finite element analysis, from mesh and element data through assembly, boundary
-conditions, solution, and post-processing.
+These element relations provide the ingredients for a complete one-dimensional
+finite element analysis: mesh and element data, assembly, boundary conditions,
+solution, and post-processing.
+
+::: {.callout-important title="Key points to remember"}
+- A two-node bar uses linear interpolation through shape functions, with
+  $\mathbf{u}_e$ providing the nodal displacement degrees of freedom.
+- The strain--displacement matrix $\mathbf{B}$ converts nodal displacements to
+  element strain; for a linear element, the strain is constant in the element.
+- The weak form yields the element stiffness matrix and consistent distributed-
+  load vector, which are assembled through connectivity and DOF maps.
+- Strain, stress, and axial force are derived from the finite element
+  displacement approximation; they are not additional primary unknowns.
+- Essential boundary conditions remove rigid-body modes from the assembled
+  equilibrium system.
+:::
