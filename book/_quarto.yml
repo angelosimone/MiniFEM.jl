@@ -32,6 +32,7 @@ book:
         - chapters/standard-and-physical-coordinates.qmd
         - chapters/gauss-quadrature-two-node-bar.qmd
         - chapters/gauss-legendre-quadrature-implementation.qmd
+        - chapters/isoparametric-formulation-one-dimension.qmd
     - glossary.qmd
     - references.qmd
 
