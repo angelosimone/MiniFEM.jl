@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; The isoparametric formulation in one dimension – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/gauss-legendre-quadrature-implementation.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c72bfcf2850aa2268dce9df1d5752dad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/isoparametric-formulation-one-dimension.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Discrete systems and the direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">One-dimensional continuum finite elements</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-node-linear-bar-element.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The two-node linear bar element</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/four-element-axial-bar-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/numerical-integration-one-dimension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/gauss-quadrature-two-node-bar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Gauss–Legendre quadrature for the two-node bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/gauss-legendre-quadrature-implementation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Implementing Gauss–Legendre quadrature for the two-node bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/isoparametric-formulation-one-dimension.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#interpolation-mapping-and-numerical-integration" id="toc-interpolation-mapping-and-numerical-integration" class="nav-link active" data-scroll-target="#interpolation-mapping-and-numerical-integration"><span class="header-section-number">17.1</span> Interpolation, mapping, and numerical integration</a></li>
+  <li><a href="#the-familiar-two-node-element-revisited" id="toc-the-familiar-two-node-element-revisited" class="nav-link" data-scroll-target="#the-familiar-two-node-element-revisited"><span class="header-section-number">17.2</span> The familiar two-node element revisited</a>
+  <ul class="collapse">
+  <li><a href="#the-same-interpolation-viewed-in-different-coordinates" id="toc-the-same-interpolation-viewed-in-different-coordinates" class="nav-link" data-scroll-target="#the-same-interpolation-viewed-in-different-coordinates"><span class="header-section-number">17.2.1</span> The same interpolation viewed in different coordinates</a></li>
+  </ul></li>
+  <li><a href="#nodal-interpolation-and-lagrange-shape-functions" id="toc-nodal-interpolation-and-lagrange-shape-functions" class="nav-link" data-scroll-target="#nodal-interpolation-and-lagrange-shape-functions"><span class="header-section-number">17.3</span> Nodal interpolation and Lagrange shape functions</a></li>
+  <li><a href="#the-isoparametric-concept" id="toc-the-isoparametric-concept" class="nav-link" data-scroll-target="#the-isoparametric-concept"><span class="header-section-number">17.4</span> The isoparametric concept</a></li>
+  <li><a href="#the-reference-to-physical-map" id="toc-the-reference-to-physical-map" class="nav-link" data-scroll-target="#the-reference-to-physical-map"><span class="header-section-number">17.5</span> The reference-to-physical map</a></li>
+  <li><a href="#the-jacobian-follows-from-the-geometry" id="toc-the-jacobian-follows-from-the-geometry" class="nav-link" data-scroll-target="#the-jacobian-follows-from-the-geometry"><span class="header-section-number">17.6</span> The Jacobian follows from the geometry</a></li>
+  <li><a href="#transforming-derivatives-through-the-mapping" id="toc-transforming-derivatives-through-the-mapping" class="nav-link" data-scroll-target="#transforming-derivatives-through-the-mapping"><span class="header-section-number">17.7</span> Transforming derivatives through the mapping</a>
+  <ul class="collapse">
+  <li><a href="#derivatives-of-the-shape-functions" id="toc-derivatives-of-the-shape-functions" class="nav-link" data-scroll-target="#derivatives-of-the-shape-functions"><span class="header-section-number">17.7.1</span> Derivatives of the shape functions</a></li>
+  </ul></li>
+  <li><a href="#shape-functions-and-their-derivatives-enter-the-transformation-differently" id="toc-shape-functions-and-their-derivatives-enter-the-transformation-differently" class="nav-link" data-scroll-target="#shape-functions-and-their-derivatives-enter-the-transformation-differently"><span class="header-section-number">17.8</span> Shape functions and their derivatives enter the transformation differently</a></li>
+  <li><a href="#element-integrals-on-the-reference-domain" id="toc-element-integrals-on-the-reference-domain" class="nav-link" data-scroll-target="#element-integrals-on-the-reference-domain"><span class="header-section-number">17.9</span> Element integrals on the reference domain</a></li>
+  <li><a href="#interpolation-order-and-quadrature-order" id="toc-interpolation-order-and-quadrature-order" class="nav-link" data-scroll-target="#interpolation-order-and-quadrature-order"><span class="header-section-number">17.10</span> Interpolation order and quadrature order</a></li>
+  <li><a href="#affine-and-non-affine-isoparametric-mappings" id="toc-affine-and-non-affine-isoparametric-mappings" class="nav-link" data-scroll-target="#affine-and-non-affine-isoparametric-mappings"><span class="header-section-number">17.11</span> Affine and non-affine isoparametric mappings</a>
+  <ul class="collapse">
+  <li><a href="#a-three-node-geometry-with-a-midpoint-node" id="toc-a-three-node-geometry-with-a-midpoint-node" class="nav-link" data-scroll-target="#a-three-node-geometry-with-a-midpoint-node"><span class="header-section-number">17.11.1</span> A three-node geometry with a midpoint node</a></li>
+  <li><a href="#moving-the-middle-node" id="toc-moving-the-middle-node" class="nav-link" data-scroll-target="#moving-the-middle-node"><span class="header-section-number">17.11.2</span> Moving the middle node</a></li>
+  </ul></li>
+  <li><a href="#mapping-validity-and-the-jacobian" id="toc-mapping-validity-and-the-jacobian" class="nav-link" data-scroll-target="#mapping-validity-and-the-jacobian"><span class="header-section-number">17.12</span> Mapping validity and the Jacobian</a></li>
+  <li><a href="#non-affine-mappings-and-quadrature" id="toc-non-affine-mappings-and-quadrature" class="nav-link" data-scroll-target="#non-affine-mappings-and-quadrature"><span class="header-section-number">17.13</span> Non-affine mappings and quadrature</a></li>
+  <li><a href="#isoparametric-and-other-parametric-formulations" id="toc-isoparametric-and-other-parametric-formulations" class="nav-link" data-scroll-target="#isoparametric-and-other-parametric-formulations"><span class="header-section-number">17.14</span> Isoparametric and other parametric formulations</a></li>
+  <li><a href="#what-comes-next" id="toc-what-comes-next" class="nav-link" data-scroll-target="#what-comes-next"><span class="header-section-number">17.15</span> What comes next</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/isoparametric-formulation-one-dimension.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-isoparametric-formulation-one-dimension" class="quarto-section-identifier"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The preceding chapters introduced several ideas that now work together in a finite element calculation.</p>
+<p>In <a href="numerical-integration-one-dimension.html" class="quarto-xref"><span>Chapter 13</span></a>, Gauss–Legendre quadrature was defined on the standard interval</p>
+<p><span class="math display">\[
+  -1\leq\xi\leq1.
+\]</span></p>
+<p>In <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a>, an exact coordinate transformation was used to relate this standard interval to a physical interval. For a two-node bar element, this gave the mapping</p>
+<p><span class="math display">\[
+  x=x(\xi),
+\]</span></p>
+<p>the Jacobian</p>
+<p><span class="math display">\[
+  J=\frac{dx}{d\xi},
+\]</span></p>
+<p>the differential transformation</p>
+<p><span class="math display">\[
+  dx=J\,d\xi,
+\]</span></p>
+<p>and the derivative transformation</p>
+<p><span class="math display">\[
+  \frac{d}{dx}
+  =
+  \frac{1}{J}\frac{d}{d\xi}.
+\]</span></p>
+<p>Finally, <a href="gauss-quadrature-two-node-bar.html" class="quarto-xref"><span>Chapter 15</span></a> combined these operations to evaluate the stiffness matrix and consistent distributed-load vector of the two-node bar on the standard interval.</p>
+<p>We can now step back from those individual operations and recognize the more general finite element construction that connects them. This construction is called the <strong>isoparametric formulation</strong>.</p>
+<p>The central idea is simple: the same shape functions defined on a reference domain are used to interpolate both the geometry of the physical element and the primary unknown field. The coordinate mapping, its Jacobian, the transformation of derivatives, and the element integrals then follow from this common description.</p>
+<p>The two-node bar considered so far already has this isoparametric structure. In this chapter, we make that structure explicit and generalize it to a one-dimensional element with <span class="math inline">\(n\)</span> nodes. We will distinguish between interpolation of the displacement field, interpolation of the geometry, and numerical integration, and we will show how these operations are connected through the Jacobian of the coordinate mapping.</p>
+<p>The two-node bar remains the main concrete example. Higher-order interpolation is introduced only to examine an important feature of the geometry mapping: while the two-node mapping is affine and has a constant Jacobian, a higher-order mapping can be non-affine and have a Jacobian that varies within the element. This also provides a natural setting in which to discuss the validity of the coordinate mapping.</p>
+<p>The full development of the three-node quadratic bar is deferred to the next chapter. There we will construct its quadratic shape functions systematically and use the isoparametric framework developed here to derive its finite element equations.</p>
+<section id="interpolation-mapping-and-numerical-integration" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="interpolation-mapping-and-numerical-integration"><span class="header-section-number">17.1</span> Interpolation, mapping, and numerical integration</h2>
+<p>Three operations that appear together in an element calculation should first be kept conceptually distinct.</p>
+<p>The global finite element displacement field is represented within each element through <strong>interpolation</strong> of the nodal displacement values:</p>
+<p><span class="math display">\[
+  u^h\!\left(x(\xi)\right)
+  =
+  \mathbf{N}(\xi)\mathbf{u}_e.
+\]</span></p>
+<p>When working within an element, we will often write <span class="math inline">\(u^h(\xi)\)</span> as a shorthand for <span class="math inline">\(u^h\!\left(x(\xi)\right)\)</span>.</p>
+<p>Here, <span class="math inline">\(\mathbf{u}_e\)</span> collects the global nodal displacement values associated with the nodes of element <span class="math inline">\(e\)</span>. Neighboring elements therefore do not define independent displacement fields: they provide local representations of the same global finite element field and share the displacement values at common nodes.</p>
+<p>The physical position is obtained through a <strong>coordinate mapping</strong>:</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  \mathbf{N}(\xi)\mathbf{x}_e.
+\]</span></p>
+<p>An integral on the standard interval may then be evaluated by <strong>numerical integration</strong>:</p>
+<p><span class="math display">\[
+  \int_{-1}^{1}h(\xi)\,d\xi
+  \approx
+  \sum_{g=1}^{n_g}w_g h(\xi_g).
+\]</span></p>
+<p>These three operations interact, but they have different purposes:</p>
+<ul>
+<li>interpolation constructs an approximate field from nodal values;</li>
+<li>the coordinate mapping describes the physical element from nodal coordinates;</li>
+<li>numerical integration approximates an integral using a finite set of integration points and weights.</li>
+</ul>
+<p>The isoparametric formulation defines how the geometry and displacement field are represented. The resulting element integrals may then be evaluated analytically or numerically, for example using Gauss–Legendre quadrature.</p>
+<p>The distinction established previously between an exact coordinate transformation and numerical quadrature therefore remains unchanged. The mapping and the transformations derived from it are exact for the geometry represented by the finite element. Approximation by quadrature enters only when an integral is replaced by a finite weighted sum.</p>
+</section>
+<section id="the-familiar-two-node-element-revisited" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="the-familiar-two-node-element-revisited"><span class="header-section-number">17.2</span> The familiar two-node element revisited</h2>
+<p>Consider a two-node element occupying the physical interval</p>
+<p><span class="math display">\[
+  x_1 \leq x \leq x_2.
+\]</span></p>
+<p>To describe this element in standard coordinates, we introduce the reference interval</p>
+<p><span class="math display">\[
+  -1 \leq \xi \leq 1,
+\]</span></p>
+<p>with the two local nodes located at</p>
+<p><span class="math display">\[
+  \xi_1=-1,
+  \qquad
+  \xi_2=1.
+\]</span></p>
+<p>The coordinate mapping relates each point <span class="math inline">\(\xi\)</span> in the reference interval to the corresponding physical position <span class="math inline">\(x\)</span> in the element.</p>
+<p>The two-node shape functions on the reference interval are</p>
+<p><span class="math display">\[
+  N_1(\xi)
+  =
+  \frac{1-\xi}{2},
+  \qquad
+  N_2(\xi)
+  =
+  \frac{1+\xi}{2}.
+\]</span></p>
+<p>Using these shape functions, the displacement field within the element is interpolated from the nodal displacements as</p>
+<p><span class="math display">\[
+  \boxed{
+  u^h(\xi)
+  =
+  N_1(\xi)u_1
+  +
+  N_2(\xi)u_2.
+  }
+\]</span></p>
+<p>The same shape functions are also used to map the reference coordinate <span class="math inline">\(\xi\)</span> to the physical position <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[
+  \boxed{
+  x(\xi)
+  =
+  N_1(\xi)x_1
+  +
+  N_2(\xi)x_2.
+  }
+\]</span></p>
+<p>The two expressions therefore have the same interpolation structure. In the first, the shape functions interpolate the nodal displacement values <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span>; in the second, they interpolate the nodal coordinates <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>.</p>
+<p>Using the same shape functions to represent both the geometry and the displacement field is the essential idea of the <strong>isoparametric formulation</strong>. The two-node bar introduced earlier already has this structure, even though we had not yet identified it explicitly as isoparametric.</p>
+<section id="the-same-interpolation-viewed-in-different-coordinates" class="level3" data-number="17.2.1">
+<h3 data-number="17.2.1" class="anchored" data-anchor-id="the-same-interpolation-viewed-in-different-coordinates"><span class="header-section-number">17.2.1</span> The same interpolation viewed in different coordinates</h3>
+<p>The connection can also be seen by starting with the familiar two-node shape functions written directly in the physical coordinate. For an element with <span class="math inline">\(x_2&gt;x_1\)</span>,</p>
+<p><span class="math display">\[
+  N_1(x)
+  =
+  \frac{x_2-x}{x_2-x_1},
+  \qquad
+  N_2(x)
+  =
+  \frac{x-x_1}{x_2-x_1}.
+\]</span></p>
+<p>The exact affine mapping established in <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a> is</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  \frac{x_1+x_2}{2}
+  +
+  \frac{x_2-x_1}{2}\xi.
+\]</span></p>
+<p>Substituting this expression for <span class="math inline">\(x\)</span> into the first physical-coordinate shape function gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  N_1(x(\xi))
+  &amp;=
+  \frac{
+  x_2-
+  \left[
+  \dfrac{x_1+x_2}{2}
+  +
+  \dfrac{x_2-x_1}{2}\xi
+  \right]
+  }
+  {x_2-x_1}
+  \\[2mm]
+  &amp;=
+  \frac{1-\xi}{2}.
+  \end{aligned}
+\]</span></p>
+<p>Similarly,</p>
+<p><span class="math display">\[
+  N_2(x(\xi))
+  =
+  \frac{1+\xi}{2}.
+\]</span></p>
+<p>Thus the shape functions expressed in terms of the reference coordinate are not unrelated new functions. They describe the same nodal interpolation after the coordinate change.</p>
+<p>The advantage of the reference-domain description becomes much greater for higher-order and multidimensional elements: instead of deriving a new set of shape functions directly in physical coordinates for every element geometry, we define the interpolation once on a simple reference domain and use a mapping to describe each physical element.</p>
+</section>
+</section>
+<section id="nodal-interpolation-and-lagrange-shape-functions" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="nodal-interpolation-and-lagrange-shape-functions"><span class="header-section-number">17.3</span> Nodal interpolation and Lagrange shape functions</h2>
+<p>The shape functions used so far have the <strong>nodal interpolation property</strong></p>
+<p><span class="math display">\[
+  \boxed{
+  N_i(\xi_j)=\delta_{ij},
+  }
+\]</span></p>
+<p>where the Kronecker delta is</p>
+<p><span class="math display">\[
+  \delta_{ij}
+  =
+  \begin{cases}
+  1, &amp; i=j,\\
+  0, &amp; i\neq j.
+  \end{cases}
+\]</span></p>
+<p>For example,</p>
+<p><span class="math display">\[
+  N_1(-1)=1,
+  \qquad
+  N_1(1)=0,
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  N_2(-1)=0,
+  \qquad
+  N_2(1)=1.
+\]</span></p>
+<p>Each shape function therefore takes the value one at its own node and zero at the other node.</p>
+<p>Polynomial interpolation functions constructed to satisfy this nodal property are <strong>Lagrange interpolation functions</strong>. The two shape functions already used for the linear bar are the degree-one Lagrange shape functions associated with the two reference nodes <span class="math inline">\(\xi=-1\)</span> and <span class="math inline">\(\xi=1\)</span>.</p>
+<p>The terms <strong>Lagrange</strong> and <strong>isoparametric</strong> describe different aspects of the formulation:</p>
+<ul>
+<li><strong>Lagrange interpolation</strong> concerns the construction and nodal interpolation property of the shape functions;</li>
+<li><strong>Isoparametric formulation</strong> concerns how those shape functions are used: the same interpolation functions describe both the element geometry and the primary unknown field.</li>
+</ul>
+<p>Higher-order Lagrange shape functions will be constructed explicitly when the three-node quadratic bar element is introduced.</p>
+</section>
+<section id="the-isoparametric-concept" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="the-isoparametric-concept"><span class="header-section-number">17.4</span> The isoparametric concept</h2>
+<p>Consider a one-dimensional reference domain with <span class="math inline">\(n\)</span> local nodes located at</p>
+<p><span class="math display">\[
+  \xi_1,\xi_2,\ldots,\xi_n.
+\]</span></p>
+<p>Let</p>
+<p><span class="math display">\[
+  \mathbf{N}(\xi)
+  =
+  \begin{bmatrix}
+  N_1(\xi)
+  &amp;
+  N_2(\xi)
+  &amp;
+  \cdots
+  &amp;
+  N_n(\xi)
+  \end{bmatrix}
+\]</span></p>
+<p>collect the shape functions defined on this reference domain.</p>
+<p>The physical nodal coordinates are collected in</p>
+<p><span class="math display">\[
+  \mathbf{x}_e
+  =
+  \begin{bmatrix}
+  x_1\\
+  x_2\\
+  \vdots\\
+  x_n
+  \end{bmatrix},
+\]</span></p>
+<p>while the nodal displacement values are</p>
+<p><span class="math display">\[
+  \mathbf{u}_e
+  =
+  \begin{bmatrix}
+  u_1\\
+  u_2\\
+  \vdots\\
+  u_n
+  \end{bmatrix}.
+\]</span></p>
+<p>The geometry is interpolated as</p>
+<p><span class="math display">\[
+  \boxed{
+  x(\xi)
+  =
+  \mathbf{N}(\xi)\mathbf{x}_e
+  =
+  \sum_{i=1}^{n}N_i(\xi)x_i,
+  }
+\]</span></p>
+<p>and the displacement field is interpolated as</p>
+<p><span class="math display">\[
+  \boxed{
+  u^h(\xi)
+  =
+  \mathbf{N}(\xi)\mathbf{u}_e
+  =
+  \sum_{i=1}^{n}N_i(\xi)u_i.
+  }
+\]</span></p>
+<p>A finite element formulation is isoparametric when the same shape functions, defined on the reference domain, are used to interpolate both the element geometry and the primary unknown field.</p>
+<p>For the one-dimensional bar considered here, the same <span class="math inline">\(N_i(\xi)\)</span> interpolate the physical coordinate <span class="math inline">\(x\)</span> from the nodal coordinates <span class="math inline">\(x_i\)</span> and the displacement <span class="math inline">\(u^h\)</span> from the nodal displacements <span class="math inline">\(u_i\)</span>.</p>
+<p>The two interpolations therefore have the same mathematical structure but act on different nodal quantities. This common structure is illustrated in <a href="#fig-isoparametric-interpolation-one-dimension" class="quarto-xref">Figure&nbsp;<span>17.1</span></a>.</p>
+<div id="fig-isoparametric-interpolation-one-dimension" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-isoparametric-interpolation-one-dimension-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/isoparametric-interpolation-one-dimension.png" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-isoparametric-interpolation-one-dimension-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17.1: The same shape functions <span class="math inline">\(\mathbf{N}(\xi)\)</span>, defined on the reference domain, interpolate both the physical geometry from the nodal coordinates <span class="math inline">\(\mathbf{x}_e\)</span> and the displacement field from the nodal values <span class="math inline">\(\mathbf{u}_e\)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="the-reference-to-physical-map" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="the-reference-to-physical-map"><span class="header-section-number">17.5</span> The reference-to-physical map</h2>
+<p>The expression</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  \mathbf{N}(\xi)\mathbf{x}_e
+\]</span></p>
+<p>should be understood as a map from the reference domain to the physical element:</p>
+<p><span class="math display">\[
+  \boxed{
+  [-1,1]
+  \longrightarrow
+  \Omega_e.
+  }
+\]</span></p>
+<p>A position <span class="math inline">\(\xi\)</span> in the reference domain determines a physical position</p>
+<p><span class="math display">\[
+  x=x(\xi)
+\]</span></p>
+<p>through the nodal coordinates and the shape functions defined on the reference domain.</p>
+<p>For a valid one-dimensional element, the mapping must describe the physical element without collapsing or folding it. In particular, distinct positions in the reference domain should correspond to distinct physical positions.</p>
+<p>For the two-node element with <span class="math inline">\(x_2&gt;x_1\)</span>, the mapping is</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  \frac{x_1+x_2}{2}
+  +
+  \frac{x_2-x_1}{2}\xi,
+\]</span></p>
+<p>which is one-to-one and preserves the ordering of points:</p>
+<p><span class="math display">\[
+  \xi_a&lt;\xi_b
+  \quad\Longrightarrow\quad
+  x(\xi_a)&lt;x(\xi_b).
+\]</span></p>
+<p>This familiar affine case is the simplest example of the more general isoparametric mapping.</p>
+</section>
+<section id="the-jacobian-follows-from-the-geometry" class="level2" data-number="17.6">
+<h2 data-number="17.6" class="anchored" data-anchor-id="the-jacobian-follows-from-the-geometry"><span class="header-section-number">17.6</span> The Jacobian follows from the geometry</h2>
+<p>The geometry of the element is described by the interpolation</p>
+<p><span class="math display">\[
+  x(\xi) = \sum_{i=1}^{n} N_i(\xi)\,x_i.
+\]</span></p>
+<p>Differentiating this mapping with respect to the reference coordinate gives</p>
+<p><span class="math display">\[
+  \frac{dx}{d\xi} = \sum_{i=1}^{n} \frac{dN_i}{d\xi}\,x_i,
+\]</span></p>
+<p>which, as introduced in <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a>, is precisely the Jacobian of the one-dimensional mapping:</p>
+<p><span class="math display">\[
+  J(\xi) = \frac{dx}{d\xi} = \sum_{i=1}^{n} \frac{dN_i}{d\xi}\,x_i,
+\]</span></p>
+<p>or, in matrix form,</p>
+<p><span class="math display">\[
+  \boxed{
+    J(\xi) = \frac{d\mathbf{N}}{d\xi}\,\mathbf{x}_e.
+  }
+\]</span></p>
+<p>The Jacobian is thus fixed entirely by two ingredients: the shape functions used to interpolate the geometry, and the physical nodal coordinates.</p>
+<p>For the two-node element the shape-function derivatives are constant,</p>
+<p><span class="math display">\[
+  \frac{d\mathbf{N}}{d\xi} = \begin{bmatrix} -1/2 &amp; 1/2 \end{bmatrix},
+\]</span></p>
+<p>and substituting into the expression of the Jacobian gives</p>
+<p><span class="math display">\[
+  \begin{aligned}
+    J
+    &amp;= \begin{bmatrix} -1/2 &amp; 1/2 \end{bmatrix}
+       \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \\[1mm]
+    &amp;= \frac{x_2 - x_1}{2} = \frac{L_e}{2}.
+  \end{aligned}
+\]</span></p>
+<p>Because the geometry interpolation is linear in <span class="math inline">\(\xi\)</span>, the coordinate mapping is affine. Its derivative, and therefore the Jacobian, is constant over the element:</p>
+<p><span class="math display">\[
+  J=\frac{L_e}{2}.
+\]</span></p>
+<p>The general isoparametric expression therefore recovers the result obtained earlier for the affine two-node mapping.</p>
+</section>
+<section id="transforming-derivatives-through-the-mapping" class="level2" data-number="17.7">
+<h2 data-number="17.7" class="anchored" data-anchor-id="transforming-derivatives-through-the-mapping"><span class="header-section-number">17.7</span> Transforming derivatives through the mapping</h2>
+<p>The derivative transformation used in the preceding chapters can now be derived directly from the isoparametric mapping.</p>
+<p>Consider a scalar field written in physical coordinates as</p>
+<p><span class="math display">\[
+  u=u(x).
+\]</span></p>
+<p>Because</p>
+<p><span class="math display">\[
+  x=x(\xi),
+\]</span></p>
+<p>the same field can be viewed as the composition</p>
+<p><span class="math display">\[
+  u=u(x(\xi)).
+\]</span></p>
+<p>Differentiating with respect to <span class="math inline">\(\xi\)</span> and applying the chain rule gives</p>
+<p><span class="math display">\[
+  \frac{du}{d\xi}
+  =
+  \frac{du}{dx}
+  \frac{dx}{d\xi}.
+\]</span></p>
+<p>Since</p>
+<p><span class="math display">\[
+  J=\frac{dx}{d\xi},
+\]</span></p>
+<p>we obtain</p>
+<p><span class="math display">\[
+  \frac{du}{d\xi}
+  =
+  J\frac{du}{dx}.
+\]</span></p>
+<p>Provided that <span class="math inline">\(J\neq0\)</span>,</p>
+<p><span class="math display">\[
+  \boxed{
+  \frac{du}{dx}
+  =
+  \frac{1}{J}
+  \frac{du}{d\xi}.
+  }
+\]</span></p>
+<p>Equivalently,</p>
+<p><span class="math display">\[
+  \boxed{
+  \frac{d}{dx}
+  =
+  \frac{1}{J}
+  \frac{d}{d\xi}.
+  }
+\]</span></p>
+<p>This relation is not an additional approximation. It follows exactly from the coordinate mapping and the chain rule.</p>
+<section id="derivatives-of-the-shape-functions" class="level3" data-number="17.7.1">
+<h3 data-number="17.7.1" class="anchored" data-anchor-id="derivatives-of-the-shape-functions"><span class="header-section-number">17.7.1</span> Derivatives of the shape functions</h3>
+<p>Within an element, the finite element displacement field can be represented in terms of the reference coordinate as</p>
+<p><span class="math display">\[
+  u^h\!\left(x(\xi)\right)
+  =
+  \mathbf{N}(\xi)\mathbf{u}_e.
+\]</span></p>
+<p>Differentiating this representation with respect to <span class="math inline">\(\xi\)</span> gives</p>
+<p><span class="math display">\[
+  \frac{d u^h(x(\xi))}{d\xi}
+  =
+  \frac{d\mathbf{N}}{d\xi}\mathbf{u}_e.
+\]</span></p>
+<p>The axial strain, however, is defined in terms of the derivative with respect to the physical coordinate <span class="math inline">\(x\)</span> as</p>
+<p><span class="math display">\[
+  \varepsilon^h(x)
+  =
+  \frac{du^h}{dx}.
+\]</span></p>
+<p>Using the chain rule,</p>
+<p><span class="math display">\[
+  \frac{d u^h(x(\xi))}{d\xi}
+  =
+  \frac{du^h}{dx}
+  \frac{dx}{d\xi}
+  =
+  J(\xi)\frac{du^h}{dx}.
+\]</span></p>
+<p>Therefore, equating the two expressions for the derivative with respect to <span class="math inline">\(\xi\)</span> gives</p>
+<p><span class="math display">\[
+  \frac{du^h}{dx}
+  =
+  \frac{1}{J(\xi)}
+  \frac{d\mathbf{N}}{d\xi}\mathbf{u}_e.
+\]</span></p>
+<p>The derivatives of the shape functions with respect to the physical coordinate are therefore obtained from their derivatives on the reference domain through the Jacobian. Defining the strain–displacement matrix as</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{B}(\xi)
+  =
+  \frac{1}{J(\xi)}
+  \frac{d\mathbf{N}}{d\xi},
+  }
+\]</span></p>
+<p>the physical strain field can be evaluated in terms of the reference coordinate as</p>
+<p><span class="math display">\[
+  \boxed{
+  \varepsilon^h\!\left(x(\xi)\right)
+  =
+  \mathbf{B}(\xi)\mathbf{u}_e.
+  }
+\]</span></p>
+<p>The strain remains a field defined in physical space; the reference coordinate <span class="math inline">\(\xi\)</span> is used to evaluate it through the coordinate mapping <span class="math inline">\(x=x(\xi)\)</span>. This is also what happens in the finite element implementation: the strain is typically evaluated at a Gauss point specified by its reference coordinate <span class="math inline">\(\xi_g\)</span>. The shape-function derivatives and the Jacobian are evaluated directly at <span class="math inline">\(\xi_g\)</span>, giving</p>
+<p><span class="math display">\[
+  \varepsilon^h\!\left(x(\xi_g)\right)
+  =
+  \mathbf{B}(\xi_g)\mathbf{u}_e.
+\]</span></p>
+<p>It is therefore not necessary to first compute the physical coordinate <span class="math inline">\(x(\xi_g)\)</span> merely to evaluate the strain there. The mapping identifies which physical point of the element corresponds to the Gauss-point location <span class="math inline">\(\xi_g\in[-1,1]\)</span>, while the isoparametric expressions allow the required quantities to be evaluated directly in terms of <span class="math inline">\(\xi_g\)</span>.</p>
+<p>This transformation is one of the main practical advantages of the reference description as it avoids the need to construct separate explicit expressions for <span class="math inline">\(N_i(x)\)</span> for each physical element. The shape functions and their derivatives are defined in terms of <span class="math inline">\(\xi\)</span>, and the Jacobian transforms the derivatives required with respect to the physical coordinate <span class="math inline">\(x\)</span>.</p>
+</section>
+</section>
+<section id="shape-functions-and-their-derivatives-enter-the-transformation-differently" class="level2" data-number="17.8">
+<h2 data-number="17.8" class="anchored" data-anchor-id="shape-functions-and-their-derivatives-enter-the-transformation-differently"><span class="header-section-number">17.8</span> Shape functions and their derivatives enter the transformation differently</h2>
+<p>The same geometry mapping affects shape-function values and shape-function derivatives in different ways.</p>
+<p>To make this distinction explicit, let <span class="math inline">\(N_i(x)\)</span> denote a shape function expressed in the physical coordinate and let <span class="math inline">\(\bar N_i(\xi)\)</span> denote its representation on the reference domain. They are related through the coordinate mapping by</p>
+<p><span class="math display">\[
+  N_i\!\left(x(\xi)\right)
+  =
+  \bar N_i(\xi).
+\]</span></p>
+<p>Consider first an integral containing a shape function:</p>
+<p><span class="math display">\[
+  \int_{\Omega_e} N_i(x)\,dx.
+\]</span></p>
+<p>Changing from <span class="math inline">\(x\)</span> to <span class="math inline">\(\xi\)</span> gives</p>
+<p><span class="math display">\[
+  \boxed{
+  \int_{\Omega_e} N_i(x)\,dx
+  =
+  \int_{-1}^{1}
+  \bar N_i(\xi)J(\xi)\,d\xi.
+  }
+\]</span></p>
+<p>The shape-function value is therefore obtained from its representation on the reference domain, while the transformation of the integration measure introduces the factor</p>
+<p><span class="math display">\[
+  dx=J(\xi)\,d\xi.
+\]</span></p>
+<p>Now consider the derivative of the shape function with respect to the physical coordinate. Differentiating</p>
+<p><span class="math display">\[
+  N_i\!\left(x(\xi)\right)
+  =
+  \bar N_i(\xi)
+\]</span></p>
+<p>with respect to <span class="math inline">\(\xi\)</span> gives</p>
+<p><span class="math display">\[
+  \frac{dN_i}{dx}\frac{dx}{d\xi}
+  =
+  \frac{d\bar N_i}{d\xi}.
+\]</span></p>
+<p>Since</p>
+<p><span class="math display">\[
+  J(\xi)=\frac{dx}{d\xi},
+\]</span></p>
+<p>the physical derivative is</p>
+<p><span class="math display">\[
+  \boxed{
+  \frac{dN_i(x)}{dx}
+  =
+  \frac{1}{J(\xi)}
+  \frac{d\bar N_i(\xi)}{d\xi}.
+  }
+\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  \int_{\Omega_e}
+  \frac{dN_i}{dx}\,dx
+  &amp;=
+  \int_{-1}^{1}
+  \left(
+  \frac{1}{J(\xi)}
+  \frac{d\bar N_i}{d\xi}
+  \right)
+  J(\xi)\,d\xi.
+  \end{aligned}
+\]</span></p>
+<p>The two appearances of the Jacobian have different origins:</p>
+<ul>
+<li><span class="math inline">\(1/J\)</span> transforms a derivative from the reference coordinate to the physical coordinate;</li>
+<li><span class="math inline">\(J\)</span> transforms the differential measure from <span class="math inline">\(d\xi\)</span> to <span class="math inline">\(dx\)</span>.</li>
+</ul>
+<p>This distinction becomes particularly important in element integrals containing products of shape-function derivatives.</p>
+<p>For example,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  \int_{\Omega_e}
+  \left(
+  \frac{d\mathbf{N}}{dx}
+  \right)^{\mathsf T}
+  \frac{d\mathbf{N}}{dx}
+  \,dx
+  &amp;=
+  \int_{-1}^{1}
+  \left(
+  \frac{1}{J}
+  \frac{d\bar{\mathbf{N}}}{d\xi}
+  \right)^{\mathsf T}
+  \left(
+  \frac{1}{J}
+  \frac{d\bar{\mathbf{N}}}{d\xi}
+  \right)
+  J\,d\xi
+  \\[2mm]
+  &amp;=
+  \int_{-1}^{1}
+  \frac{1}{J}
+  \left(
+  \frac{d\bar{\mathbf{N}}}{d\xi}
+  \right)^{\mathsf T}
+  \frac{d\bar{\mathbf{N}}}{d\xi}
+  \,d\xi.
+  \end{aligned}
+\]</span></p>
+<p>One factor of <span class="math inline">\(1/J\)</span> therefore remains in the transformed integrand.</p>
+<p>This is different from an integral containing shape functions without physical derivatives. For example,</p>
+<p><span class="math display">\[
+  \boxed{
+  \int_{\Omega_e}
+  \mathbf{N}(x)^{\mathsf T}\mathbf{N}(x)\,dx
+  =
+  \int_{-1}^{1}
+  \bar{\mathbf{N}}(\xi)^{\mathsf T}
+  \bar{\mathbf{N}}(\xi)
+  J(\xi)\,d\xi.
+  }
+\]</span></p>
+<p>The complete transformed integrand must therefore be examined carefully rather than assuming that all element quantities acquire the Jacobian in the same way.</p>
+<p>Having made the distinction between the physical-coordinate and reference-domain representations explicit, we will now return to the usual finite element notation <span class="math inline">\(\mathbf{N}(\xi)\)</span> for the shape functions defined on the reference domain.</p>
+</section>
+<section id="element-integrals-on-the-reference-domain" class="level2" data-number="17.9">
+<h2 data-number="17.9" class="anchored" data-anchor-id="element-integrals-on-the-reference-domain"><span class="header-section-number">17.9</span> Element integrals on the reference domain</h2>
+<p>The element stiffness matrix of the two-node bar element is</p>
+<p><span class="math display">\[
+  \mathbf{K}_e
+  =
+  \int_{\Omega_e}
+  \mathbf{B}^{\mathsf T}
+  EA
+  \mathbf{B}
+  \,dx
+\]</span></p>
+<p>which, using the isoparametric mapping, can be expressed over the reference domain as</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{K}_e
+  =
+  \int_{-1}^{1}
+  \mathbf{B}(\xi)^{\mathsf T}
+  E\!\left(x(\xi)\right)
+  A\!\left(x(\xi)\right)
+  \mathbf{B}(\xi)
+  J(\xi)
+  \,d\xi.
+  }
+\]</span></p>
+<p>The same transformation applies to the consistent distributed-load vector,</p>
+<p><span class="math display">\[
+  \mathbf{f}_e^q
+  =
+  \int_{\Omega_e}
+  \mathbf{N}^{\mathsf T}q\,dx,
+\]</span></p>
+<p>which becomes</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf{f}_e^q
+  =
+  \int_{-1}^{1}
+  \mathbf{N}(\xi)^{\mathsf T}
+  q\!\left(x(\xi)\right)
+  J(\xi)
+  \,d\xi.
+  }
+\]</span></p>
+<p>These are the same expressions used in <a href="gauss-quadrature-two-node-bar.html" class="quarto-xref"><span>Chapter 15</span></a>. The difference is that we now interpret them as consequences of the general isoparametric construction rather than as relations specific to the affine two-node element.</p>
+<p>If numerical integration is used,</p>
+<p><span class="math display">\[
+  \mathbf{K}_e
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  \mathbf{B}_g^{\mathsf T}
+  E_gA_g
+  \mathbf{B}_g
+  J_g
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  \mathbf{f}_e^q
+  \approx
+  \sum_{g=1}^{n_g}
+  w_g
+  \mathbf{N}_g^{\mathsf T}
+  q_g
+  J_g,
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+  \mathbf{N}_g
+  =
+  \mathbf{N}(\xi_g),
+  \qquad
+  \mathbf{B}_g
+  =
+  \mathbf{B}(\xi_g),
+  \qquad
+  J_g
+  =
+  J(\xi_g).
+\]</span></p>
+<p>The notation <span class="math inline">\(J_g\)</span> is useful in the general case because the Jacobian need not be constant over the element.</p>
+</section>
+<section id="interpolation-order-and-quadrature-order" class="level2" data-number="17.10">
+<h2 data-number="17.10" class="anchored" data-anchor-id="interpolation-order-and-quadrature-order"><span class="header-section-number">17.10</span> Interpolation order and quadrature order</h2>
+<p>The preceding Gauss–Legendre chapter established that the minimum exact quadrature rule is determined by the degree of each complete <strong>transformed scalar integrand</strong>.</p>
+<p>The isoparametric formulation shows how the different contributions to that integrand arise from the interpolation, the geometry mapping, and the physical data. Suppose, for example, that the shape functions are quadratic in <span class="math inline">\(\xi\)</span>. Then</p>
+<p><span class="math display">\[
+  N_i(\xi)
+\]</span></p>
+<p>has polynomial degree two, while</p>
+<p><span class="math display">\[
+  \frac{dN_i}{d\xi}
+\]</span></p>
+<p>has degree one.</p>
+<p>For an affine geometry mapping with constant <span class="math inline">\(J\)</span>, a representative transformed integrand containing two shape functions is</p>
+<p><span class="math display">\[
+  N_i(\xi)N_j(\xi)J.
+\]</span></p>
+<p>If the shape functions are quadratic in <span class="math inline">\(\xi\)</span>, this integrand has degree four.</p>
+<p>Exact Gauss–Legendre integration therefore requires three points because</p>
+<p><span class="math display">\[
+  4\leq2(3)-1=5.
+\]</span></p>
+<p>A stiffness integrand for constant <span class="math inline">\(E\)</span>, constant <span class="math inline">\(A\)</span>, and constant <span class="math inline">\(J\)</span> contains</p>
+<p><span class="math display">\[
+  B_iEA B_jJ.
+\]</span></p>
+<p>Since</p>
+<p><span class="math display">\[
+  B_i
+  =
+  \frac{1}{J}\frac{dN_i}{d\xi},
+\]</span></p>
+<p>each <span class="math inline">\(B_i\)</span> is linear when <span class="math inline">\(J\)</span> is constant. The stiffness integrand is therefore quadratic:</p>
+<p><span class="math display">\[
+  1+1=2,
+\]</span></p>
+<p>and a two-point Gauss–Legendre rule is sufficient for exact integration.</p>
+<p>Thus the same quadratic interpolation can produce element integrands requiring different numbers of integration points.</p>
+<p>The interpolation order alone does not determine the quadrature order.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Select quadrature from the transformed integrand">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Select quadrature from the transformed integrand
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The number of Gauss–Legendre points must be selected from the complete scalar integrand after the coordinate and derivative transformations have been performed.</p>
+<p>Neither the polynomial degree of the shape functions alone nor the degree of one individual factor is sufficient.</p>
+</div>
+</div>
+</section>
+<section id="affine-and-non-affine-isoparametric-mappings" class="level2" data-number="17.11">
+<h2 data-number="17.11" class="anchored" data-anchor-id="affine-and-non-affine-isoparametric-mappings"><span class="header-section-number">17.11</span> Affine and non-affine isoparametric mappings</h2>
+<p>For the two-node bar considered so far, the geometry interpolation produces the affine mapping introduced in <a href="standard-and-physical-coordinates.html" class="quarto-xref"><span>Chapter 14</span></a>:</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  \frac{x_1+x_2}{2}
+  +
+  \frac{L_e}{2}\xi,
+\]</span></p>
+<p>with constant Jacobian</p>
+<p><span class="math display">\[
+  J
+  =
+  \frac{dx}{d\xi}
+  =
+  \frac{L_e}{2}.
+\]</span></p>
+<p>In that case, the local scale factor between the reference and physical coordinates is the same everywhere in the element.</p>
+<p>The isoparametric formulation, however, is not restricted to affine mappings. When higher-order shape functions are used to interpolate the geometry, the map <span class="math inline">\(x(\xi)\)</span> can become non-affine and the Jacobian can vary with <span class="math inline">\(\xi\)</span>. Higher-order interpolation does not, however, make the mapping non-affine automatically: this depends on the physical positions of the element nodes.</p>
+<p>To illustrate this distinction, we briefly consider a three-node geometry. The purpose here is only to examine the coordinate mapping <span class="math inline">\(x(\xi)\)</span> and its Jacobian. The three-node quadratic bar element itself will be developed in the next chapter.</p>
+<p>Consider the reference interval</p>
+<p><span class="math display">\[
+  -1\leq\xi\leq1,
+\]</span></p>
+<p>with three local nodes located at</p>
+<p><span class="math display">\[
+  \xi_1=-1,
+  \qquad
+  \xi_2=0,
+  \qquad
+  \xi_3=1,
+\]</span></p>
+<p>and quadratic nodal shape functions</p>
+<p><span class="math display">\[
+  N_1(\xi)
+  =
+  \frac{1}{2}\xi(\xi-1),
+\]</span></p>
+<p><span class="math display">\[
+  N_2(\xi)
+  =
+  1-\xi^2,
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  N_3(\xi)
+  =
+  \frac{1}{2}\xi(\xi+1).
+\]</span></p>
+<p>Their construction will be derived in the following chapter. Here they are used only to examine the geometry mapping</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  N_1(\xi)x_1
+  +
+  N_2(\xi)x_2
+  +
+  N_3(\xi)x_3.
+\]</span></p>
+<section id="a-three-node-geometry-with-a-midpoint-node" class="level3" data-number="17.11.1">
+<h3 data-number="17.11.1" class="anchored" data-anchor-id="a-three-node-geometry-with-a-midpoint-node"><span class="header-section-number">17.11.1</span> A three-node geometry with a midpoint node</h3>
+<p>Let the physical nodal coordinates be</p>
+<p><span class="math display">\[
+  x_1=0,
+  \qquad
+  x_2=\frac{L_e}{2},
+  \qquad
+  x_3=L_e.
+\]</span></p>
+<p>The middle node is exactly halfway between the two end nodes. The isoparametric mapping becomes</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  x(\xi)
+  &amp;=
+  N_1(\xi)\,0
+  +
+  N_2(\xi)\frac{L_e}{2}
+  +
+  N_3(\xi)L_e
+  \\[1mm]
+  &amp;=
+  \frac{L_e}{2}(1+\xi).
+  \end{aligned}
+\]</span></p>
+<p>Although quadratic shape functions were used to interpolate the geometry, the quadratic terms cancel. The actual coordinate mapping is affine.</p>
+<p>Its Jacobian is therefore constant:</p>
+<p><span class="math display">\[
+  \boxed{
+  J
+  =
+  \frac{dx}{d\xi}
+  =
+  \frac{L_e}{2}.
+  }
+\]</span></p>
+<p>This distinction is important:</p>
+<blockquote class="blockquote">
+<p>The interpolation used to describe the geometry may be quadratic even when the resulting physical mapping happens to be affine.</p>
+</blockquote>
+<p>The word <em>isoparametric</em> describes the relationship between geometry and field interpolation. It does not imply that the resulting geometry mapping must be non-affine.</p>
+</section>
+<section id="moving-the-middle-node" class="level3" data-number="17.11.2">
+<h3 data-number="17.11.2" class="anchored" data-anchor-id="moving-the-middle-node"><span class="header-section-number">17.11.2</span> Moving the middle node</h3>
+<p>Now consider the unit physical interval with</p>
+<p><span class="math display">\[
+  x_1=0,
+  \qquad
+  x_2=0.6,
+  \qquad
+  x_3=1.
+\]</span></p>
+<p>The middle physical node no longer lies at the midpoint <span class="math inline">\(x=0.5\)</span>.</p>
+<p>Using the same quadratic shape functions,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  x(\xi)
+  &amp;=
+  N_1(\xi)\,0
+  +
+  N_2(\xi)\,0.6
+  +
+  N_3(\xi)\,1
+  \\[1mm]
+  &amp;=
+  0.6+0.5\xi-0.1\xi^2.
+  \end{aligned}
+\]</span></p>
+<p>The quadratic term no longer cancels. The mapping is genuinely non-affine.</p>
+<p>Its Jacobian is</p>
+<p><span class="math display">\[
+  \boxed{
+  J(\xi)
+  =
+  0.5-0.2\xi.
+  }
+\]</span></p>
+<p>The local scale factor therefore varies through the element.</p>
+<p>For</p>
+<p><span class="math display">\[
+  -1\leq\xi\leq1,
+\]</span></p>
+<p>the Jacobian ranges between</p>
+<p><span class="math display">\[
+  J(-1)=0.7
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  J(1)=0.3.
+\]</span></p>
+<p>It remains positive throughout the element, so the mapping remains valid even though it is non-affine.</p>
+</section>
+</section>
+<section id="mapping-validity-and-the-jacobian" class="level2" data-number="17.12">
+<h2 data-number="17.12" class="anchored" data-anchor-id="mapping-validity-and-the-jacobian"><span class="header-section-number">17.12</span> Mapping validity and the Jacobian</h2>
+<p>The Jacobian is not only an integration factor. It also provides information about the validity of the element geometry.</p>
+<p>For an orientation-preserving one-dimensional mapping, we require</p>
+<p><span class="math display">\[
+  \boxed{
+  J(\xi)&gt;0
+  \qquad
+  \text{for all }
+  -1\leq\xi\leq1.
+  }
+\]</span></p>
+<p>If</p>
+<p><span class="math display">\[
+  J(\xi)=0
+\]</span></p>
+<p>at some position, the mapping becomes locally singular: the local scale factor between reference and physical coordinates vanishes at that position.</p>
+<p>If</p>
+<p><span class="math display">\[
+  J(\xi)&lt;0,
+\]</span></p>
+<p>the local orientation is reversed.</p>
+<p>A mapping whose Jacobian changes sign within the reference domain cannot provide the required one-to-one, orientation-preserving description of the physical element.</p>
+<p>For the affine two-node element with <span class="math inline">\(x_2&gt;x_1\)</span>,</p>
+<p><span class="math display">\[
+  J=\frac{x_2-x_1}{2}&gt;0
+\]</span></p>
+<p>automatically.</p>
+<p>For higher-order geometry, however,</p>
+<p><span class="math display">\[
+  J=J(\xi)
+\]</span></p>
+<p>may vary, and its behavior must be considered throughout the element.</p>
+<p>The displaced-middle-node example above gives</p>
+<p><span class="math display">\[
+  J(\xi)=0.5-0.2\xi,
+\]</span></p>
+<p>which remains positive on the entire reference interval. It therefore illustrates an important distinction:</p>
+<blockquote class="blockquote">
+<p>A non-affine mapping is not necessarily an invalid mapping.</p>
+</blockquote>
+<p>The relevant question is whether the mapping remains one-to-one and orientation-preserving, with <span class="math inline">\(J(\xi)&gt;0\)</span> throughout the reference domain.</p>
+</section>
+<section id="non-affine-mappings-and-quadrature" class="level2" data-number="17.13">
+<h2 data-number="17.13" class="anchored" data-anchor-id="non-affine-mappings-and-quadrature"><span class="header-section-number">17.13</span> Non-affine mappings and quadrature</h2>
+<p>A variable Jacobian also affects the form of transformed element integrands.</p>
+<p>For the axial-bar stiffness,</p>
+<p><span class="math display">\[
+  \mathbf{B}
+  =
+  \frac{1}{J}
+  \frac{d\mathbf{N}}{d\xi}.
+\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  \mathbf{B}^{\mathsf T}
+  EA
+  \mathbf{B}
+  J
+  &amp;=
+  \left(
+  \frac{1}{J}
+  \frac{d\mathbf{N}}{d\xi}
+  \right)^{\mathsf T}
+  EA
+  \left(
+  \frac{1}{J}
+  \frac{d\mathbf{N}}{d\xi}
+  \right)
+  J
+  \\[2mm]
+  &amp;=
+  \frac{EA}{J}
+  \left(
+  \frac{d\mathbf{N}}{d\xi}
+  \right)^{\mathsf T}
+  \frac{d\mathbf{N}}{d\xi}.
+  \end{aligned}
+\]</span></p>
+<p>When <span class="math inline">\(J\)</span> is constant, polynomial degree counting is straightforward.</p>
+<p>When</p>
+<p><span class="math display">\[
+  J=J(\xi)
+\]</span></p>
+<p>varies, the factor</p>
+<p><span class="math display">\[
+  \frac{1}{J(\xi)}
+\]</span></p>
+<p>must be included in the complete transformed integrand. Even when the shape functions are polynomial, the stiffness integrand may therefore no longer be a polynomial.</p>
+<p>In that case, the Gauss–Legendre degree-of-exactness rule</p>
+<p><span class="math display">\[
+  p\leq2n_g-1
+\]</span></p>
+<p>does not provide a finite polynomial degree from which exactness can be guaranteed. Numerical integration remains applicable, but its accuracy must be assessed rather than inferred from polynomial degree alone.</p>
+<p>This is why the quadrature rule must always be selected by examining the complete transformed integrand.</p>
+<p>The first three-node bar developed in the next chapter will deliberately place the middle node at the physical midpoint. Its mapping therefore remains affine and its Jacobian constant, allowing the effects of quadratic displacement interpolation to be studied without simultaneously introducing the additional complications of a variable geometric mapping.</p>
+</section>
+<section id="isoparametric-and-other-parametric-formulations" class="level2" data-number="17.14">
+<h2 data-number="17.14" class="anchored" data-anchor-id="isoparametric-and-other-parametric-formulations"><span class="header-section-number">17.14</span> Isoparametric and other parametric formulations</h2>
+<p>The formulation considered throughout this chapter uses the same interpolation functions for the geometry and the displacement field and is therefore isoparametric.</p>
+<p>Other choices are possible. If the geometry is interpolated with a lower polynomial order than the primary field, the formulation is called <strong>subparametric</strong>; if the geometry uses a higher order, it is called <strong>superparametric</strong>.</p>
+<p>These alternatives are not needed for the developments that follow. We will continue with the isoparametric formulation so that the same reference shape functions retain a clear and consistent role in both the geometry and the unknown field.</p>
+</section>
+<section id="what-comes-next" class="level2" data-number="17.15">
+<h2 data-number="17.15" class="anchored" data-anchor-id="what-comes-next"><span class="header-section-number">17.15</span> What comes next</h2>
+<p>The isoparametric framework is now in place: the same shape functions describe the element geometry and the displacement field, the Jacobian connects reference and physical coordinates, and the resulting element integrals can be evaluated on the reference domain.</p>
+<p>The next chapter applies this framework to the three-node quadratic bar. There, the additional node supports a quadratic displacement interpolation, allowing the strain field to vary within an element. We will construct the corresponding Lagrange shape functions and use them to derive the element equations, numerical integration, and response recovery.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Exercises">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercises
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p>For the two-node interpolation on the reference interval, verify directly that</p>
+<p><span class="math display">\[
+  N_i(\xi_j)=\delta_{ij}
+\]</span></p>
+<p>for all four combinations of <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. Explain why this property makes <span class="math inline">\(u_1\)</span> and <span class="math inline">\(u_2\)</span> the values of the interpolated displacement at the two element nodes.</p></li>
+<li><p>Starting from</p>
+<p><span class="math display">\[
+  x(\xi)=\mathbf{N}(\xi)\mathbf{x}_e,
+\]</span></p>
+<p>derive</p>
+<p><span class="math display">\[
+  J(\xi)
+  =
+  \frac{d\mathbf{N}}{d\xi}\mathbf{x}_e.
+\]</span></p>
+<p>Identify which quantities determine the Jacobian and which common finite element quantities do not enter this expression.</p></li>
+<li><p>Starting from</p>
+<p><span class="math display">\[
+  u^h=u^h\!\left(x(\xi)\right),
+\]</span></p>
+<p>use the chain rule to derive</p>
+<p><span class="math display">\[
+  \frac{du^h}{dx}
+  =
+  \frac{1}{J}
+  \frac{du^h}{d\xi}.
+\]</span></p>
+<p>Explain why this relation is part of the exact coordinate transformation rather than a numerical approximation.</p></li>
+<li><p>Let <span class="math inline">\(N_i(x)\)</span> and <span class="math inline">\(N_j(x)\)</span> denote shape functions expressed in the physical coordinate, and let <span class="math inline">\(\bar N_i(\xi)\)</span> and <span class="math inline">\(\bar N_j(\xi)\)</span> denote their representations on the reference domain. Consider</p>
+<p><span class="math display">\[
+  I_N
+  =
+  \int_{\Omega_e}N_i(x)N_j(x)\,dx
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  I_B
+  =
+  \int_{\Omega_e}
+  \frac{dN_i}{dx}
+  \frac{dN_j}{dx}
+  \,dx.
+\]</span></p>
+<p>Transform both integrals to the reference coordinate and identify every factor of <span class="math inline">\(J\)</span> and <span class="math inline">\(1/J\)</span>. Explain why the two transformed integrands contain the Jacobian differently.</p></li>
+<li><p>Suppose that <span class="math inline">\(\bar N_i(\xi)\)</span> and <span class="math inline">\(\bar N_j(\xi)\)</span> are quadratic and <span class="math inline">\(J\)</span> is constant. Determine the polynomial degree of</p>
+<p><span class="math display">\[
+  \bar N_i\bar N_jJ
+\]</span></p>
+<p>and the minimum Gauss–Legendre rule required for exact integration.</p>
+<p>Then let</p>
+<p><span class="math display">\[
+  B_i=\frac{dN_i}{dx},
+  \qquad
+  B_j=\frac{dN_j}{dx},
+\]</span></p>
+<p>and repeat the calculation for</p>
+<p><span class="math display">\[
+  B_iB_jJ
+\]</span></p>
+<p>when <span class="math inline">\(B_i\)</span> and <span class="math inline">\(B_j\)</span> are linear.</p></li>
+<li><p>For a quadratic geometry with</p>
+<p><span class="math display">\[
+  x_1=0,
+  \qquad
+  x_2=\frac12,
+  \qquad
+  x_3=1,
+\]</span></p>
+<p>substitute the three quadratic shape functions into</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  \sum_{i=1}^{3}N_i(\xi)x_i
+\]</span></p>
+<p>and verify that the quadratic terms cancel. Compute the Jacobian and confirm that the resulting map is affine.</p></li>
+<li><p>Repeat the preceding calculation for</p>
+<p><span class="math display">\[
+  x_1=0,
+  \qquad
+  x_2=0.6,
+  \qquad
+  x_3=1.
+\]</span></p>
+<p>Verify that</p>
+<p><span class="math display">\[
+  x(\xi)
+  =
+  0.6+0.5\xi-0.1\xi^2
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  J(\xi)
+  =
+  0.5-0.2\xi.
+\]</span></p>
+<p>Determine the minimum and maximum values of <span class="math inline">\(J\)</span> over <span class="math inline">\(-1\leq\xi\leq1\)</span> and explain why this non-affine mapping remains valid.</p></li>
+<li><p>Explain the distinction between each of the following pairs of concepts:</p>
+<ul>
+<li>isoparametric formulation and numerical integration;</li>
+<li>higher-order geometry interpolation and non-affine mapping;</li>
+<li>interpolation order and quadrature order;</li>
+<li>variable Jacobian and invalid mapping.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled" title="Key points to remember">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Key points to remember
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>The isoparametric formulation organizes several ideas introduced in the preceding chapters: interpolation on a reference domain, coordinate mapping, Jacobian transformations, and the transformation and evaluation of element integrals.</p></li>
+<li><p>Interpolation, coordinate mapping, and numerical integration are distinct operations. The mapping and its derivative transformations are exact for the element geometry being represented; numerical approximation by quadrature begins only when an integral is replaced by a finite quadrature sum.</p></li>
+<li><p>Lagrange shape functions satisfy the nodal interpolation property</p>
+<p><span class="math display">\[
+  N_i(\xi_j)=\delta_{ij}.
+\]</span></p>
+<p>The two-node bar shape functions already used in the book are linear Lagrange shape functions.</p></li>
+<li><p>In an isoparametric formulation, the same shape functions defined on the reference domain interpolate both the geometry and the primary unknown field:</p>
+<p><span class="math display">\[
+  x(\xi)=\mathbf{N}(\xi)\mathbf{x}_e,
+  \qquad
+  u^h\!\left(x(\xi)\right)=\mathbf{N}(\xi)\mathbf{u}_e.
+\]</span></p></li>
+<li><p>The Jacobian is determined by the geometry:</p>
+<p><span class="math display">\[
+  J(\xi)
+  =
+  \frac{dx}{d\xi}
+  =
+  \frac{d\mathbf{N}}{d\xi}\mathbf{x}_e.
+\]</span></p></li>
+<li><p>Shape-function values and physical derivatives enter the coordinate transformation differently. Differential lengths introduce <span class="math inline">\(J\)</span>, while physical derivatives introduce <span class="math inline">\(1/J\)</span> through</p>
+<p><span class="math display">\[
+  \frac{d\mathbf{N}}{dx}
+  =
+  \frac{1}{J}
+  \frac{d\mathbf{N}}{d\xi}.
+\]</span></p></li>
+<li><p>The number of Gauss–Legendre points must be selected from the complete transformed scalar integrand. Interpolation order alone is not sufficient.</p></li>
+<li><p>Higher-order geometry interpolation does not necessarily produce a non-affine map. For a three-node geometry whose middle node lies at the physical midpoint, the quadratic geometry interpolation reduces to an affine mapping.</p></li>
+<li><p>A non-affine mapping can still be valid. In one dimension, an orientation-preserving mapping requires</p>
+<p><span class="math display">\[
+  J(\xi)&gt;0
+\]</span></p>
+<p>throughout the reference domain.</p></li>
+<li><p>When <span class="math inline">\(J(\xi)\)</span> varies, factors such as <span class="math inline">\(1/J(\xi)\)</span> may make a transformed stiffness integrand non-polynomial. The polynomial degree-of-exactness rule then no longer guarantees exact integration with a prescribed finite Gauss–Legendre rule.</p></li>
+</ul>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/gauss-legendre-quadrature-implementation.html" class="pagination-link" aria-label="Implementing Gauss--Legendre quadrature for the two-node bar">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Implementing Gauss–Legendre quadrature for the two-node bar</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
