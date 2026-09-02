@@ -33,6 +33,7 @@ book:
         - chapters/gauss-quadrature-two-node-bar.qmd
         - chapters/gauss-legendre-quadrature-implementation.qmd
         - chapters/isoparametric-formulation-one-dimension.qmd
+        - chapters/isoparametric-three-node-bar_element.qmd
     - glossary.qmd
     - references.qmd
 

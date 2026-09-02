@@ -1,0 +1,1149 @@
+# The three-node quadratic axial-bar element
+
+This chapter develops the three-node quadratic axial-bar element as the first
+higher-order extension of the two-node bar introduced earlier.
+
+The finite element procedure developed in the previous chapters does not change.
+We will still interpolate the displacement field, map the reference element to
+physical space, transform derivatives through the Jacobian, construct and
+integrate the element equations, assemble the global problem, and recover the
+element response.
+
+What changes is one fundamental ingredient: the **approximation space** used
+within each element.
+
+The two-node axial-bar element uses a linear displacement interpolation,
+
+$$
+  u^h\in\mathcal P_1,
+$$
+
+and therefore produces a constant strain within each element. Introducing a
+third node allows the displacement approximation to be enriched to
+$u^h\in\mathcal P_2$. For the regular affine element considered in this chapter,
+this gives $\varepsilon^h\in\mathcal P_1$.
+
+This change has consequences throughout the element formulation. The
+strain--displacement matrix is no longer constant, strain and stress can vary
+within the element, and the polynomial degrees of the stiffness and load
+integrands change, affecting the quadrature required for exact integration.
+
+At the same time, increasing the interpolation order does not imply that every
+finite element solution must be quadratic. The approximation spaces are nested,
+
+$$
+  \mathcal P_0
+  \subset
+  \mathcal P_1
+  \subset
+  \mathcal P_2,
+$$
+
+so a quadratic element can also represent constant and linear displacement
+fields. This connection between the approximation space and the fields that an
+element can represent exactly will be one of the main themes of the chapter.
+
+We will construct the quadratic Lagrange shape functions, specialize the
+one-dimensional isoparametric formulation to a regular three-node bar, derive
+its stiffness matrix and consistent distributed-load vector, and then use two
+simple one-element problems to examine what the richer approximation space can
+actually represent.
+
+## Quadratic shape functions
+
+To construct the quadratic approximation
+
+$$
+  u^h\in\mathcal P_2,
+$$
+
+consider the reference interval
+
+$$
+  -1\le\xi\le1
+$$
+
+with three interpolation nodes,
+
+$$
+  \xi_1=-1,
+  \qquad
+  \xi_2=0,
+  \qquad
+  \xi_3=1.
+$$
+
+The corresponding element displacement vector is
+
+$$
+  \mathbf u_e
+  =
+  \begin{bmatrix}
+  u_1\\
+  u_2\\
+  u_3
+  \end{bmatrix}.
+$$
+
+As for the two-node element, the shape functions must satisfy the nodal
+interpolation conditions
+
+$$
+  N_i(\xi_j)=\delta_{ij}.
+$$
+
+Let us derive the first shape function directly from these conditions. Since
+$N_1$ is quadratic, it can be expressed as the quadratic polynomial
+
+$$
+  N_1(\xi)=a+b\xi+c\xi^2.
+$$
+
+The requirements
+
+$$
+  N_1(-1)=1,
+  \qquad
+  N_1(0)=0,
+  \qquad
+  N_1(1)=0
+$$
+
+give
+
+$$
+  a=0,
+  \qquad
+  b=-\frac12,
+  \qquad
+  c=\frac12.
+$$
+
+Hence,
+
+$$
+  \boxed{
+  N_1(\xi)
+  =
+  \frac12\xi(\xi-1).
+  }
+$$
+
+Applying the same nodal conditions to the other two nodes gives
+
+$$
+  \boxed{
+  N_2(\xi)=1-\xi^2
+  }
+$$
+
+and
+
+$$
+  \boxed{
+  N_3(\xi)
+  =
+  \frac12\xi(\xi+1).
+  }
+$$
+
+### Using Lagrange polynomials
+
+The direct derivation above shows how a nodal shape function is determined from
+its interpolation conditions. The same functions can also be constructed
+systematically using Lagrange polynomials.
+
+For a set of interpolation nodes with reference coordinates
+$\xi_1,\xi_2,\ldots,\xi_n$, the Lagrange shape function $N_i(\xi)$ is associated
+with node $i$:
+
+$$
+  N_i(\xi)
+  =
+  \prod_{\substack{j=1\\j\ne i}}^n
+  \frac{\xi-\xi_j}{\xi_i-\xi_j}.
+$$
+
+For example,
+
+$$
+  N_1(\xi)
+  =
+  \frac{\xi-\xi_2}{\xi_1-\xi_2}
+  \frac{\xi-\xi_3}{\xi_1-\xi_3}
+  =
+  \frac{\xi}{-1}
+  \frac{\xi-1}{-2}
+  =
+  \frac12\xi(\xi-1).
+$$
+
+The remaining two functions follow in the same way.
+
+The Lagrange construction is useful because it provides a systematic procedure
+for generating nodal interpolation functions once the interpolation nodes have
+been specified.
+
+The three shape functions are collected in the shape-function matrix
+
+$$
+  \mathbf N(\xi)
+  =
+  \begin{bmatrix}
+  N_1(\xi) & N_2(\xi) & N_3(\xi)
+  \end{bmatrix}.
+$$
+
+The quadratic finite element displacement field is therefore written as
+
+$$
+  \boxed{
+  u^h\!\left(x(\xi)\right)
+  =
+  \mathbf N(\xi)\mathbf u_e.
+  }
+$$
+
+The shape functions satisfy the partition-of-unity property,
+
+$$
+  N_1(\xi)+N_2(\xi)+N_3(\xi)=1.
+$$
+
+Consider a constant displacement field, for which
+
+$$
+  u_1=u_2=u_3=\bar u.
+$$
+
+The finite element interpolation then gives
+
+$$
+  u^h\!\left(x(\xi)\right)
+  =
+  \mathbf N(\xi)\mathbf u_e
+  =
+  \left(
+  N_1+N_2+N_3
+  \right)\bar u
+  =
+  \bar u.
+$$
+
+Therefore, the partition-of-unity property ensures that a constant displacement
+field,
+
+$$
+  u\in\mathcal P_0,
+$$
+
+corresponding to a rigid translation of the bar, is reproduced exactly. Since
+such a field has zero strain, the element does not generate spurious deformation
+under rigid-body motion.
+
+## Regular isoparametric geometry and the strain--displacement matrix
+
+The preceding chapter showed that a three-node isoparametric geometry does not
+necessarily produce a non-affine mapping. In particular, if the middle physical
+node lies exactly halfway between the two end nodes, the quadratic geometry
+interpolation reduces to an affine map.
+
+We adopt that regular geometry here:
+
+$$
+  x_2=\frac{x_1+x_3}{2},
+$$
+
+with
+
+$$
+  L_e=x_3-x_1.
+$$
+
+Using
+
+$$
+  x(\xi)=\mathbf N(\xi)\mathbf x_e,
+$$
+
+the coordinate mapping becomes
+
+$$
+  x(\xi)
+  =
+  x_1+\frac{L_e}{2}(1+\xi),
+$$
+
+and therefore
+
+$$
+  \boxed{
+  J=\frac{dx}{d\xi}=\frac{L_e}{2}.
+  }
+$$
+
+The geometry is thus deliberately kept affine. The constant Jacobian allows us
+to isolate the effect of increasing the displacement interpolation order: in
+this regular case, $\mathbf B(\xi)$ remains linear in $\xi$. With a non-affine
+geometry, $J$ would vary within the element and this simple polynomial structure
+would no longer hold.
+
+Differentiating the quadratic shape functions gives
+
+$$
+  \frac{d\mathbf N}{d\xi}
+  =
+  \begin{bmatrix}
+  \xi-\frac12 &
+  -2\xi &
+  \xi+\frac12
+  \end{bmatrix}.
+$$
+
+Using the derivative transformation established previously,
+
+$$
+  \mathbf B(\xi)
+  =
+  \frac{1}{J}
+  \frac{d\mathbf N}{d\xi},
+$$
+
+we obtain
+
+$$
+  \boxed{
+  \mathbf B(\xi)
+  =
+  \frac{2}{L_e}
+  \begin{bmatrix}
+  \xi-\frac12 &
+  -2\xi &
+  \xi+\frac12
+  \end{bmatrix}.
+  }
+$$
+
+Unlike the two-node bar, the strain--displacement matrix now varies within the
+element.
+
+Consequently,
+
+$$
+  \varepsilon^h\!\left(x(\xi)\right)
+  =
+  \mathbf B(\xi)\mathbf u_e
+$$
+
+is of degree at most one in $\xi$. Since the coordinate mapping is affine, it is
+also of degree at most one in the physical coordinate $x$. For constant $E$ and
+$A$, the same is true of stress and axial force.
+
+## Element stiffness and numerical integration
+
+The element stiffness matrix retains the same form used for the two-node bar,
+
+$$
+  \mathbf K_e
+  =
+  \int_{-1}^{1}
+  \mathbf B(\xi)^{\mathsf T}
+  EA
+  \mathbf B(\xi)
+  J\,d\xi.
+$$
+
+What changes is the polynomial degree of the transformed integrand.
+
+For the regular quadratic element with constant $E$ and $A$,
+
+$$
+  \mathbf B(\xi)\in\mathcal P_1,
+$$
+
+because the derivatives of the quadratic shape functions are linear and the
+Jacobian is constant. Therefore, each scalar entry of the stiffness integrand
+contains a product
+
+$$
+  B_i(\xi)B_j(\xi)\in\mathcal P_2.
+$$
+
+The complete transformed scalar stiffness integrands are thus quadratic in
+$\xi$.
+
+The Gauss--Legendre rule must therefore satisfy
+
+$$
+  2n_g-1\ge2,
+$$
+
+so the minimum exact rule has
+
+$$
+  \boxed{n_g=2.}
+$$
+
+This is the first direct numerical consequence of increasing the interpolation
+order. For the constant-property two-node bar, $\mathbf B$ is constant and one
+Gauss point is sufficient; for the quadratic bar, $\mathbf B$ varies linearly
+and two points are required.
+
+For example,
+
+$$
+  K_{11}
+  =
+  \int_{-1}^{1}
+  B_1(\xi)^2EAJ\,d\xi,
+$$
+
+with
+
+$$
+  B_1(\xi)
+  =
+  \frac{2}{L_e}
+  \left(
+  \xi-\frac12
+  \right).
+$$
+
+The corresponding scalar integrand therefore contains the quadratic factor
+
+$$
+  \left(
+  \xi-\frac12
+  \right)^2.
+$$
+
+Evaluating the element integrals gives
+
+$$
+  \boxed{
+  \mathbf K_e
+  =
+  \frac{EA}{3L_e}
+  \begin{bmatrix}
+  7 & -8 & 1\\
+  -8 & 16 & -8\\
+  1 & -8 & 7
+  \end{bmatrix}.
+  }
+$$
+
+Two-point Gauss--Legendre quadrature reproduces this matrix exactly.
+
+Using fewer quadrature points is not merely less accurate in this case. With one
+Gauss point, the quadratic element stiffness matrix develops an additional
+zero-energy mode. This consequence of under-integration is explored in the
+exercises.
+
+## Consistent distributed loading
+
+The consistent element load vector retains the same form,
+
+$$
+  \mathbf f_e^q
+  =
+  \int_{-1}^{1}
+  \mathbf N(\xi)^{\mathsf T}
+  q\!\left(x(\xi)\right)
+  J\,d\xi.
+$$
+
+For a uniform distributed load,
+
+$$
+  q(x)=q_0,
+$$
+
+the only factor that varies with $\xi$ is the quadratic shape function. Since
+
+$$
+  N_i(\xi)\in\mathcal P_2,
+$$
+
+while $q_0$ and $J$ are constant, each scalar load-vector integrand belongs to
+
+$$
+  \mathcal P_2.
+$$
+
+The minimum exact Gauss--Legendre rule therefore again has
+
+$$
+  \boxed{n_g=2.}
+$$
+
+This provides a second direct consequence of the higher-order interpolation. For
+the two-node bar with uniform loading, the corresponding load-vector integrands
+are linear and one Gauss point is sufficient. For the three-node quadratic bar,
+they are quadratic and require two points.
+
+Evaluating the integrals gives
+
+$$
+  \boxed{
+  \mathbf f_e^q
+  =
+  \frac{q_0L_e}{6}
+  \begin{bmatrix}
+  1\\
+  4\\
+  1
+  \end{bmatrix}.
+  }
+$$
+
+The ratio
+
+$$
+  1:4:1
+$$
+
+is not an arbitrary distribution of the total load. Each nodal contribution is
+determined by the corresponding shape function through
+
+$$
+  f_{e,i}^q
+  =
+  q_0J
+  \int_{-1}^{1}
+  N_i(\xi)\,d\xi.
+$$
+
+Because the shape functions form a partition of unity, the nodal contributions
+also preserve the total distributed load
+
+$$
+  \sum_{i=1}^{3} f_{e,i}^q
+  =
+  q_0L_e.
+$$
+
+## What the quadratic approximation can reproduce
+
+Having derived the quadratic element formulation, we can now ask a different
+question: which displacement fields can this richer approximation space
+represent exactly?
+
+The approximation space of the three-node element contains all polynomial
+displacement fields up to degree two,
+
+$$
+  \mathcal P_0
+  \subset
+  \mathcal P_1
+  \subset
+  \mathcal P_2.
+$$
+
+If a displacement field belongs to one of these polynomial subspaces, the
+interpolation has the capability to represent it exactly. This property is
+commonly described as **polynomial completeness** or **polynomial
+reproducibility**.
+
+The three cases have a direct mechanical interpretation:
+
+  | Displacement field | Polynomial space | Mechanical interpretation |
+  | ------------------ | ---------------: | ------------------------- |
+  | $u=a$              |   $\mathcal P_0$ | rigid translation         |
+  | $u=a+bx$           |   $\mathcal P_1$ | constant strain           |
+  | $u=a+bx+cx^2$      |   $\mathcal P_2$ | linearly varying strain   |
+
+Thus, increasing the interpolation order enlarges the set of displacement fields
+that the element can represent exactly. It does not require every finite element
+solution to contain a quadratic term.
+
+The following two one-element problems make this distinction explicit. The first
+has an exact solution in the lower-order space $\mathcal P_1$; the second uses
+the full quadratic space $\mathcal P_2$.
+
+### End-force-only bar
+
+Consider a bar of length $L$, constant $E$ and $A$, fixed at
+
+$$
+  x=0
+$$
+
+and subjected to an axial force $F$ at
+
+$$
+  x=L
+$$
+
+with no distributed load ($q(x)=0$).
+
+The analytical solution is
+
+$$
+  u(x)
+  =
+  \frac{F}{EA}x.
+$$
+
+The displacement field is therefore linear.
+
+Discretize the complete bar using one regular quadratic element,
+
+$$
+  x_1=0,
+  \qquad
+  x_2=\frac L2,
+  \qquad
+  x_3=L.
+$$
+
+The nodal force vector is
+
+$$
+  \mathbf f_e
+  =
+  \begin{bmatrix}
+  0\\
+  0\\
+  F
+  \end{bmatrix}.
+$$
+
+Using the quadratic-element stiffness matrix and imposing
+
+$$
+  u_1=0,
+$$
+
+yields the reduced system
+
+$$
+  \frac{EA}{3L}
+  \begin{bmatrix}
+  16 & -8\\
+  -8 & 7
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_2\\
+  u_3
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  0\\
+  F
+  \end{bmatrix}.
+$$
+
+Its solution is
+
+$$
+  u_2
+  =
+  \frac{FL}{2EA},
+  \qquad
+  u_3
+  =
+  \frac{FL}{EA}.
+$$
+
+Substituting these values into the quadratic interpolation gives
+
+$$
+  u^h\!\left(x(\xi)\right)
+  =
+  \frac{FL}{EA}
+  \left(
+  \frac12N_2+N_3
+  \right).
+$$
+
+Since
+
+$$
+  \frac12N_2+N_3
+  =
+  \frac{1+\xi}{2},
+$$
+
+and
+
+$$
+  x=\frac L2(1+\xi),
+$$
+
+we obtain
+
+$$
+  \boxed{
+  u^h(x)=\frac{F}{EA}x.
+  }
+$$
+
+For this problem, the quadratic element reproduces the linear solution exactly.
+The exact displacement field belongs to $\mathcal P_1$, which is contained in
+the quadratic approximation space $\mathcal P_2$.
+
+The quadratic term is therefore not activated in this particular solution: the
+element represents the lower-order linear field exactly, and the corresponding
+strain is constant.
+
+### Uniformly loaded bar
+
+Now consider the same bar subjected to a uniform distributed axial load $q$,
+with
+
+$$
+  u(0)=0
+$$
+
+and no applied axial force at
+
+$$
+  x=L.
+$$
+
+For constant $EA$,
+
+$$
+  -EA\frac{d^2u}{dx^2}=q,
+$$
+
+and the analytical solution is
+
+$$
+  \boxed{
+  u(x)
+  =
+  \frac{q}{EA}
+  \left(
+  Lx-\frac{x^2}{2}
+  \right),
+  }
+$$
+
+which is a quadratic displacement field.
+
+Using one regular quadratic element over the complete bar, the consistent load
+vector is
+
+$$
+  \mathbf f_e^q
+  =
+  \frac{qL}{6}
+  \begin{bmatrix}
+  1\\
+  4\\
+  1
+  \end{bmatrix}.
+$$
+
+After imposing
+
+$$
+  u_1=0,
+$$
+
+the reduced finite element equations become
+
+$$
+  \frac{EA}{3L}
+  \begin{bmatrix}
+  16 & -8\\
+  -8 & 7
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_2\\
+  u_3
+  \end{bmatrix}
+  =
+  \frac{qL}{6}
+  \begin{bmatrix}
+  4\\
+  1
+  \end{bmatrix}.
+$$
+
+The solution is
+
+$$
+  u_2
+  =
+  \frac{3qL^2}{8EA},
+  \qquad
+  u_3
+  =
+  \frac{qL^2}{2EA}.
+$$
+
+Substituting these nodal values into the interpolation gives
+
+$$
+  \boxed{
+  u^h(x)
+  =
+  \frac{q}{EA}
+  \left(
+  Lx-\frac{x^2}{2}
+  \right).
+  }
+$$
+
+One quadratic element therefore reproduces the complete analytical displacement
+field exactly.
+
+In this case,
+
+$$
+  u(x)\in\mathcal P_2,
+$$
+
+so the solution uses the full approximation space available to the element. Its
+derivative is linear, and the corresponding strain varies within the element.
+
+Together, the two examples show that the polynomial order of the element
+describes its **approximation capability**, not the polynomial degree that every
+particular solution must exhibit.
+
+## Response recovery
+
+For the quadratic element,
+
+$$
+  \varepsilon^h\!\left(x(\xi)\right)
+  =
+  \mathbf B(\xi)\mathbf u_e.
+$$
+
+Because $\mathbf B$ varies linearly with $\xi$, the finite element strain
+generally varies within the element. For constant $E$ and $A$, the same is true
+of
+
+$$
+  \sigma^h\!\left(x(\xi)\right)
+  =
+  E\varepsilon^h\!\left(x(\xi)\right)
+$$
+
+and
+
+$$
+  N^h\!\left(x(\xi)\right)
+  =
+  A\sigma^h\!\left(x(\xi)\right).
+$$
+
+Response recovery therefore no longer produces, in general, a single strain,
+stress, or axial-force value for the complete element. These fields can be
+evaluated at any selected position within the element.
+
+The locations used for response evaluation should not be confused with the
+quadrature points used to integrate the element equations. The same locations
+may be used for both purposes, but integration and response evaluation are
+different operations.
+
+## Toward the MiniFEM implementation
+
+The next implementation will reuse the existing isoparametric and
+Gauss--Legendre framework. Rather than constructing a new finite element
+workflow, we will adapt the verified two-node formulation to the quadratic
+interpolation developed in this chapter.
+
+The main element-level changes are:
+
+- three local displacement DOFs instead of two;
+- quadratic shape functions and linear shape-function derivatives;
+- a strain--displacement matrix $\mathbf B(\xi)$ that varies within the element;
+- two-point Gauss--Legendre quadrature for the regular constant-property
+  stiffness matrix and uniform distributed load;
+- response recovery for fields that can vary within the element.
+
+The two one-element problems considered in this chapter provide reference cases
+for verifying the implementation. The end-force problem must reproduce the
+linear displacement field and constant strain exactly, whereas the uniformly
+loaded problem must reproduce the quadratic displacement field and linear strain
+exactly.
+
+Once the quadratic element has been implemented and verified, we will move from
+exact polynomial reproduction to problems that require approximation, allowing
+us to introduce error measures and study convergence under mesh refinement.
+
+::: {.callout-tip title="Exercises"}
+1. Differentiate the partition-of-unity relation and verify that
+
+   $$ \frac{dN_1}{d\xi} + \frac{dN_2}{d\xi} + \frac{dN_3}{d\xi} =
+   0. $$
+
+   Explain why this is consistent with zero strain under a rigid translation.
+
+2. Consider a linear displacement field
+   $$
+   u(x)=a+bx.
+   $$
+   Evaluate it at the three element nodes,
+   $$
+   x_1,\qquad x_2=\frac{x_1+x_3}{2},\qquad x_3,
+   $$
+   and show directly that the quadratic interpolation reproduces the original
+   field exactly.
+
+3. Evaluate the stiffness entry
+
+   $$
+     K_{12}
+   $$
+
+   analytically and verify the corresponding entry of the closed-form element
+   stiffness matrix.
+
+4. Verify that
+
+   $$
+     \mathbf K_e
+     \begin{bmatrix}
+     1\\
+     1\\
+     1
+     \end{bmatrix}
+     =
+     \mathbf 0.
+   $$
+
+   What physical displacement mode does this vector represent?
+
+5. Evaluate the quadratic-element stiffness using one Gauss--Legendre point at
+
+   $$
+     \xi=0.
+   $$
+
+   Construct the resulting stiffness matrix and identify the additional
+   zero-energy mode.
+
+6. Use partition of unity to show directly that the uniform consistent load
+   vector preserves the total distributed load:
+
+   $$
+     \sum_{i=1}^{3}f_{e,i}^q=q_0L_e.
+   $$
+
+7. Suppose that $q(x)$ varies linearly over the regular quadratic element.
+
+   Determine the polynomial degree of
+
+   $$
+     N_i(\xi)q\!\left(x(\xi)\right)J
+   $$
+
+   and hence the minimum exact Gauss--Legendre rule.
+
+   Then derive the corresponding consistent nodal load vector.
+
+8. For the end-force-only example, substitute the finite element nodal
+   displacements into
+
+   $$
+     \varepsilon^h(\xi)
+     =
+     \mathbf B(\xi)\mathbf u_e
+   $$
+
+   and show that the strain is constant.
+
+   Repeat the calculation for the uniformly loaded bar and show that the strain
+   varies linearly.
+
+9. The three-node bar developed in this chapter uses the local numbering
+
+   $$
+     1 \;-\; 2 \;-\; 3,
+   $$
+
+   with node 2 at the element midpoint. In many finite element formulations,
+   however, the two end nodes are numbered first and the midpoint node is
+   numbered last. Relative to the numbering used in this chapter, the nodal
+   positions are then reordered as
+
+   $$
+     1 \;-\; 3 \;-\; 2.
+   $$
+
+   Thus, the alternative convention assigns local nodes 1 and 2 to the element
+   ends and local node 3 to the midpoint. The finite element itself has not
+   changed: only the ordering of the local nodal quantities has changed. This is
+   useful to understand because element matrices depend on the chosen local DOF
+   ordering, even though the underlying mechanical element and its physical
+   predictions remain unchanged.
+
+   Starting from the quadratic element derived in this chapter, construct the
+   element stiffness matrix for the local displacement vector
+
+   $$
+     \mathbf u_e
+     =
+     \begin{bmatrix}
+     u_1\\
+     u_2\\
+     u_3
+     \end{bmatrix},
+   $$
+
+   where nodes 1 and 2 are located at the two element ends and node 3 is the
+   midpoint.
+
+   Show that the resulting stiffness matrix is
+
+   $$
+     \boxed{
+     \mathbf K_e
+     =
+     \frac{EA}{3L_e}
+     \begin{bmatrix}
+     7 & 1 & -8\\
+     1 & 7 & -8\\
+     -8 & -8 & 16
+     \end{bmatrix}.
+     }
+   $$
+
+   Verify this result in two different ways:
+
+   1. Reorder the rows and columns of the stiffness matrix derived in the
+      chapter. You may do this using a permutation matrix. If
+
+      $$
+        \mathbf u_e^{(123)}
+        =
+        \begin{bmatrix}
+        u_1\\
+        u_2\\
+        u_3
+        \end{bmatrix}
+      $$
+
+      denotes the ordering used in the chapter, with node 2 at the midpoint, and
+
+      $$
+        \mathbf u_e^{(132)}
+        =
+        \begin{bmatrix}
+        u_1\\
+        u_3\\
+        u_2
+        \end{bmatrix}
+      $$
+
+      denotes the ordering with the two end nodes first, then
+
+      $$
+        \mathbf u_e^{(132)}
+        =
+        \mathbf P\mathbf u_e^{(123)},
+      $$
+
+      with
+
+      $$
+        \mathbf P
+        =
+        \begin{bmatrix}
+        1 & 0 & 0\\
+        0 & 0 & 1\\
+        0 & 1 & 0
+        \end{bmatrix}.
+      $$
+
+      Use this transformation to show that
+
+      $$
+        \boxed{
+        \mathbf K_e^{(132)}
+        =
+        \mathbf P
+        \mathbf K_e^{(123)}
+        \mathbf P^{\mathsf T}.
+        }
+      $$
+
+      Verify that this produces the matrix given above.
+
+   2. Verify the same result directly from the element formulation. For the new
+      local ordering, first write the reordered shape-function matrix as
+      $$
+      \mathbf N^{(132)}(\xi)
+      =
+      \begin{bmatrix}
+      N_1(\xi) & N_3(\xi) & N_2(\xi)
+      \end{bmatrix}.
+      $$
+      Construct the corresponding $\mathbf B^{(132)}(\xi)$ and use
+      $$
+      \mathbf K_e^{(132)}
+      =
+      \int_{-1}^{1}
+      \mathbf B^{(132)}(\xi)^{\mathsf T}
+      EA
+      \mathbf B^{(132)}(\xi)
+      J\,d\xi
+      $$
+      to verify the stiffness matrix obtained by permutation.
+
+      Explain why the two stiffness matrices have different arrangements of
+      their entries but represent exactly the same finite element.
+:::
+
+::: {.callout-important title="Key points to remember"}
+- Increasing the interpolation order from linear to quadratic enlarges the
+  approximation space from $\mathcal P_1$ to $\mathcal P_2$ without changing the
+  underlying finite element procedure.
+
+- The quadratic Lagrange shape functions satisfy the nodal interpolation
+  property
+  $$
+  N_i(\xi_j)=\delta_{ij}
+  $$
+  and form a partition of unity.
+
+- The approximation spaces are nested:
+  $$
+  \mathcal P_0
+  \subset
+  \mathcal P_1
+  \subset
+  \mathcal P_2.
+  $$
+  The quadratic element can therefore represent rigid translations, linear
+  displacement fields with constant strain, and quadratic displacement fields
+  with linearly varying strain.
+
+- The polynomial order of the element describes its approximation capability. It
+  does not require every finite element solution to contain terms of the highest
+  available order.
+
+- For the regular three-node element,
+  $$
+  J=\frac{L_e}{2},
+  $$
+  while $\mathbf B(\xi)$ is linear in $\xi$. For constant $E$ and $A$, strain,
+  stress, and axial force can therefore vary linearly within the element.
+
+- For constant $E$ and $A$, the stiffness integrands and the uniform-load
+  integrands are quadratic in $\xi$. Two-point Gauss--Legendre quadrature is the
+  minimum exact rule for both.
+
+- The consistent nodal vector for a uniform distributed load is
+  $$
+  \mathbf f_e^q
+  =
+  \frac{q_0L_e}{6}
+  \begin{bmatrix}
+  1\\
+  4\\
+  1
+  \end{bmatrix}.
+  $$
+
+- Increasing the interpolation order changes several connected parts of the
+  element formulation: it enriches the approximation space, changes
+  $\mathbf B(\xi)$ and the variation of the recovered fields within the element,
+  increases the polynomial degree of the element integrands, and can therefore
+  increase the quadrature order required for exact integration.
+:::
