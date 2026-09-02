@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>14&nbsp; Standard and physical coordinates – An Introduction to the Finite Element Method</title>
+<title>18&nbsp; The three-node quadratic axial-bar element – An Introduction to the Finite Element Method</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../chapters/gauss-quadrature-two-node-bar.html" rel="next">
-<link href="../chapters/numerical-integration-one-dimension.html" rel="prev">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/isoparametric-formulation-one-dimension.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -127,7 +127,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/standard-and-physical-coordinates.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/isoparametric-three-node-bar_element.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -269,7 +269,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link active">
+  <a href="../chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span></a>
   </div>
 </li>
@@ -293,7 +293,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/isoparametric-three-node-bar_element.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/isoparametric-three-node-bar_element.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></span></a>
   </div>
 </li>
@@ -321,30 +321,29 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#relating-two-intervals" id="toc-relating-two-intervals" class="nav-link active" data-scroll-target="#relating-two-intervals"><span class="header-section-number">14.1</span> Relating two intervals</a></li>
-  <li><a href="#the-jacobian" id="toc-the-jacobian" class="nav-link" data-scroll-target="#the-jacobian"><span class="header-section-number">14.2</span> The Jacobian</a>
+  <li><a href="#quadratic-shape-functions" id="toc-quadratic-shape-functions" class="nav-link active" data-scroll-target="#quadratic-shape-functions"><span class="header-section-number">18.1</span> Quadratic shape functions</a>
   <ul class="collapse">
-  <li><a href="#a-geometric-check" id="toc-a-geometric-check" class="nav-link" data-scroll-target="#a-geometric-check"><span class="header-section-number">14.2.1</span> A geometric check</a></li>
+  <li><a href="#using-lagrange-polynomials" id="toc-using-lagrange-polynomials" class="nav-link" data-scroll-target="#using-lagrange-polynomials"><span class="header-section-number">18.1.1</span> Using Lagrange polynomials</a></li>
   </ul></li>
-  <li><a href="#transforming-an-integral" id="toc-transforming-an-integral" class="nav-link" data-scroll-target="#transforming-an-integral"><span class="header-section-number">14.3</span> Transforming an integral</a></li>
-  <li><a href="#worked-example-mapping-an-integral-to-the-standard-interval" id="toc-worked-example-mapping-an-integral-to-the-standard-interval" class="nav-link" data-scroll-target="#worked-example-mapping-an-integral-to-the-standard-interval"><span class="header-section-number">14.4</span> Worked example: mapping an integral to the standard interval</a>
+  <li><a href="#regular-isoparametric-geometry-and-the-straindisplacement-matrix" id="toc-regular-isoparametric-geometry-and-the-straindisplacement-matrix" class="nav-link" data-scroll-target="#regular-isoparametric-geometry-and-the-straindisplacement-matrix"><span class="header-section-number">18.2</span> Regular isoparametric geometry and the strain–displacement matrix</a></li>
+  <li><a href="#element-stiffness-and-numerical-integration" id="toc-element-stiffness-and-numerical-integration" class="nav-link" data-scroll-target="#element-stiffness-and-numerical-integration"><span class="header-section-number">18.3</span> Element stiffness and numerical integration</a></li>
+  <li><a href="#consistent-distributed-loading" id="toc-consistent-distributed-loading" class="nav-link" data-scroll-target="#consistent-distributed-loading"><span class="header-section-number">18.4</span> Consistent distributed loading</a></li>
+  <li><a href="#what-the-quadratic-approximation-can-reproduce" id="toc-what-the-quadratic-approximation-can-reproduce" class="nav-link" data-scroll-target="#what-the-quadratic-approximation-can-reproduce"><span class="header-section-number">18.5</span> What the quadratic approximation can reproduce</a>
   <ul class="collapse">
-  <li><a href="#one-point-rule" id="toc-one-point-rule" class="nav-link" data-scroll-target="#one-point-rule"><span class="header-section-number">14.4.1</span> One-point rule</a></li>
-  <li><a href="#two--three--and-four-point-rules" id="toc-two--three--and-four-point-rules" class="nav-link" data-scroll-target="#two--three--and-four-point-rules"><span class="header-section-number">14.4.2</span> Two-, three-, and four-point rules</a></li>
+  <li><a href="#end-force-only-bar" id="toc-end-force-only-bar" class="nav-link" data-scroll-target="#end-force-only-bar"><span class="header-section-number">18.5.1</span> End-force-only bar</a></li>
+  <li><a href="#uniformly-loaded-bar" id="toc-uniformly-loaded-bar" class="nav-link" data-scroll-target="#uniformly-loaded-bar"><span class="header-section-number">18.5.2</span> Uniformly loaded bar</a></li>
   </ul></li>
-  <li><a href="#from-a-physical-interval-to-a-reference-element" id="toc-from-a-physical-interval-to-a-reference-element" class="nav-link" data-scroll-target="#from-a-physical-interval-to-a-reference-element"><span class="header-section-number">14.5</span> From a physical interval to a reference element</a></li>
-  <li><a href="#shape-functions-in-the-reference-coordinate" id="toc-shape-functions-in-the-reference-coordinate" class="nav-link" data-scroll-target="#shape-functions-in-the-reference-coordinate"><span class="header-section-number">14.6</span> Shape functions in the reference coordinate</a></li>
-  <li><a href="#transforming-shape-function-derivatives" id="toc-transforming-shape-function-derivatives" class="nav-link" data-scroll-target="#transforming-shape-function-derivatives"><span class="header-section-number">14.7</span> Transforming shape-function derivatives</a></li>
-  <li><a href="#what-the-mapping-has-accomplished" id="toc-what-the-mapping-has-accomplished" class="nav-link" data-scroll-target="#what-the-mapping-has-accomplished"><span class="header-section-number">14.8</span> What the mapping has accomplished</a></li>
+  <li><a href="#response-recovery" id="toc-response-recovery" class="nav-link" data-scroll-target="#response-recovery"><span class="header-section-number">18.6</span> Response recovery</a></li>
+  <li><a href="#toward-the-minifem-implementation" id="toc-toward-the-minifem-implementation" class="nav-link" data-scroll-target="#toward-the-minifem-implementation"><span class="header-section-number">18.7</span> Toward the MiniFEM implementation</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/standard-and-physical-coordinates.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/isoparametric-three-node-bar_element.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span id="sec-standard-physical-coordinates" class="quarto-section-identifier"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span></h1>
+<h1 class="title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></h1>
 </div>
 
 
@@ -361,529 +360,623 @@ window.Quarto = {
 </header>
 
 
-<p>The Gauss–Legendre rules introduced in <a href="numerical-integration-one-dimension.html" class="quarto-xref"><span>Chapter 13</span></a> are defined on the standard integration interval</p>
+<p>This chapter develops the three-node quadratic axial-bar element as the first higher-order extension of the two-node bar introduced earlier.</p>
+<p>The finite element procedure developed in the previous chapters does not change. We will still interpolate the displacement field, map the reference element to physical space, transform derivatives through the Jacobian, construct and integrate the element equations, assemble the global problem, and recover the element response.</p>
+<p>What changes is one fundamental ingredient: the <strong>approximation space</strong> used within each element.</p>
+<p>The two-node axial-bar element uses a linear displacement interpolation,</p>
 <p><span class="math display">\[
-  \xi\in[-1,1].
+  u^h\in\mathcal P_1,
 \]</span></p>
-<p>A scalar integral or a physical finite element is usually defined over a different interval. For example, consider a two-node bar element whose local nodes are ordered so that <span class="math inline">\(x_2&gt;x_1\)</span>. The element extends from <span class="math inline">\(x_1\)</span> to <span class="math inline">\(x_2\)</span> and has positive length</p>
+<p>and therefore produces a constant strain within each element. Introducing a third node allows the displacement approximation to be enriched to <span class="math inline">\(u^h\in\mathcal P_2\)</span>. For the regular affine element considered in this chapter, this gives <span class="math inline">\(\varepsilon^h\in\mathcal P_1\)</span>.</p>
+<p>This change has consequences throughout the element formulation. The strain–displacement matrix is no longer constant, strain and stress can vary within the element, and the polynomial degrees of the stiffness and load integrands change, affecting the quadrature required for exact integration.</p>
+<p>At the same time, increasing the interpolation order does not imply that every finite element solution must be quadratic. The approximation spaces are nested,</p>
 <p><span class="math display">\[
-  L_e=x_2-x_1&gt;0.
+  \mathcal P_0
+  \subset
+  \mathcal P_1
+  \subset
+  \mathcal P_2,
 \]</span></p>
-<p>The quadrature rule and the physical element therefore use two different coordinates:</p>
-<ul>
-<li><span class="math inline">\(\xi\)</span> describes a position on the standard interval;</li>
-<li><span class="math inline">\(x\)</span> describes a position on the physical interval.</li>
-</ul>
-<p>This chapter develops the exact change of coordinate that relates them. The mapping is not itself a numerical approximation. Its purpose is to express an integral defined on a physical interval as an equivalent integral on the standard interval.</p>
-<section id="relating-two-intervals" class="level2" data-number="14.1">
-<h2 data-number="14.1" class="anchored" data-anchor-id="relating-two-intervals"><span class="header-section-number">14.1</span> Relating two intervals</h2>
-<p>Consider an integral over the physical interval <span class="math inline">\([a,b]\)</span>,</p>
+<p>so a quadratic element can also represent constant and linear displacement fields. This connection between the approximation space and the fields that an element can represent exactly will be one of the main themes of the chapter.</p>
+<p>We will construct the quadratic Lagrange shape functions, specialize the one-dimensional isoparametric formulation to a regular three-node bar, derive its stiffness matrix and consistent distributed-load vector, and then use two simple one-element problems to examine what the richer approximation space can actually represent.</p>
+<section id="quadratic-shape-functions" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="quadratic-shape-functions"><span class="header-section-number">18.1</span> Quadratic shape functions</h2>
+<p>To construct the quadratic approximation</p>
 <p><span class="math display">\[
-  I
-  =
-  \int_a^b f(x)\,dx,
+  u^h\in\mathcal P_2,
+\]</span></p>
+<p>consider the reference interval</p>
+<p><span class="math display">\[
+  -1\le\xi\le1
+\]</span></p>
+<p>with three interpolation nodes,</p>
+<p><span class="math display">\[
+  \xi_1=-1,
   \qquad
-  a&lt;b.
-\]</span></p>
-<p>We seek a coordinate transformation <span class="math inline">\(x=x(\xi)\)</span> satisfying</p>
-<p><span class="math display">\[
-  \xi=-1
-  \quad\Longleftrightarrow\quad
-  x=a
-\]</span></p>
-<p>and</p>
-<p><span class="math display">\[
-  \xi=1
-  \quad\Longleftrightarrow\quad
-  x=b.
-\]</span></p>
-<p>Assume a transformation of the form</p>
-<p><span class="math display">\[
-  x(\xi)=c+d\xi.
-\]</span></p>
-<p>The endpoint conditions give</p>
-<p><span class="math display">\[
-  a=c-d,
+  \xi_2=0,
   \qquad
-  b=c+d.
+  \xi_3=1.
 \]</span></p>
-<p>Adding and subtracting these equations yields</p>
+<p>The corresponding element displacement vector is</p>
 <p><span class="math display">\[
-  c=\frac{a+b}{2},
-  \qquad
-  d=\frac{b-a}{2}.
-\]</span></p>
-<p>The required transformation is therefore</p>
-<p><span class="math display">\[
-  \boxed{
-  x(\xi)
+  \mathbf u_e
   =
-  \frac{a+b}{2}
-  +
-  \frac{b-a}{2}\xi.
-  }
+  \begin{bmatrix}
+  u_1\\
+  u_2\\
+  u_3
+  \end{bmatrix}.
 \]</span></p>
-<p>The first term locates the midpoint of the physical interval. The second term scales the standard interval, whose length is <span class="math inline">\(2\)</span>, to the physical interval, whose length is <span class="math inline">\(b-a\)</span>.</p>
-<p>The same transformation can be written as</p>
+<p>As for the two-node element, the shape functions must satisfy the nodal interpolation conditions</p>
 <p><span class="math display">\[
-  \boxed{
-  x(\xi)
-  =
-  \frac{1-\xi}{2}a
-  +
-  \frac{1+\xi}{2}b.
-  }
+  N_i(\xi_j)=\delta_{ij}.
 \]</span></p>
-<p>Substitution confirms the endpoint correspondence:</p>
+<p>Let us derive the first shape function directly from these conditions. Since <span class="math inline">\(N_1\)</span> is quadratic, it can be expressed as the quadratic polynomial</p>
 <p><span class="math display">\[
-  x(-1)=a,
-  \qquad
-  x(1)=b.
+  N_1(\xi)=a+b\xi+c\xi^2.
 \]</span></p>
-<p>The inverse transformation obtained by solving the affine mapping for <span class="math inline">\(\xi\)</span> is</p>
-<p><span class="math display">\[
-  \boxed{
-  \xi(x)
-  =
-  \frac{2x-(a+b)}{b-a}
-  },
-\]</span></p>
-<p>and satisfies</p>
-<p><span class="math display">\[
-  \xi(a)=-1,
-  \qquad
-  \xi(b)=1.
-\]</span></p>
-<p>Because <span class="math inline">\(a&lt;b\)</span>, the denominator <span class="math inline">\(b-a\)</span> is positive. The forward and inverse mappings are therefore one-to-one and preserve the orientation of the interval.</p>
-<p>This transformation is an <a href="../glossary.html#gls-affine-mapping">affine mapping</a>. The exact correspondence between the standard and physical intervals is summarized in <a href="#fig-affine-mapping-standard-physical-interval" class="quarto-xref">Figure&nbsp;<span>14.1</span></a>.</p>
-<div id="fig-affine-mapping-standard-physical-interval" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-affine-mapping-standard-physical-interval-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/affine-mapping-standard-physical-interval.png" class="img-fluid figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-affine-mapping-standard-physical-interval-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="math inline">\([-1,1]\)</span> to the physical interval <span class="math inline">\([a,b]\)</span>. The endpoints and midpoints correspond, the standard length <span class="math inline">\(2\)</span> is transformed into the physical length <span class="math inline">\(b-a\)</span>, and differential lengths are scaled by the constant Jacobian <span class="math inline">\(J=(b-a)/2\)</span>. The diagram is schematic: no quadrature rule or numerical approximation is involved.
-</figcaption>
-</figure>
-</div>
-<div class="callout callout-style-default callout-note callout-titled" title="Why 'affine'?">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Why ‘affine’?
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>An affine mapping has the form</p>
-<p><span class="math display">\[
-  x=a_0+a_1\xi.
-\]</span></p>
-<p>It combines a linear scaling with a translation. This is more general than a strictly linear mapping: a linear mapping must send the origin to the origin, whereas an affine mapping may shift it.</p>
-<p>For the transformation between two one-dimensional intervals, the translation places the midpoint and the scaling adjusts the length. The mapping cannot bend or curve the interval, and its local scale factor is therefore constant.</p>
-<p>More general finite element mappings introduced later may have a scale factor that varies with position. Higher-order geometric interpolation can represent such non-affine mappings, although using higher-order shape functions does not by itself require the mapping to be non-affine.</p>
-</div>
-</div>
-</section>
-<section id="the-jacobian" class="level2" data-number="14.2">
-<h2 data-number="14.2" class="anchored" data-anchor-id="the-jacobian"><span class="header-section-number">14.2</span> The Jacobian</h2>
-<p>Differentiating the mapping gives</p>
-<p><span class="math display">\[
-  \boxed{
-  J
-  =
-  \frac{dx}{d\xi}
-  =
-  \frac{b-a}{2}.
-  }
-\]</span></p>
-<p>The quantity <span class="math inline">\(J\)</span> is the one-dimensional <strong>Jacobian</strong> of the transformation. It is the exact local scale factor between the two coordinates: at each point, it gives the ratio between a differential length in the physical coordinate and the corresponding differential length in the standard coordinate. Thus,</p>
-<p><span class="math display">\[
-  \boxed{
-  dx=J\,d\xi.
-  }
-\]</span></p>
-<p>For <span class="math inline">\(a&lt;b\)</span>, the Jacobian is positive and the mapping preserves orientation. In the affine mapping considered here, <span class="math inline">\(J\)</span> is also constant: every part of the standard interval is scaled by the same factor.</p>
-<section id="a-geometric-check" class="level3" data-number="14.2.1">
-<h3 data-number="14.2.1" class="anchored" data-anchor-id="a-geometric-check"><span class="header-section-number">14.2.1</span> A geometric check</h3>
-<p>The length of the interval <span class="math inline">\([a,b]\)</span> can be recovered by integrating the constant function <span class="math inline">\(1\)</span>:</p>
-<p><span class="math display">\[
-  \begin{aligned}
-  \int_a^b 1\,dx
-  &amp;=
-  \int_{-1}^{1}J\,d\xi
-  \\
-  &amp;=
-  2J
-  \\
-  &amp;=
-  b-a.
-  \end{aligned}
-\]</span></p>
-<p>This calculation explains the Jacobian geometrically: the standard interval has length <span class="math inline">\(2\)</span>, and multiplication by <span class="math inline">\(J=(b-a)/2\)</span> converts that length into the physical length <span class="math inline">\(b-a\)</span>.</p>
-</section>
-</section>
-<section id="transforming-an-integral" class="level2" data-number="14.3">
-<h2 data-number="14.3" class="anchored" data-anchor-id="transforming-an-integral"><span class="header-section-number">14.3</span> Transforming an integral</h2>
-<p>Using the change of variable <span class="math inline">\(x=x(\xi)\)</span> and <span class="math inline">\(dx=J\,d\xi\)</span> gives</p>
-<p><span class="math display">\[
-  \boxed{
-  \int_a^b f(x)\,dx
-  =
-  \int_{-1}^{1}
-  f\!\left(x(\xi)\right)J\,d\xi.
-  }
-\]</span></p>
-<p>This equation is an exact identity. The integrand expressed in the standard coordinate is</p>
-<p><span class="math display">\[
-  h(\xi)
-  =
-  f\!\left(x(\xi)\right)J.
-\]</span></p>
-<p>Only after the integral has been expressed on <span class="math inline">\([-1,1]\)</span> is Gauss–Legendre quadrature applied:</p>
-<p><span class="math display">\[
-  \boxed{
-  \int_a^b f(x)\,dx
-  \approx
-  \sum_{g=1}^{n_g}
-  w_g
-  f(x_g)J,
-  }
-\]</span></p>
-<p>where</p>
-<p><span class="math display">\[
-  x_g=x(\xi_g)
-\]</span></p>
-<p>is the physical position corresponding to standard integration point <span class="math inline">\(\xi_g\)</span>.</p>
-<p>The Jacobian <span class="math inline">\(J\)</span> and the quadrature weight <span class="math inline">\(w_g\)</span> have different origins and roles. The Jacobian is fixed by the exact coordinate transformation, whereas <span class="math inline">\(w_g\)</span> belongs to the selected Gauss–Legendre rule and appears only when the integral is replaced by a finite sum. Although the product <span class="math inline">\(w_gJ\)</span> occurs in the quadrature formula for the present affine mapping, <span class="math inline">\(J\)</span> is not a quadrature weight.</p>
-<div class="callout callout-style-default callout-important callout-titled" title="Equality and approximation are different steps">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Equality and approximation are different steps
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The coordinate transformation introduces no approximation:</p>
-<p><span class="math display">\[
-  \int_a^b f(x)\,dx
-  =
-  \int_{-1}^{1}f\!\left(x(\xi)\right)J\,d\xi.
-\]</span></p>
-<p>The approximation is introduced only when the transformed integral is replaced by a finite weighted sum:</p>
-<p><span class="math display">\[
-  \int_{-1}^{1}f\!\left(x(\xi)\right)J\,d\xi
-  \approx
-  \sum_{g=1}^{n_g}w_gf(x_g)J.
-\]</span></p>
-<p>An inaccurate quadrature result is therefore not an error caused by the affine mapping. It results from using a quadrature rule that is insufficient for the transformed integrand.</p>
-</div>
-</div>
-</section>
-<section id="worked-example-mapping-an-integral-to-the-standard-interval" class="level2" data-number="14.4">
-<h2 data-number="14.4" class="anchored" data-anchor-id="worked-example-mapping-an-integral-to-the-standard-interval"><span class="header-section-number">14.4</span> Worked example: mapping an integral to the standard interval</h2>
-<p>Return to the scalar integral used to study the midpoint and trapezoidal rules:</p>
-<p><span class="math display">\[
-  I
-  =
-  \int_0^3(x^2+1)\,dx
-  =
-  12.
-\]</span></p>
-<p>The physical interval is <span class="math inline">\([0,3]\)</span>. Its affine mapping is</p>
-<p><span class="math display">\[
-  x(\xi)
-  =
-  \frac{0+3}{2}
-  +
-  \frac{3-0}{2}\xi
-  =
-  \frac{3}{2}(1+\xi),
-\]</span></p>
-<p>and its Jacobian is</p>
-<p><span class="math display">\[
-  J=\frac{3}{2}.
-\]</span></p>
-<p>Changing variables from <span class="math inline">\(x\)</span> to <span class="math inline">\(\xi\)</span> gives</p>
-<p><span class="math display">\[
-  I
-  =
-  \int_{-1}^{1}
-  \left[
-  \left(\frac{3}{2}(1+\xi)\right)^2+1
-  \right]
-  \frac{3}{2}\,d\xi.
-\]</span></p>
-<p>Define the transformed integrand</p>
-<p><span class="math display">\[
-  h(\xi)
-  =
-  \left[
-  \left(\frac{3}{2}(1+\xi)\right)^2+1
-  \right]
-  \frac{3}{2}.
-\]</span></p>
-<p>Expanding it gives</p>
-<p><span class="math display">\[
-  h(\xi)
-  =
-  \frac{39}{8}
-  +
-  \frac{27}{4}\xi
-  +
-  \frac{27}{8}\xi^2.
-\]</span></p>
-<p>The transformed integrand is quadratic in <span class="math inline">\(\xi\)</span>.</p>
-<section id="one-point-rule" class="level3" data-number="14.4.1">
-<h3 data-number="14.4.1" class="anchored" data-anchor-id="one-point-rule"><span class="header-section-number">14.4.1</span> One-point rule</h3>
-<p>The one-point rule gives</p>
-<p><span class="math display">\[
-  \begin{aligned}
-  Q_1
-  &amp;=
-  2h(0)
-  \\
-  &amp;=
-  2\left(\frac{39}{8}\right)
-  \\
-  &amp;=
-  9.75.
-  \end{aligned}
-\]</span></p>
-<p>The result is not exact because a one-point Gauss–Legendre rule has degree of exactness one, whereas <span class="math inline">\(h(\xi)\)</span> has degree two.</p>
-</section>
-<section id="two--three--and-four-point-rules" class="level3" data-number="14.4.2">
-<h3 data-number="14.4.2" class="anchored" data-anchor-id="two--three--and-four-point-rules"><span class="header-section-number">14.4.2</span> Two-, three-, and four-point rules</h3>
-<p>The two-point rule has degree of exactness three and therefore integrates the quadratic transformed integrand exactly:</p>
-<p><span class="math display">\[
-  Q_2=12.
-\]</span></p>
-<p>The three- and four-point rules also give</p>
-<p><span class="math display">\[
-  Q_3=Q_4=12.
-\]</span></p>
-<p>They are exact but use more function evaluations than required. In general, the original integrand and the coordinate mapping together determine the transformed integrand. If the transformed integrand is a polynomial of degree <span class="math inline">\(p\)</span>, an <span class="math inline">\(n_g\)</span>-point Gauss–Legendre rule is guaranteed to integrate it exactly when</p>
-<p><span class="math display">\[
-  2n_g-1\geq p.
-\]</span></p>
-<p>Here <span class="math inline">\(p=2\)</span>, so the two-point rule is the lowest-order rule satisfying this guarantee, and the preceding one-point calculation confirms that the one-point rule is not exact.</p>
-</section>
-</section>
-<section id="from-a-physical-interval-to-a-reference-element" class="level2" data-number="14.5">
-<h2 data-number="14.5" class="anchored" data-anchor-id="from-a-physical-interval-to-a-reference-element"><span class="header-section-number">14.5</span> From a physical interval to a reference element</h2>
-<p>We now specialize the preceding transformation to a two-node bar element. Let the local nodes be ordered so that</p>
-<p><span class="math display">\[
-  x_1&lt;x_2,
-\]</span></p>
-<p>and define</p>
-<p><span class="math display">\[
-  L_e=x_2-x_1&gt;0.
-\]</span></p>
-<p>The physical element extends over</p>
-<p><span class="math display">\[
-  x\in[x_1,x_2],
-\]</span></p>
-<p>while the standard coordinate belongs to</p>
-<p><span class="math display">\[
-  \xi\in[-1,1].
-\]</span></p>
-<p>In this finite element context, the standard interval is called the <strong>reference element</strong>, and <span class="math inline">\(\xi\)</span> is called the <strong>reference coordinate</strong> or <strong>natural coordinate</strong>.</p>
-<p>The affine element mapping is</p>
-<p><span class="math display">\[
-  \boxed{
-  x(\xi)
-  =
-  \frac{1-\xi}{2}x_1
-  +
-  \frac{1+\xi}{2}x_2.
-  }
-\]</span></p>
-<p>Equivalently,</p>
-<p><span class="math display">\[
-  x(\xi)
-  =
-  \frac{x_1+x_2}{2}
-  +
-  \frac{L_e}{2}\xi.
-\]</span></p>
-<p>The Jacobian is</p>
-<p><span class="math display">\[
-  \boxed{
-  J
-  =
-  \frac{dx}{d\xi}
-  =
-  \frac{L_e}{2}.
-  }
-\]</span></p>
-<p>The assumption <span class="math inline">\(x_1&lt;x_2\)</span> ensures <span class="math inline">\(J&gt;0\)</span>. The mapping is therefore nondegenerate and preserves the left-to-right orientation of the element.</p>
-</section>
-<section id="shape-functions-in-the-reference-coordinate" class="level2" data-number="14.6">
-<h2 data-number="14.6" class="anchored" data-anchor-id="shape-functions-in-the-reference-coordinate"><span class="header-section-number">14.6</span> Shape functions in the reference coordinate</h2>
-<p>In <a href="two-node-linear-bar-element.html" class="quarto-xref"><span>Chapter 10</span></a>, the two-node bar shape functions were derived directly in the physical coordinate:</p>
-<p><span class="math display">\[
-  N_1(x)
-  =
-  \frac{x_2-x}{L_e},
-  \qquad
-  N_2(x)
-  =
-  \frac{x-x_1}{L_e}.
-\]</span></p>
-<p>Substituting <span class="math inline">\(x=x(\xi)\)</span> gives</p>
-<p><span class="math display">\[
-  \boxed{
-  N_1(\xi)=\frac{1-\xi}{2},
-  \qquad
-  N_2(\xi)=\frac{1+\xi}{2}.
-  }
-\]</span></p>
-<p>These functions satisfy</p>
+<p>The requirements</p>
 <p><span class="math display">\[
   N_1(-1)=1,
   \qquad
-  N_1(1)=0,
+  N_1(0)=0,
+  \qquad
+  N_1(1)=0
+\]</span></p>
+<p>give</p>
+<p><span class="math display">\[
+  a=0,
+  \qquad
+  b=-\frac12,
+  \qquad
+  c=\frac12.
+\]</span></p>
+<p>Hence,</p>
+<p><span class="math display">\[
+  \boxed{
+  N_1(\xi)
+  =
+  \frac12\xi(\xi-1).
+  }
+\]</span></p>
+<p>Applying the same nodal conditions to the other two nodes gives</p>
+<p><span class="math display">\[
+  \boxed{
+  N_2(\xi)=1-\xi^2
+  }
 \]</span></p>
 <p>and</p>
 <p><span class="math display">\[
-  N_2(-1)=0,
-  \qquad
-  N_2(1)=1.
+  \boxed{
+  N_3(\xi)
+  =
+  \frac12\xi(\xi+1).
+  }
 \]</span></p>
-<p>The element mapping can therefore also be written as</p>
+<section id="using-lagrange-polynomials" class="level3" data-number="18.1.1">
+<h3 data-number="18.1.1" class="anchored" data-anchor-id="using-lagrange-polynomials"><span class="header-section-number">18.1.1</span> Using Lagrange polynomials</h3>
+<p>The direct derivation above shows how a nodal shape function is determined from its interpolation conditions. The same functions can also be constructed systematically using Lagrange polynomials.</p>
+<p>For a set of interpolation nodes with reference coordinates <span class="math inline">\(\xi_1,\xi_2,\ldots,\xi_n\)</span>, the Lagrange shape function <span class="math inline">\(N_i(\xi)\)</span> is associated with node <span class="math inline">\(i\)</span>:</p>
+<p><span class="math display">\[
+  N_i(\xi)
+  =
+  \prod_{\substack{j=1\\j\ne i}}^n
+  \frac{\xi-\xi_j}{\xi_i-\xi_j}.
+\]</span></p>
+<p>For example,</p>
+<p><span class="math display">\[
+  N_1(\xi)
+  =
+  \frac{\xi-\xi_2}{\xi_1-\xi_2}
+  \frac{\xi-\xi_3}{\xi_1-\xi_3}
+  =
+  \frac{\xi}{-1}
+  \frac{\xi-1}{-2}
+  =
+  \frac12\xi(\xi-1).
+\]</span></p>
+<p>The remaining two functions follow in the same way.</p>
+<p>The Lagrange construction is useful because it provides a systematic procedure for generating nodal interpolation functions once the interpolation nodes have been specified.</p>
+<p>The three shape functions are collected in the shape-function matrix</p>
+<p><span class="math display">\[
+  \mathbf N(\xi)
+  =
+  \begin{bmatrix}
+  N_1(\xi) &amp; N_2(\xi) &amp; N_3(\xi)
+  \end{bmatrix}.
+\]</span></p>
+<p>The quadratic finite element displacement field is therefore written as</p>
 <p><span class="math display">\[
   \boxed{
+  u^h\!\left(x(\xi)\right)
+  =
+  \mathbf N(\xi)\mathbf u_e.
+  }
+\]</span></p>
+<p>The shape functions satisfy the partition-of-unity property,</p>
+<p><span class="math display">\[
+  N_1(\xi)+N_2(\xi)+N_3(\xi)=1.
+\]</span></p>
+<p>Consider a constant displacement field, for which</p>
+<p><span class="math display">\[
+  u_1=u_2=u_3=\bar u.
+\]</span></p>
+<p>The finite element interpolation then gives</p>
+<p><span class="math display">\[
+  u^h\!\left(x(\xi)\right)
+  =
+  \mathbf N(\xi)\mathbf u_e
+  =
+  \left(
+  N_1+N_2+N_3
+  \right)\bar u
+  =
+  \bar u.
+\]</span></p>
+<p>Therefore, the partition-of-unity property ensures that a constant displacement field,</p>
+<p><span class="math display">\[
+  u\in\mathcal P_0,
+\]</span></p>
+<p>corresponding to a rigid translation of the bar, is reproduced exactly. Since such a field has zero strain, the element does not generate spurious deformation under rigid-body motion.</p>
+</section>
+</section>
+<section id="regular-isoparametric-geometry-and-the-straindisplacement-matrix" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="regular-isoparametric-geometry-and-the-straindisplacement-matrix"><span class="header-section-number">18.2</span> Regular isoparametric geometry and the strain–displacement matrix</h2>
+<p>The preceding chapter showed that a three-node isoparametric geometry does not necessarily produce a non-affine mapping. In particular, if the middle physical node lies exactly halfway between the two end nodes, the quadratic geometry interpolation reduces to an affine map.</p>
+<p>We adopt that regular geometry here:</p>
+<p><span class="math display">\[
+  x_2=\frac{x_1+x_3}{2},
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+  L_e=x_3-x_1.
+\]</span></p>
+<p>Using</p>
+<p><span class="math display">\[
+  x(\xi)=\mathbf N(\xi)\mathbf x_e,
+\]</span></p>
+<p>the coordinate mapping becomes</p>
+<p><span class="math display">\[
   x(\xi)
   =
-  N_1(\xi)x_1
-  +
-  N_2(\xi)x_2.
-  }
+  x_1+\frac{L_e}{2}(1+\xi),
 \]</span></p>
-<p>Within the straight one-dimensional two-node bar model, the element geometry is completely specified by the endpoint coordinates <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>. Consequently, this affine interpolation does not introduce a geometric approximation and represents the physical element interval exactly.</p>
-<p>The same shape functions interpolate the displacement field:</p>
-<p><span class="math display">\[
-  u^h(\xi)
-  =
-  N_1(\xi)u_1
-  +
-  N_2(\xi)u_2.
-\]</span></p>
-<p>In contrast to the exact representation of the element geometry, the displacement field is only an approximation of the unknown physical field.</p>
-<p>Expressing the approximation in <span class="math inline">\(\xi\)</span> does not create a new displacement approximation. It is the previously derived linear interpolation written using a different coordinate.</p>
-</section>
-<section id="transforming-shape-function-derivatives" class="level2" data-number="14.7">
-<h2 data-number="14.7" class="anchored" data-anchor-id="transforming-shape-function-derivatives"><span class="header-section-number">14.7</span> Transforming shape-function derivatives</h2>
-<p>The bar strain is defined using a derivative with respect to the physical coordinate <span class="math inline">\(x\)</span>. The element stiffness matrix,</p>
-<p><span class="math display">\[
-  \mathbf{K}_e
-  =
-  \int_{x_1}^{x_2}
-  \mathbf{B}^{\mathsf T}EA\mathbf{B}\,dx,
-\]</span></p>
-<p>is likewise written in the physical coordinate. <a href="gauss-quadrature-two-node-bar.html" class="quarto-xref"><span>Chapter 15</span></a> evaluates this integral using Gauss–Legendre quadrature on the standard interval. Before that rule can be applied, both the integration measure <span class="math inline">\(dx\)</span> and the physical derivatives contained in <span class="math inline">\(\mathbf{B}\)</span> must therefore be expressed exactly in terms of the standard coordinate <span class="math inline">\(\xi\)</span>.</p>
-<p>At this point, it is natural to ask why the standard coordinate is needed at all. For the present two-node bar, the shape functions are already available as simple explicit functions of <span class="math inline">\(x\)</span>. Their physical derivatives can be computed directly, and the stiffness integral could also be evaluated directly over the physical interval. This is a special advantage of such a simple element and mapping, however, rather than the general finite element procedure.</p>
-<p>In finite element theory and implementation, shape functions are customarily defined directly on a standard element. The functions <span class="math inline">\(N_i(\xi)\)</span> are then fixed polynomials, independent of the position and size of any particular physical element. The geometry of each element is introduced separately through the mapping <span class="math inline">\(x(\xi)\)</span>. This separation makes it possible to use the same shape functions, differentiation procedure, and selected quadrature rule for every element of the same type, while the mapping accounts for the geometry of the individual physical element.</p>
-<p>In <a href="two-node-linear-bar-element.html" class="quarto-xref"><span>Chapter 10</span></a>, the two-node shape functions were derived in the physical coordinate as <span class="math inline">\(N_i(x)\)</span>. In this chapter, they were rewritten as <span class="math inline">\(N_i(\xi)\)</span> by substituting the affine mapping. This order makes the connection between the physical and standard descriptions especially transparent. In the general formulation, however, <span class="math inline">\(N_i(\xi)\)</span> is normally introduced directly, without first constructing an explicit expression for <span class="math inline">\(N_i(x)\)</span>. The physical shape function is then known through the composition of <span class="math inline">\(N_i(\xi)\)</span> with the inverse of the element mapping.</p>
-<p>Once <span class="math inline">\(N_i(\xi)\)</span> is available as an explicit polynomial, its derivative <span class="math inline">\(dN_i/d\xi\)</span> follows immediately by direct differentiation. Strain, however, requires the physical derivative <span class="math inline">\(dN_i/dx\)</span>. The exact relationship between these derivatives follows from the chain rule. For the present two-node bar, <span class="math inline">\(dN_i/dx\)</span> is also known from the earlier physical-coordinate derivation, so it provides a direct check of the transformed result.</p>
-<p>Let</p>
-<p><span class="math display">\[
-  \widehat{\phi}(\xi)=\phi\!\left(x(\xi)\right)
-\]</span></p>
-<p>denote any scalar function expressed in the standard coordinate. The chain rule gives</p>
-<p><span class="math display">\[
-  \frac{d\widehat{\phi}}{d\xi}
-  =
-  \frac{d\phi}{dx}
-  \frac{dx}{d\xi}
-  =
-  J\frac{d\phi}{dx}.
-\]</span></p>
-<p>Because <span class="math inline">\(J&gt;0\)</span>, this relationship can be inverted. At the operator level,</p>
+<p>and therefore</p>
 <p><span class="math display">\[
   \boxed{
-  \frac{d}{dx}
-  =
-  \frac{1}{J}\frac{d}{d\xi}.
+  J=\frac{dx}{d\xi}=\frac{L_e}{2}.
   }
 \]</span></p>
-<p>Applied to the shape functions, it gives</p>
+<p>The geometry is thus deliberately kept affine. The constant Jacobian allows us to isolate the effect of increasing the displacement interpolation order: in this regular case, <span class="math inline">\(\mathbf B(\xi)\)</span> remains linear in <span class="math inline">\(\xi\)</span>. With a non-affine geometry, <span class="math inline">\(J\)</span> would vary within the element and this simple polynomial structure would no longer hold.</p>
+<p>Differentiating the quadratic shape functions gives</p>
 <p><span class="math display">\[
-  \boxed{
-  \frac{dN_i}{dx}
+  \frac{d\mathbf N}{d\xi}
   =
-  \frac{1}{J}
-  \frac{dN_i}{d\xi}.
-  }
-\]</span></p>
-<p>For the two-node shape functions,</p>
-<p><span class="math display">\[
-  \frac{dN_1}{d\xi}=-\frac12,
-  \qquad
-  \frac{dN_2}{d\xi}=\frac12.
-\]</span></p>
-<p>Using <span class="math inline">\(J=L_e/2\)</span> gives</p>
-<p><span class="math display">\[
-  \frac{dN_1}{dx}=-\frac{1}{L_e},
-  \qquad
-  \frac{dN_2}{dx}=\frac{1}{L_e}.
-\]</span></p>
-<p>The strain–displacement matrix is therefore</p>
-<p><span class="math display">\[
-  \begin{aligned}
-  \mathbf{B}
-  &amp;=
-  \frac{d\mathbf{N}}{dx}
-  \\
-  &amp;=
-  \frac{1}{J}
-  \frac{d\mathbf{N}}{d\xi}
-  \\
-  &amp;=
   \begin{bmatrix}
-  -\dfrac{1}{L_e} &amp; \dfrac{1}{L_e}
+  \xi-\frac12 &amp;
+  -2\xi &amp;
+  \xi+\frac12
   \end{bmatrix}.
-  \end{aligned}
 \]</span></p>
-<p>This is exactly the same constant matrix obtained previously by differentiating the physical-coordinate shape functions directly.</p>
+<p>Using the derivative transformation established previously,</p>
+<p><span class="math display">\[
+  \mathbf B(\xi)
+  =
+  \frac{1}{J}
+  \frac{d\mathbf N}{d\xi},
+\]</span></p>
+<p>we obtain</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf B(\xi)
+  =
+  \frac{2}{L_e}
+  \begin{bmatrix}
+  \xi-\frac12 &amp;
+  -2\xi &amp;
+  \xi+\frac12
+  \end{bmatrix}.
+  }
+\]</span></p>
+<p>Unlike the two-node bar, the strain–displacement matrix now varies within the element.</p>
+<p>Consequently,</p>
+<p><span class="math display">\[
+  \varepsilon^h\!\left(x(\xi)\right)
+  =
+  \mathbf B(\xi)\mathbf u_e
+\]</span></p>
+<p>is of degree at most one in <span class="math inline">\(\xi\)</span>. Since the coordinate mapping is affine, it is also of degree at most one in the physical coordinate <span class="math inline">\(x\)</span>. For constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>, the same is true of stress and axial force.</p>
 </section>
-<section id="what-the-mapping-has-accomplished" class="level2" data-number="14.8">
-<h2 data-number="14.8" class="anchored" data-anchor-id="what-the-mapping-has-accomplished"><span class="header-section-number">14.8</span> What the mapping has accomplished</h2>
-<p>The affine mapping provides the following relationships:</p>
+<section id="element-stiffness-and-numerical-integration" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="element-stiffness-and-numerical-integration"><span class="header-section-number">18.3</span> Element stiffness and numerical integration</h2>
+<p>The element stiffness matrix retains the same form used for the two-node bar,</p>
+<p><span class="math display">\[
+  \mathbf K_e
+  =
+  \int_{-1}^{1}
+  \mathbf B(\xi)^{\mathsf T}
+  EA
+  \mathbf B(\xi)
+  J\,d\xi.
+\]</span></p>
+<p>What changes is the polynomial degree of the transformed integrand.</p>
+<p>For the regular quadratic element with constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>,</p>
+<p><span class="math display">\[
+  \mathbf B(\xi)\in\mathcal P_1,
+\]</span></p>
+<p>because the derivatives of the quadratic shape functions are linear and the Jacobian is constant. Therefore, each scalar entry of the stiffness integrand contains a product</p>
+<p><span class="math display">\[
+  B_i(\xi)B_j(\xi)\in\mathcal P_2.
+\]</span></p>
+<p>The complete transformed scalar stiffness integrands are thus quadratic in <span class="math inline">\(\xi\)</span>.</p>
+<p>The Gauss–Legendre rule must therefore satisfy</p>
+<p><span class="math display">\[
+  2n_g-1\ge2,
+\]</span></p>
+<p>so the minimum exact rule has</p>
+<p><span class="math display">\[
+  \boxed{n_g=2.}
+\]</span></p>
+<p>This is the first direct numerical consequence of increasing the interpolation order. For the constant-property two-node bar, <span class="math inline">\(\mathbf B\)</span> is constant and one Gauss point is sufficient; for the quadratic bar, <span class="math inline">\(\mathbf B\)</span> varies linearly and two points are required.</p>
+<p>For example,</p>
+<p><span class="math display">\[
+  K_{11}
+  =
+  \int_{-1}^{1}
+  B_1(\xi)^2EAJ\,d\xi,
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+  B_1(\xi)
+  =
+  \frac{2}{L_e}
+  \left(
+  \xi-\frac12
+  \right).
+\]</span></p>
+<p>The corresponding scalar integrand therefore contains the quadratic factor</p>
+<p><span class="math display">\[
+  \left(
+  \xi-\frac12
+  \right)^2.
+\]</span></p>
+<p>Evaluating the element integrals gives</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf K_e
+  =
+  \frac{EA}{3L_e}
+  \begin{bmatrix}
+  7 &amp; -8 &amp; 1\\
+  -8 &amp; 16 &amp; -8\\
+  1 &amp; -8 &amp; 7
+  \end{bmatrix}.
+  }
+\]</span></p>
+<p>Two-point Gauss–Legendre quadrature reproduces this matrix exactly.</p>
+<p>Using fewer quadrature points is not merely less accurate in this case. With one Gauss point, the quadratic element stiffness matrix develops an additional zero-energy mode. This consequence of under-integration is explored in the exercises.</p>
+</section>
+<section id="consistent-distributed-loading" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="consistent-distributed-loading"><span class="header-section-number">18.4</span> Consistent distributed loading</h2>
+<p>The consistent element load vector retains the same form,</p>
+<p><span class="math display">\[
+  \mathbf f_e^q
+  =
+  \int_{-1}^{1}
+  \mathbf N(\xi)^{\mathsf T}
+  q\!\left(x(\xi)\right)
+  J\,d\xi.
+\]</span></p>
+<p>For a uniform distributed load,</p>
+<p><span class="math display">\[
+  q(x)=q_0,
+\]</span></p>
+<p>the only factor that varies with <span class="math inline">\(\xi\)</span> is the quadratic shape function. Since</p>
+<p><span class="math display">\[
+  N_i(\xi)\in\mathcal P_2,
+\]</span></p>
+<p>while <span class="math inline">\(q_0\)</span> and <span class="math inline">\(J\)</span> are constant, each scalar load-vector integrand belongs to</p>
+<p><span class="math display">\[
+  \mathcal P_2.
+\]</span></p>
+<p>The minimum exact Gauss–Legendre rule therefore again has</p>
+<p><span class="math display">\[
+  \boxed{n_g=2.}
+\]</span></p>
+<p>This provides a second direct consequence of the higher-order interpolation. For the two-node bar with uniform loading, the corresponding load-vector integrands are linear and one Gauss point is sufficient. For the three-node quadratic bar, they are quadratic and require two points.</p>
+<p>Evaluating the integrals gives</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf f_e^q
+  =
+  \frac{q_0L_e}{6}
+  \begin{bmatrix}
+  1\\
+  4\\
+  1
+  \end{bmatrix}.
+  }
+\]</span></p>
+<p>The ratio</p>
+<p><span class="math display">\[
+  1:4:1
+\]</span></p>
+<p>is not an arbitrary distribution of the total load. Each nodal contribution is determined by the corresponding shape function through</p>
+<p><span class="math display">\[
+  f_{e,i}^q
+  =
+  q_0J
+  \int_{-1}^{1}
+  N_i(\xi)\,d\xi.
+\]</span></p>
+<p>Because the shape functions form a partition of unity, the nodal contributions also preserve the total distributed load</p>
+<p><span class="math display">\[
+  \sum_{i=1}^{3} f_{e,i}^q
+  =
+  q_0L_e.
+\]</span></p>
+</section>
+<section id="what-the-quadratic-approximation-can-reproduce" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="what-the-quadratic-approximation-can-reproduce"><span class="header-section-number">18.5</span> What the quadratic approximation can reproduce</h2>
+<p>Having derived the quadratic element formulation, we can now ask a different question: which displacement fields can this richer approximation space represent exactly?</p>
+<p>The approximation space of the three-node element contains all polynomial displacement fields up to degree two,</p>
+<p><span class="math display">\[
+  \mathcal P_0
+  \subset
+  \mathcal P_1
+  \subset
+  \mathcal P_2.
+\]</span></p>
+<p>If a displacement field belongs to one of these polynomial subspaces, the interpolation has the capability to represent it exactly. This property is commonly described as <strong>polynomial completeness</strong> or <strong>polynomial reproducibility</strong>.</p>
+<p>The three cases have a direct mechanical interpretation:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
-<th style="text-align: left;">Quantity</th>
-<th style="text-align: left;">Relationship</th>
+<th>Displacement field</th>
+<th style="text-align: right;">Polynomial space</th>
+<th>Mechanical interpretation</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">physical position</td>
-<td style="text-align: left;"><span class="math inline">\(x(\xi)=N_1(\xi)x_1+N_2(\xi)x_2\)</span></td>
+<td><span class="math inline">\(u=a\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\mathcal P_0\)</span></td>
+<td>rigid translation</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">physical differential</td>
-<td style="text-align: left;"><span class="math inline">\(dx=J\,d\xi\)</span></td>
+<td><span class="math inline">\(u=a+bx\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\mathcal P_1\)</span></td>
+<td>constant strain</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Jacobian</td>
-<td style="text-align: left;"><span class="math inline">\(J=L_e/2\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">physical derivative</td>
-<td style="text-align: left;"><span class="math inline">\(dN_i/dx=J^{-1}dN_i/d\xi\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">mapped physical point</td>
-<td style="text-align: left;"><span class="math inline">\(x_g=x(\xi_g)\)</span></td>
+<td><span class="math inline">\(u=a+bx+cx^2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\mathcal P_2\)</span></td>
+<td>linearly varying strain</td>
 </tr>
 </tbody>
 </table>
-<p>No numerical approximation has yet been made in deriving these relationships. They allow element integrals and derivatives to be expressed using one standard coordinate system. <a href="gauss-quadrature-two-node-bar.html" class="quarto-xref"><span>Chapter 15</span></a> combines these exact transformations with Gauss–Legendre quadrature to evaluate the stiffness matrix and consistent distributed-load vector of the two-node bar.</p>
+<p>Thus, increasing the interpolation order enlarges the set of displacement fields that the element can represent exactly. It does not require every finite element solution to contain a quadratic term.</p>
+<p>The following two one-element problems make this distinction explicit. The first has an exact solution in the lower-order space <span class="math inline">\(\mathcal P_1\)</span>; the second uses the full quadratic space <span class="math inline">\(\mathcal P_2\)</span>.</p>
+<section id="end-force-only-bar" class="level3" data-number="18.5.1">
+<h3 data-number="18.5.1" class="anchored" data-anchor-id="end-force-only-bar"><span class="header-section-number">18.5.1</span> End-force-only bar</h3>
+<p>Consider a bar of length <span class="math inline">\(L\)</span>, constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>, fixed at</p>
+<p><span class="math display">\[
+  x=0
+\]</span></p>
+<p>and subjected to an axial force <span class="math inline">\(F\)</span> at</p>
+<p><span class="math display">\[
+  x=L
+\]</span></p>
+<p>with no distributed load (<span class="math inline">\(q(x)=0\)</span>).</p>
+<p>The analytical solution is</p>
+<p><span class="math display">\[
+  u(x)
+  =
+  \frac{F}{EA}x.
+\]</span></p>
+<p>The displacement field is therefore linear.</p>
+<p>Discretize the complete bar using one regular quadratic element,</p>
+<p><span class="math display">\[
+  x_1=0,
+  \qquad
+  x_2=\frac L2,
+  \qquad
+  x_3=L.
+\]</span></p>
+<p>The nodal force vector is</p>
+<p><span class="math display">\[
+  \mathbf f_e
+  =
+  \begin{bmatrix}
+  0\\
+  0\\
+  F
+  \end{bmatrix}.
+\]</span></p>
+<p>Using the quadratic-element stiffness matrix and imposing</p>
+<p><span class="math display">\[
+  u_1=0,
+\]</span></p>
+<p>yields the reduced system</p>
+<p><span class="math display">\[
+  \frac{EA}{3L}
+  \begin{bmatrix}
+  16 &amp; -8\\
+  -8 &amp; 7
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_2\\
+  u_3
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+  0\\
+  F
+  \end{bmatrix}.
+\]</span></p>
+<p>Its solution is</p>
+<p><span class="math display">\[
+  u_2
+  =
+  \frac{FL}{2EA},
+  \qquad
+  u_3
+  =
+  \frac{FL}{EA}.
+\]</span></p>
+<p>Substituting these values into the quadratic interpolation gives</p>
+<p><span class="math display">\[
+  u^h\!\left(x(\xi)\right)
+  =
+  \frac{FL}{EA}
+  \left(
+  \frac12N_2+N_3
+  \right).
+\]</span></p>
+<p>Since</p>
+<p><span class="math display">\[
+  \frac12N_2+N_3
+  =
+  \frac{1+\xi}{2},
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  x=\frac L2(1+\xi),
+\]</span></p>
+<p>we obtain</p>
+<p><span class="math display">\[
+  \boxed{
+  u^h(x)=\frac{F}{EA}x.
+  }
+\]</span></p>
+<p>For this problem, the quadratic element reproduces the linear solution exactly. The exact displacement field belongs to <span class="math inline">\(\mathcal P_1\)</span>, which is contained in the quadratic approximation space <span class="math inline">\(\mathcal P_2\)</span>.</p>
+<p>The quadratic term is therefore not activated in this particular solution: the element represents the lower-order linear field exactly, and the corresponding strain is constant.</p>
+</section>
+<section id="uniformly-loaded-bar" class="level3" data-number="18.5.2">
+<h3 data-number="18.5.2" class="anchored" data-anchor-id="uniformly-loaded-bar"><span class="header-section-number">18.5.2</span> Uniformly loaded bar</h3>
+<p>Now consider the same bar subjected to a uniform distributed axial load <span class="math inline">\(q\)</span>, with</p>
+<p><span class="math display">\[
+  u(0)=0
+\]</span></p>
+<p>and no applied axial force at</p>
+<p><span class="math display">\[
+  x=L.
+\]</span></p>
+<p>For constant <span class="math inline">\(EA\)</span>,</p>
+<p><span class="math display">\[
+  -EA\frac{d^2u}{dx^2}=q,
+\]</span></p>
+<p>and the analytical solution is</p>
+<p><span class="math display">\[
+  \boxed{
+  u(x)
+  =
+  \frac{q}{EA}
+  \left(
+  Lx-\frac{x^2}{2}
+  \right),
+  }
+\]</span></p>
+<p>which is a quadratic displacement field.</p>
+<p>Using one regular quadratic element over the complete bar, the consistent load vector is</p>
+<p><span class="math display">\[
+  \mathbf f_e^q
+  =
+  \frac{qL}{6}
+  \begin{bmatrix}
+  1\\
+  4\\
+  1
+  \end{bmatrix}.
+\]</span></p>
+<p>After imposing</p>
+<p><span class="math display">\[
+  u_1=0,
+\]</span></p>
+<p>the reduced finite element equations become</p>
+<p><span class="math display">\[
+  \frac{EA}{3L}
+  \begin{bmatrix}
+  16 &amp; -8\\
+  -8 &amp; 7
+  \end{bmatrix}
+  \begin{bmatrix}
+  u_2\\
+  u_3
+  \end{bmatrix}
+  =
+  \frac{qL}{6}
+  \begin{bmatrix}
+  4\\
+  1
+  \end{bmatrix}.
+\]</span></p>
+<p>The solution is</p>
+<p><span class="math display">\[
+  u_2
+  =
+  \frac{3qL^2}{8EA},
+  \qquad
+  u_3
+  =
+  \frac{qL^2}{2EA}.
+\]</span></p>
+<p>Substituting these nodal values into the interpolation gives</p>
+<p><span class="math display">\[
+  \boxed{
+  u^h(x)
+  =
+  \frac{q}{EA}
+  \left(
+  Lx-\frac{x^2}{2}
+  \right).
+  }
+\]</span></p>
+<p>One quadratic element therefore reproduces the complete analytical displacement field exactly.</p>
+<p>In this case,</p>
+<p><span class="math display">\[
+  u(x)\in\mathcal P_2,
+\]</span></p>
+<p>so the solution uses the full approximation space available to the element. Its derivative is linear, and the corresponding strain varies within the element.</p>
+<p>Together, the two examples show that the polynomial order of the element describes its <strong>approximation capability</strong>, not the polynomial degree that every particular solution must exhibit.</p>
+</section>
+</section>
+<section id="response-recovery" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="response-recovery"><span class="header-section-number">18.6</span> Response recovery</h2>
+<p>For the quadratic element,</p>
+<p><span class="math display">\[
+  \varepsilon^h\!\left(x(\xi)\right)
+  =
+  \mathbf B(\xi)\mathbf u_e.
+\]</span></p>
+<p>Because <span class="math inline">\(\mathbf B\)</span> varies linearly with <span class="math inline">\(\xi\)</span>, the finite element strain generally varies within the element. For constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>, the same is true of</p>
+<p><span class="math display">\[
+  \sigma^h\!\left(x(\xi)\right)
+  =
+  E\varepsilon^h\!\left(x(\xi)\right)
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+  N^h\!\left(x(\xi)\right)
+  =
+  A\sigma^h\!\left(x(\xi)\right).
+\]</span></p>
+<p>Response recovery therefore no longer produces, in general, a single strain, stress, or axial-force value for the complete element. These fields can be evaluated at any selected position within the element.</p>
+<p>The locations used for response evaluation should not be confused with the quadrature points used to integrate the element equations. The same locations may be used for both purposes, but integration and response evaluation are different operations.</p>
+</section>
+<section id="toward-the-minifem-implementation" class="level2" data-number="18.7">
+<h2 data-number="18.7" class="anchored" data-anchor-id="toward-the-minifem-implementation"><span class="header-section-number">18.7</span> Toward the MiniFEM implementation</h2>
+<p>The next implementation will reuse the existing isoparametric and Gauss–Legendre framework. Rather than constructing a new finite element workflow, we will adapt the verified two-node formulation to the quadratic interpolation developed in this chapter.</p>
+<p>The main element-level changes are:</p>
+<ul>
+<li>three local displacement DOFs instead of two;</li>
+<li>quadratic shape functions and linear shape-function derivatives;</li>
+<li>a strain–displacement matrix <span class="math inline">\(\mathbf B(\xi)\)</span> that varies within the element;</li>
+<li>two-point Gauss–Legendre quadrature for the regular constant-property stiffness matrix and uniform distributed load;</li>
+<li>response recovery for fields that can vary within the element.</li>
+</ul>
+<p>The two one-element problems considered in this chapter provide reference cases for verifying the implementation. The end-force problem must reproduce the linear displacement field and constant strain exactly, whereas the uniformly loaded problem must reproduce the quadratic displacement field and linear strain exactly.</p>
+<p>Once the quadratic element has been implemented and verified, we will move from exact polynomial reproduction to problems that require approximation, allowing us to introduce error measures and study convergence under mesh refinement.</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Exercises">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -895,12 +988,155 @@ Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="m
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>Derive the affine mapping from <span class="math inline">\([-1,1]\)</span> to <span class="math inline">\([2,8]\)</span> and its inverse, verify both endpoint correspondences, and calculate the Jacobian.</li>
-<li>Map the standard points <span class="math inline">\(\xi=-1/\sqrt{3}\)</span> and <span class="math inline">\(\xi=1/\sqrt{3}\)</span> to the physical interval <span class="math inline">\([2,8]\)</span>.</li>
-<li>Verify by direct integration that <span class="math inline">\(\int_2^8 1\,dx=\int_{-1}^{1}J\,d\xi\)</span>.</li>
-<li>Transform <span class="math inline">\(\int_2^8x\,dx\)</span> to the standard interval and evaluate the transformed integral analytically.</li>
-<li>For a bar element with <span class="math inline">\(x_1=7\)</span> and <span class="math inline">\(x_2=11\)</span>, calculate <span class="math inline">\(x(0)\)</span>, <span class="math inline">\(J\)</span>, <span class="math inline">\(dN_1/dx\)</span>, and <span class="math inline">\(dN_2/dx\)</span>.</li>
-<li>Explain why the equality introduced by the coordinate transformation must be distinguished from the approximation introduced by quadrature.</li>
+<li><p>Differentiate the partition-of-unity relation and verify that</p>
+<p><span class="math display">\[ \frac{dN_1}{d\xi} + \frac{dN_2}{d\xi} + \frac{dN_3}{d\xi} =
+0. \]</span></p>
+<p>Explain why this is consistent with zero strain under a rigid translation.</p></li>
+<li><p>Consider a linear displacement field <span class="math display">\[
+u(x)=a+bx.
+\]</span> Evaluate it at the three element nodes, <span class="math display">\[
+x_1,\qquad x_2=\frac{x_1+x_3}{2},\qquad x_3,
+\]</span> and show directly that the quadratic interpolation reproduces the original field exactly.</p></li>
+<li><p>Evaluate the stiffness entry</p>
+<p><span class="math display">\[
+  K_{12}
+\]</span></p>
+<p>analytically and verify the corresponding entry of the closed-form element stiffness matrix.</p></li>
+<li><p>Verify that</p>
+<p><span class="math display">\[
+  \mathbf K_e
+  \begin{bmatrix}
+  1\\
+  1\\
+  1
+  \end{bmatrix}
+  =
+  \mathbf 0.
+\]</span></p>
+<p>What physical displacement mode does this vector represent?</p></li>
+<li><p>Evaluate the quadratic-element stiffness using one Gauss–Legendre point at</p>
+<p><span class="math display">\[
+  \xi=0.
+\]</span></p>
+<p>Construct the resulting stiffness matrix and identify the additional zero-energy mode.</p></li>
+<li><p>Use partition of unity to show directly that the uniform consistent load vector preserves the total distributed load:</p>
+<p><span class="math display">\[
+  \sum_{i=1}^{3}f_{e,i}^q=q_0L_e.
+\]</span></p></li>
+<li><p>Suppose that <span class="math inline">\(q(x)\)</span> varies linearly over the regular quadratic element.</p>
+<p>Determine the polynomial degree of</p>
+<p><span class="math display">\[
+  N_i(\xi)q\!\left(x(\xi)\right)J
+\]</span></p>
+<p>and hence the minimum exact Gauss–Legendre rule.</p>
+<p>Then derive the corresponding consistent nodal load vector.</p></li>
+<li><p>For the end-force-only example, substitute the finite element nodal displacements into</p>
+<p><span class="math display">\[
+  \varepsilon^h(\xi)
+  =
+  \mathbf B(\xi)\mathbf u_e
+\]</span></p>
+<p>and show that the strain is constant.</p>
+<p>Repeat the calculation for the uniformly loaded bar and show that the strain varies linearly.</p></li>
+<li><p>The three-node bar developed in this chapter uses the local numbering</p>
+<p><span class="math display">\[
+  1 \;-\; 2 \;-\; 3,
+\]</span></p>
+<p>with node 2 at the element midpoint. In many finite element formulations, however, the two end nodes are numbered first and the midpoint node is numbered last. Relative to the numbering used in this chapter, the nodal positions are then reordered as</p>
+<p><span class="math display">\[
+  1 \;-\; 3 \;-\; 2.
+\]</span></p>
+<p>Thus, the alternative convention assigns local nodes 1 and 2 to the element ends and local node 3 to the midpoint. The finite element itself has not changed: only the ordering of the local nodal quantities has changed. This is useful to understand because element matrices depend on the chosen local DOF ordering, even though the underlying mechanical element and its physical predictions remain unchanged.</p>
+<p>Starting from the quadratic element derived in this chapter, construct the element stiffness matrix for the local displacement vector</p>
+<p><span class="math display">\[
+  \mathbf u_e
+  =
+  \begin{bmatrix}
+  u_1\\
+  u_2\\
+  u_3
+  \end{bmatrix},
+\]</span></p>
+<p>where nodes 1 and 2 are located at the two element ends and node 3 is the midpoint.</p>
+<p>Show that the resulting stiffness matrix is</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf K_e
+  =
+  \frac{EA}{3L_e}
+  \begin{bmatrix}
+  7 &amp; 1 &amp; -8\\
+  1 &amp; 7 &amp; -8\\
+  -8 &amp; -8 &amp; 16
+  \end{bmatrix}.
+  }
+\]</span></p>
+<p>Verify this result in two different ways:</p>
+<ol type="1">
+<li><p>Reorder the rows and columns of the stiffness matrix derived in the chapter. You may do this using a permutation matrix. If</p>
+<p><span class="math display">\[
+  \mathbf u_e^{(123)}
+  =
+  \begin{bmatrix}
+  u_1\\
+  u_2\\
+  u_3
+  \end{bmatrix}
+\]</span></p>
+<p>denotes the ordering used in the chapter, with node 2 at the midpoint, and</p>
+<p><span class="math display">\[
+  \mathbf u_e^{(132)}
+  =
+  \begin{bmatrix}
+  u_1\\
+  u_3\\
+  u_2
+  \end{bmatrix}
+\]</span></p>
+<p>denotes the ordering with the two end nodes first, then</p>
+<p><span class="math display">\[
+  \mathbf u_e^{(132)}
+  =
+  \mathbf P\mathbf u_e^{(123)},
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+  \mathbf P
+  =
+  \begin{bmatrix}
+  1 &amp; 0 &amp; 0\\
+  0 &amp; 0 &amp; 1\\
+  0 &amp; 1 &amp; 0
+  \end{bmatrix}.
+\]</span></p>
+<p>Use this transformation to show that</p>
+<p><span class="math display">\[
+  \boxed{
+  \mathbf K_e^{(132)}
+  =
+  \mathbf P
+  \mathbf K_e^{(123)}
+  \mathbf P^{\mathsf T}.
+  }
+\]</span></p>
+<p>Verify that this produces the matrix given above.</p></li>
+<li><p>Verify the same result directly from the element formulation. For the new local ordering, first write the reordered shape-function matrix as <span class="math display">\[
+\mathbf N^{(132)}(\xi)
+=
+\begin{bmatrix}
+N_1(\xi) &amp; N_3(\xi) &amp; N_2(\xi)
+\end{bmatrix}.
+\]</span> Construct the corresponding <span class="math inline">\(\mathbf B^{(132)}(\xi)\)</span> and use <span class="math display">\[
+\mathbf K_e^{(132)}
+=
+\int_{-1}^{1}
+\mathbf B^{(132)}(\xi)^{\mathsf T}
+EA
+\mathbf B^{(132)}(\xi)
+J\,d\xi
+\]</span> to verify the stiffness matrix obtained by permutation.</p>
+<p>Explain why the two stiffness matrices have different arrangements of their entries but represent exactly the same finite element.</p></li>
+</ol></li>
 </ol>
 </div>
 </div>
@@ -915,33 +1151,33 @@ Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="m
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li><p>The affine mapping relates the standard interval <span class="math inline">\(\xi\in[-1,1]\)</span> to a physical interval by a constant scaling and a translation. It is an exact, one-to-one change of coordinate when the physical endpoints are correctly ordered.</p></li>
-<li><p>The Jacobian</p>
-<p><span class="math display">\[
-  J=\frac{dx}{d\xi}
-\]</span></p>
-<p>is the exact local scale factor of the mapping. It transforms differential lengths according to <span class="math inline">\(dx=J\,d\xi\)</span>.</p></li>
-<li><p>Changing coordinates produces the exact identity</p>
-<p><span class="math display">\[
-  \int_a^b f(x)\,dx
-  =
-  \int_{-1}^{1}f\!\left(x(\xi)\right)J\,d\xi.
-\]</span></p>
-<p>Numerical approximation begins only when the transformed integral is replaced by a finite quadrature sum.</p></li>
-<li><p>The Jacobian and the quadrature weights have different roles. The mapping determines <span class="math inline">\(J\)</span>, whereas the selected Gauss–Legendre rule determines the integration points <span class="math inline">\(\xi_g\)</span> and weights <span class="math inline">\(w_g\)</span>. The Jacobian is not a quadrature weight.</p></li>
-<li><p>For a straight two-node bar,</p>
-<p><span class="math display">\[
-  x(\xi)=N_1(\xi)x_1+N_2(\xi)x_2,
-  \qquad
-  J=\frac{L_e}{2},
-\]</span></p>
-<p>represents the element geometry exactly. The interpolated displacement <span class="math inline">\(u^h(\xi)\)</span> remains an approximation of the unknown physical field.</p></li>
-<li><p>Physical derivatives are recovered exactly through the chain rule:</p>
-<p><span class="math display">\[
-  \frac{d}{dx}
-  =
-  \frac{1}{J}\frac{d}{d\xi}.
+<li><p>Increasing the interpolation order from linear to quadratic enlarges the approximation space from <span class="math inline">\(\mathcal P_1\)</span> to <span class="math inline">\(\mathcal P_2\)</span> without changing the underlying finite element procedure.</p></li>
+<li><p>The quadratic Lagrange shape functions satisfy the nodal interpolation property <span class="math display">\[
+N_i(\xi_j)=\delta_{ij}
+\]</span> and form a partition of unity.</p></li>
+<li><p>The approximation spaces are nested: <span class="math display">\[
+\mathcal P_0
+\subset
+\mathcal P_1
+\subset
+\mathcal P_2.
+\]</span> The quadratic element can therefore represent rigid translations, linear displacement fields with constant strain, and quadratic displacement fields with linearly varying strain.</p></li>
+<li><p>The polynomial order of the element describes its approximation capability. It does not require every finite element solution to contain terms of the highest available order.</p></li>
+<li><p>For the regular three-node element, <span class="math display">\[
+J=\frac{L_e}{2},
+\]</span> while <span class="math inline">\(\mathbf B(\xi)\)</span> is linear in <span class="math inline">\(\xi\)</span>. For constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>, strain, stress, and axial force can therefore vary linearly within the element.</p></li>
+<li><p>For constant <span class="math inline">\(E\)</span> and <span class="math inline">\(A\)</span>, the stiffness integrands and the uniform-load integrands are quadratic in <span class="math inline">\(\xi\)</span>. Two-point Gauss–Legendre quadrature is the minimum exact rule for both.</p></li>
+<li><p>The consistent nodal vector for a uniform distributed load is <span class="math display">\[
+\mathbf f_e^q
+=
+\frac{q_0L_e}{6}
+\begin{bmatrix}
+1\\
+4\\
+1
+\end{bmatrix}.
 \]</span></p></li>
+<li><p>Increasing the interpolation order changes several connected parts of the element formulation: it enriches the approximation space, changes <span class="math inline">\(\mathbf B(\xi)\)</span> and the variation of the recovered fields within the element, increases the polynomial degree of the element integrands, and can therefore increase the quadrature order required for exact integration.</p></li>
 </ul>
 </div>
 </div>
@@ -1352,13 +1588,13 @@ Figure&nbsp;14.1: Exact affine mapping from the standard interval <span class="m
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/numerical-integration-one-dimension.html" class="pagination-link" aria-label="Numerical integration in one dimension">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span>
+      <a href="../chapters/isoparametric-formulation-one-dimension.html" class="pagination-link" aria-label="The isoparametric formulation in one dimension">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../chapters/gauss-quadrature-two-node-bar.html" class="pagination-link" aria-label="Gauss--Legendre quadrature for the two-node bar">
-        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Gauss–Legendre quadrature for the two-node bar</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
