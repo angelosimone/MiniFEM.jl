@@ -1,0 +1,584 @@
+# Implementing the three-node quadratic axial-bar element {#sec-three-node-quadratic-bar-implementation}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S07-gauss-legendre-quadrature`\
+**Target snapshot:** `2026-27/S08-three-node-quadratic-bar`
+:::
+
+::: {.callout-important}
+## Task: Change the approximation space
+
+Starting from the two-node Gauss--Legendre axial-bar implementation, develop the
+corresponding regular three-node quadratic implementation. Change only the
+operations that depend on the interpolation, keep the two-node implementations
+active, and verify the richer approximation against independent reference cases.
+:::
+
+The preceding theory chapters established the one-dimensional isoparametric
+formulation and the regular three-node quadratic bar. We now turn to its
+implementation and ask:
+
+> What actually changes when the approximation space is enriched from a two-node
+> linear element to a three-node quadratic element, while the surrounding FEM
+> workflow remains essentially unchanged?
+
+We will first identify which operations must change, then adapt a verified
+implementation, verify the element formulation and the complete analysis, and
+finally compare two discretizations of the same reference benchmark.
+
+## Start from a verified implementation
+
+Before changing anything, run the existing regression suite:
+
+```text
+julia --project=. test/runtests.jl
+```
+
+All tests must pass before you continue. A verified baseline means that a later
+failure can be traced to the quadratic adaptation rather than to an unresolved
+problem in the established two-node workflow.
+
+The closest verified starting point is the S07 Gauss--Legendre implementation.
+Make copies of its formulation file and executable driver:
+
+- copy `examples/axial_bar_gauss_legendre_fem.jl` as
+  `examples/quadratic_axial_bar_gauss_legendre_fem.jl`;
+- copy `examples/four_element_axial_bar_gauss_legendre.jl` as
+  `examples/three_node_quadratic_axial_bar_gauss_legendre.jl`.
+
+Do not overwrite the originals. Keeping both implementations available makes it
+possible to compare them directly and isolate the consequences of changing the
+approximation space from unrelated changes in code organization.
+
+## Decide what the new interpolation changes
+
+Before editing the copied files, inspect the two-node implementation and decide
+which operations depend on its approximation space.
+
+  | Operation                                                    | Does the change from P1 to P2 affect this operation? Why? |
+  | ------------------------------------------------------------ | --------------------------------------------------------- |
+  | Shape functions and their derivatives                        |                                                           |
+  | Number of local nodes and dimensions of `K_e` and `f_e`      |                                                           |
+  | Element connectivity and `dof_map`                           |                                                           |
+  | Isoparametric Jacobian and `B` evaluation                    |                                                           |
+  | Gauss--Legendre loop and stiffness/load accumulation pattern |                                                           |
+  | `assemble_matrix!` and `assemble_vector!`                    |                                                           |
+  | Partitioned global solution and reaction recovery            |                                                           |
+  | Spatial response recovery                                    |                                                           |
+
+The comparison separates two kinds of change. Interpolation, local dimensions,
+connectivity, and the spatial variation of recovered responses depend on the
+element. The sequence of isoparametric operations, the quadrature-loop
+structure, the local-to-global scatter operations, and the global equilibrium
+procedure remain structurally the same.
+
+In particular, the sequence of element-level operations remains the same. At
+each Gauss point, we
+
+1. evaluate the shape functions and their derivatives with respect to $\xi$;
+2. compute the Jacobian $J$;
+3. obtain the strain--displacement vector $\mathbf B$;
+4. use these quantities to accumulate the element stiffness matrix and
+   consistent load vector.
+
+What changes from the two-node to the three-node element is the interpolation
+used in these steps, not their overall sequence.
+
+For the two-node bar, some of these quantities were especially simple. For the
+three-node bar, the interpolation changes and `B` generally varies with `xi`.
+
+## Replace the interpolation before changing the element loop
+
+The first quadratic-specific target is:
+
+```julia
+quadratic_bar_shape_functions(xi)
+```
+
+Here, `xi` is the reference coordinate at which the quadratic shape functions
+and their derivatives are evaluated. The function returns two three-entry
+vectors, `N` and `dN_dxi`, ordered as left endpoint, midpoint, and right
+endpoint:
+
+$$
+  N_1 = \tfrac12\xi(\xi - 1),\qquad N_2
+      = 1 - \xi^2,\qquad N_3 = \tfrac12\xi(\xi + 1),
+$$
+
+$$
+  \frac{dN_1}{d\xi} = \xi - \tfrac12,\qquad \frac{dN_2}{d\xi}
+                    = -2\xi,\qquad \frac{dN_3}{d\xi} = \xi + \tfrac12.
+$$
+
+Before using these expressions in an element calculation, determine what they
+must satisfy at the three local reference nodes $\xi = -1$, $0$, and $1$. Then
+verify the Kronecker property, the partition of unity $\sum_i N_i = 1$, and the
+derivative identity $\sum_i dN_i/d\xi = 0$.
+
+These checks confirm that the implementation preserves the interpolation
+properties established in the preceding theory chapter.
+
+## Does a quadratic element imply a quadratic geometry map?
+
+The copied two-node code evaluates a simple affine map. The quadratic element
+instead evaluates the Jacobian from the isoparametric relation at every
+evaluation point. For the local coordinate vector `x_e`, calculate
+
+```julia
+J = sum(dN_dxi[i] * x_e[i] for i in 1:3)
+B = dN_dxi / J
+```
+
+`B` is a three-entry vector. Before evaluating the code, consider a regular
+element: its midpoint node satisfies $x_2 = (x_1 + x_3)/2$. Must the resulting
+geometry map still be affine, or does quadratic interpolation force a varying
+Jacobian?
+
+Check the result at both Gauss points. For a regular three-node element,
+
+$$
+  J = \frac{L_e}{2}.
+$$
+
+The geometry map is therefore affine, even though the displacement interpolation
+is quadratic. We nevertheless compute $J$ from the isoparametric relation,
+rather than inserting $L_e/2$ directly, so that the implementation remains
+consistent with the general formulation.
+
+## Adapt the local element integral
+
+The next target is:
+
+```julia
+integrate_three_node_bar_gauss_legendre(
+    x_e, E_e, A_e, q_e, num_gauss_legendre_points,
+)
+```
+
+`x_e` contains the three local coordinates; `E_e`, `A_e`, and `q_e` are the
+constant element material, area, and distributed-load data; and the final
+argument specifies the number of Gauss--Legendre integration points. The
+function returns the local stiffness matrix `K_e` and consistent
+distributed-load vector `f_e`.
+
+Before modifying the copied two-node function, inspect the quantities that
+depend on the number of local nodes. How should the dimensions of `K_e`, `f_e`,
+`N`, `dN_dxi`, and `B` change for a three-node element? What should happen to
+the local accumulation loops?
+
+Once the necessary dimensional changes are clear, adapt the copied function
+while preserving the structure of the element integration. At each Gauss point,
+evaluate the quadratic interpolation, compute $J$ and $\mathbf B$, and
+accumulate the stiffness and consistent-load contributions:
+
+```julia
+for (xi_g, w_g) in gauss_legendre_rule(num_gauss_legendre_points)
+    # evaluate N_g and dN_dxi_g
+    # compute J_g and B_g
+    # accumulate stiffness entries
+    # accumulate consistent-load entries
+end
+```
+
+The remaining question is how many Gauss points are required. As in the
+preceding quadrature chapters, examine the complete transformed integrands. For
+a regular three-node element, $d\mathbf N/d\xi$ is linear in $\xi$ and $J$ is
+constant, so $\mathbf B$ is linear. The stiffness integrand
+
+$$
+  B_i E A B_j J
+$$
+
+is therefore quadratic in $\xi$. Likewise, each $N_i$ is quadratic, so for a
+uniform distributed load the integrand
+
+$$
+  N_i q J
+$$
+
+is also quadratic. One-point Gauss--Legendre quadrature is therefore
+insufficient, whereas the two-point rule is exact for both integrals.
+
+Use the existing two-point Gauss--Legendre rule by setting
+
+```julia
+num_gauss_legendre_points = 2
+```
+
+No new quadrature function is required; only the number of integration points
+changes.
+
+Before assembling the global system, verify the resulting element quantities
+against the analytical expressions
+
+$$
+  \mathbf K_e = \frac{E_eA_e}{3L_e} \begin{bmatrix}
+                                      7  & -8 & 1  \\
+                                      -8 & 16 & -8 \\
+                                      1  & -8 & 7
+                                    \end{bmatrix},
+  \qquad \mathbf f_e^q = \frac{q_eL_e}{6} \begin{bmatrix}
+                                            1 \\
+                                            4 \\
+                                            1
+                                          \end{bmatrix}.
+$$
+
+Also verify that $\mathbf K_e$ is symmetric, that a rigid translation produces
+no internal force, and that the entries of $\mathbf f_e^q$ sum to the total
+distributed load $q_eL_e$. The $1:4:1$ distribution follows directly from the
+integrals of the quadratic shape functions: the midpoint shape function
+contributes four times as much as either endpoint shape function.
+
+## Reuse the S06 assembly boundary
+
+Once the $3 \times 3$ local stiffness matrix and the three-entry local load
+vector have been constructed, ask a second question:
+
+> Does the three-node element require a new assembly algorithm?
+
+The quadratic element requires a new element loop:
+
+```julia
+assemble_quadratic_axial_bar_gauss_legendre!(
+    K, f, node_coordinates, element_connectivity,
+    element_E, element_A, element_q, num_gauss_legendre_points,
+)
+```
+
+This mutating function assembles the supplied global `K` and `f` in place. As
+before, the element loop extracts the connected nodes, forms the local data,
+evaluates the element stiffness matrix and load vector, and constructs the
+`dof_map`. The only difference is that the quadratic element has three connected
+nodes, ordered as left endpoint, midpoint, and right endpoint.
+
+The local quantities can then be passed directly to the S06 assembly functions:
+
+```julia
+assemble_matrix!(K, K_e, dof_map)
+assemble_vector!(f, f_e, dof_map)
+```
+
+No modification is required. These functions iterate over the supplied local
+arrays using `axes(...)`, so the same scatter-add operation works for both
+two-node and three-node elements.
+
+The local topology has changed, but the assembly operation has not. This is
+precisely the separation introduced in S06: the element formulation determines
+the local matrix, vector, and degree-of-freedom map, while the assembly
+functions place those local contributions into the global system.
+
+## Reuse the global equilibrium procedure
+
+The same question now applies to the solution stage:
+
+> Does the higher-order interpolation change the global equilibrium equation or
+> the partitioned solution procedure?
+
+The global equilibrium problem is still
+
+$$
+  \mathbf K_{ff}\mathbf u_f = \mathbf f_f - \mathbf K_{fc}\mathbf u_c.
+$$
+
+The element formulation and connectivity have changed, but the global solution
+procedure has not. The quadratic solver can therefore be adapted directly from
+the existing two-node solver:
+
+```julia
+solve_quadratic_axial_bar_gauss_legendre(
+    node_coordinates, element_connectivity, element_E, element_A, element_q,
+    applied_forces, constrained_dofs, prescribed_displacements,
+    num_gauss_legendre_points,
+)
+```
+
+It returns `u, reactions`. As before, the function creates the global arrays,
+assembles the element contributions, adds the applied nodal forces, partitions
+the system into free and constrained degrees of freedom, solves for the unknown
+displacements, reconstructs the complete displacement vector, and computes the
+reactions from the residual. Only the element assembly operation supplied to
+this procedure is now the quadratic one.
+
+## Recover a response that can vary within an element
+
+We can now compute the quadratic nodal displacement vector. Unlike the two-node
+linear element, however, the quadratic displacement field generally produces a
+strain field that varies within the element. Before using the new element in the
+verification cases, we therefore need a way to evaluate its response at selected
+positions inside the element.
+
+Implement:
+
+```julia
+recover_quadratic_axial_bar_response(
+    node_coordinates, element_connectivity, element_E, element_A, u,
+    response_reference_coordinates,
+)
+```
+
+As established in the preceding theory chapter, the quadratic-element response
+can be evaluated at any selected position within the element. The final
+argument, `response_reference_coordinates`, therefore specifies the reference
+coordinates $\xi$ at which the response is to be evaluated.
+
+The function should return four arrays, each with shape
+`(num_elements, num_response_points)`:
+
+```text
+response_coordinates
+response_strain
+response_stress
+response_axial_force
+```
+
+For example, consider one element spanning $x = 0$ to $x = 2$, with $E = 100$,
+$A = 2$, and nodal displacements
+
+```julia
+u = [0.0, 0.15, 0.4]
+```
+
+Sampling the response at `[-1.0, 0.0, 1.0]` gives
+
+```julia
+response_coordinates = [0.0   1.0   2.0]
+response_strain      = [0.1   0.2   0.3]
+response_stress      = [10.0  20.0  30.0]
+response_axial_force = [20.0  40.0  60.0]
+```
+
+Each column refers to the same response location: the first to $\xi = -1$, the
+second to $\xi = 0$, and the third to $\xi = 1$. The entries of
+`response_coordinates` contain the corresponding physical coordinates $x$, while
+the other arrays contain the strain, stress, and axial force evaluated at those
+same locations.
+
+At each selected reference coordinate, evaluate the shape functions and their
+derivatives, compute $J$ and $\mathbf B$, map the point to the physical
+coordinate $x$, and then recover the strain, stress, and axial force.
+
+The locations supplied to this function are used to evaluate the
+already-computed finite element solution; they do not define a numerical
+integration rule, and no quadrature weights are required. Sampling at
+`[-1.0, 0.0, 1.0]`, for example, makes constant and linearly varying responses
+easy to inspect.
+
+::: {.callout-note}
+## Why are responses often sampled at Gauss points?
+
+In finite element calculations, stresses, strains, and other element quantities
+are commonly evaluated at the Gauss points used for numerical integration.
+Besides being convenient locations already available in the element calculation,
+Gauss points often provide particularly accurate values of these derived fields.
+For many standard displacement-based elements, stresses and strains evaluated
+there can be more accurate than values evaluated at generic positions within the
+element; under suitable conditions, this enhanced accuracy is associated with
+**superconvergence**.
+
+This is one reason why Gauss-point values are widely used in finite element
+post-processing. The distinction remains important, however: Gauss points are
+defined by the numerical integration rule, whereas response locations specify
+where the computed finite element fields are evaluated. The two sets of
+locations may coincide, but they need not.
+:::
+
+## First controlled case: can P2 reproduce a P1 solution?
+
+Use one regular quadratic element with its left end fixed, no distributed load,
+and an end force $F$. The exact displacement field is
+
+$$
+  u(x) = \frac{Fx}{EA}.
+$$
+
+Before running the finite element analysis, use the relation $P_1 \subset P_2$
+to predict whether the three-node quadratic element should be able to reproduce
+this field exactly.
+
+Determine the exact displacement at each of the three nodes and then compare
+these values with the finite element solution. In particular, check the
+displacement of the midpoint node.
+
+Next, use the recovery function to examine the strain, stress, and axial force
+at several positions within the element. What spatial variation should you
+expect for each quantity? Finally, verify the support reaction and global
+equilibrium.
+
+Explain the result in terms of the approximation space: does using a quadratic
+element imply that the computed displacement field must contain a nonzero
+quadratic term?
+
+## Second controlled case: when is the quadratic mode needed?
+
+Next use one regular quadratic element with a uniform distributed load and a
+free right end. The exact displacement field is
+
+$$
+  u(x) = \frac{q}{EA}\left( Lx - \frac{x^2}{2} \right).
+$$
+
+Before solving, compare this field with the quadratic approximation space. How
+many regular quadratic elements should be needed to reproduce it exactly?
+
+Determine the exact displacement at the three nodes and compare these values
+with the finite element solution. Then use the recovery function to examine the
+strain, stress, and axial force within the element. What variation should each
+quantity have? Finally, verify the support reaction and global equilibrium.
+
+Compare this result with the preceding end-force case. There, the exact
+displacement field was linear and could be represented within the quadratic
+approximation space without using its quadratic part. What changes in the
+present problem?
+
+## The five-node reference benchmark: same nodes, richer fields
+
+We now revisit the axial-bar problem considered earlier:
+
+$$
+  L = 1000\ \mathrm{mm},\qquad E
+    = 100000\ \mathrm{N/mm^2},\qquad A = 100\ \mathrm{mm^2},
+$$
+
+$$
+  q = 10\ \mathrm{N/mm},\qquad P
+    = 10000\ \mathrm{N}\text{ at }x = L/2,\qquad u(0) = 0.
+$$
+
+Previously, this problem was discretized using four two-node linear elements. We
+now solve it using two three-node quadratic elements.
+
+Using the same five physical node positions
+
+```text
+0, 250, 500, 750, 1000 mm
+```
+
+define two regular quadratic elements:
+
+```text
+element 1: 0, 250, 500 mm
+element 2: 500, 750, 1000 mm
+```
+
+The midpoint node of each quadratic element is already one of the existing
+physical nodes.
+
+Before running the quadratic driver, compare the two discretizations:
+
+  |                          | Four P1 elements | Two P2 elements     |
+  | ------------------------ | ---------------: | ------------------: |
+  | Physical nodes           |                5 |                   5 |
+  | Global displacement DOFs |                5 |                   5 |
+  | Element interpolation    | piecewise linear | piecewise quadratic |
+  | Strain within an element |         constant |    generally linear |
+
+The mechanical problem, physical node positions, and number of global
+displacement degrees of freedom are therefore unchanged. What has changed is the
+approximation used between the nodes.
+
+Before solving, consider the following questions:
+
+- Should the nodal displacement values obtained with the two discretizations be
+  the same for this particular problem?
+- What is the polynomial form of the exact displacement on each side of the
+  concentrated force?
+- Which of the two finite element spaces can reproduce that field exactly within
+  each element?
+- What differences should therefore appear in the recovered strain, stress, and
+  axial force between the nodes?
+
+Run the quadratic analysis and compare the nodal displacements with the earlier
+four-element P1 result. Then sample the response within each quadratic element
+and compare it with the appropriate analytical solution on each side of
+$x = L/2$.
+
+At $x = L/2$, remember that the concentrated force produces a jump in the axial
+force. The value recovered from element 1 corresponds to the left-hand limit,
+while the value recovered from element 2 corresponds to the right-hand limit.
+There is no single axial-force value at the discontinuity.
+
+To adapt the existing driver, change only what is required by the new element
+formulation: use the quadratic implementation, define the two three-node
+elements, use two Gauss points for element integration, call the quadratic
+solver, and evaluate the quadratic response at the selected locations. The
+physical data, loading, constraints, reaction check, and overall
+solve--verify--interpret workflow remain unchanged.
+
+## Study the supplied regression checks
+
+After completing the analytical verification, inspect the S08 regression tests.
+They check the interpolation properties, the Jacobian for a regular element, the
+element stiffness matrix and consistent load vector, the two one-element
+reference cases, and the two-element benchmark, including reactions,
+equilibrium, and recovered response quantities.
+
+The tests use `isapprox` to allow for floating-point roundoff. Their purpose is
+to ensure that subsequent changes do not alter the verified behavior of the
+implementation. They complement the preceding FEM verification; they do not
+replace it and should not be interpreted as validation.
+
+::: {.callout-tip title="Exercise: one-point underintegration"}
+Evaluate the quadratic element stiffness matrix using a single Gauss point at
+$\xi = 0$.
+
+A displacement mode $\mathbf d$ is a zero-energy mode if
+
+$$
+  \frac12\mathbf d^{\mathsf T}\mathbf K_e\mathbf d = 0.
+$$
+
+For the element stiffness matrix considered here, this is equivalent to
+
+$$
+  \mathbf K_e\mathbf d = \mathbf 0.
+$$
+
+Find the displacement vectors that satisfy this equation for the one-point
+stiffness matrix. One of them should correspond to the expected rigid
+translation,
+
+$$
+  \mathbf d = \begin{bmatrix}
+                1 \\
+                1 \\
+                1
+              \end{bmatrix}.
+$$
+
+Show that there is a second, linearly independent zero-energy mode. Plot or
+interpret the corresponding quadratic displacement field and examine its strain
+within the element. Why does one-point integration fail to detect this
+deformation?
+
+Repeat the argument for the two-point stiffness matrix. Which zero-energy mode
+remains?
+:::
+
+## What changed, and what did not?
+
+Moving from P1 to P2 changed the interpolation, the number of local nodes, the
+dimensions of the local element arrays, the connectivity, and the variation of
+the response within each element. The overall FEM procedure, however, remained
+the same: numerical integration, assembly, global equilibrium, solution,
+reaction recovery, and response evaluation followed the same sequence.
+
+In the reference benchmark, four P1 elements and two P2 elements even use the
+same five physical nodes and the same five global displacement DOFs. What
+differs is the approximation constructed between those nodes: the P2
+discretization can represent a richer displacement field and, consequently, a
+richer strain field.
+
+At this point, the two isoparametric implementations also reveal substantial
+duplication. Their interpolation differs, but most of the numerical integration,
+assembly, solution, and response-recovery operations are the same. This now
+provides a natural basis for a further refactoring: retain the choice between
+linear and quadratic interpolation explicitly, while sharing the FEM operations
+that do not depend on that choice.
+
+Once that common isoparametric formulation is established, we can turn to
+problems whose exact solution is not already contained in the finite element
+approximation space and study approximation error and convergence.

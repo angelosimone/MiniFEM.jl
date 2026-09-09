@@ -5,6 +5,7 @@ include("../examples/two_springs_fem.jl")
 include("../examples/axial_bar_fem.jl")
 include("../examples/gauss_legendre_quadrature.jl")
 include("../examples/axial_bar_gauss_legendre_fem.jl")
+include("../examples/quadratic_axial_bar_gauss_legendre_fem.jl")
 
 @testset "Two-spring regression tests" begin
     atol = 1.0e-12
@@ -40,6 +41,211 @@ include("../examples/axial_bar_gauss_legendre_fem.jl")
     @test isapprox(
         strain_energy_global,
         strain_energy_expected;
+        atol=atol,
+        rtol=rtol,
+    )
+end
+
+function run_three_node_quadratic_axial_bar_gauss_legendre_tests()
+    atol = 1.0e-12
+    rtol = 1.0e-12
+    zero_atol = 1.0e-10
+
+    reference_nodes = [-1.0, 0.0, 1.0]
+    for local_node in 1:3
+        N, _ = quadratic_bar_shape_functions(reference_nodes[local_node])
+        N_expected = zeros(3)
+        N_expected[local_node] = 1.0
+        @test isapprox(N, N_expected; atol=atol, rtol=rtol)
+    end
+
+    for xi in [-0.5, 0.0, 0.75]
+        N, dN_dxi = quadratic_bar_shape_functions(xi)
+        @test isapprox(sum(N), 1.0; atol=atol, rtol=rtol)
+        @test isapprox(sum(dN_dxi), 0.0; atol=atol, rtol=rtol)
+    end
+
+    L_e = 1000.0
+    E_e = 100000.0
+    A_e = 100.0
+    q_e = 10.0
+    x_e = [0.0, L_e / 2, L_e]
+
+    for (xi_g, _) in gauss_legendre_rule(2)
+        _, dN_dxi_g = quadratic_bar_shape_functions(xi_g)
+        J_g = sum(dN_dxi_g[i] * x_e[i] for i in 1:3)
+        @test isapprox(J_g, L_e / 2; atol=atol, rtol=rtol)
+    end
+
+    K_e, f_e = integrate_three_node_bar_gauss_legendre(x_e, E_e, A_e, q_e, 2)
+    K_e_expected = E_e * A_e / (3 * L_e) * [
+        7.0 -8.0 1.0;
+        -8.0 16.0 -8.0;
+        1.0 -8.0 7.0
+    ]
+    f_e_expected = q_e * L_e / 6 * [1.0, 4.0, 1.0]
+    @test isapprox(K_e, K_e_expected; atol=atol, rtol=rtol)
+    @test isapprox(K_e, transpose(K_e); atol=atol, rtol=rtol)
+    @test isapprox(K_e * ones(3), zeros(3); atol=zero_atol, rtol=rtol)
+    @test isapprox(f_e, f_e_expected; atol=atol, rtol=rtol)
+    @test isapprox(sum(f_e), q_e * L_e; atol=atol, rtol=rtol)
+
+    E = 100000.0
+    A = 100.0
+    EA = E * A
+    L = 1000.0
+    node_coordinates = [0.0, L / 2, L]
+    element_connectivity = [1 2 3]
+    element_E = [E]
+    element_A = [A]
+    constrained_dofs = [1]
+    prescribed_displacements = [0.0]
+    response_reference_coordinates = [-1.0, 0.0, 1.0]
+
+    F = 10000.0
+    u_end_force, reactions_end_force = solve_quadratic_axial_bar_gauss_legendre(
+        node_coordinates,
+        element_connectivity,
+        element_E,
+        element_A,
+        [0.0],
+        [(3, F)],
+        constrained_dofs,
+        prescribed_displacements,
+        2,
+    )
+    (
+    _,
+    strain_end_force,
+    stress_end_force,
+    axial_force_end_force
+) = recover_quadratic_axial_bar_response(
+        node_coordinates,
+        element_connectivity,
+        element_E,
+        element_A,
+        u_end_force,
+        response_reference_coordinates,
+    )
+    @test isapprox(u_end_force, [0.0, F * L / (2 * EA), F * L / EA]; atol=atol, rtol=rtol)
+    @test isapprox(strain_end_force, fill(F / EA, 1, 3); atol=atol, rtol=rtol)
+    @test isapprox(stress_end_force, fill(F / A, 1, 3); atol=atol, rtol=rtol)
+    @test isapprox(axial_force_end_force, fill(F, 1, 3); atol=atol, rtol=rtol)
+    @test isapprox(reactions_end_force[1], -F; atol=atol, rtol=rtol)
+    @test isapprox(reactions_end_force[1] + F, 0.0; atol=zero_atol, rtol=rtol)
+
+    q = 10.0
+    u_uniform_load, reactions_uniform_load = solve_quadratic_axial_bar_gauss_legendre(
+        node_coordinates,
+        element_connectivity,
+        element_E,
+        element_A,
+        [q],
+        Tuple{Int, Float64}[],
+        constrained_dofs,
+        prescribed_displacements,
+        2,
+    )
+    (
+    response_coordinates_uniform_load,
+    strain_uniform_load,
+    stress_uniform_load,
+    axial_force_uniform_load
+) = recover_quadratic_axial_bar_response(
+        node_coordinates,
+        element_connectivity,
+        element_E,
+        element_A,
+        u_uniform_load,
+        response_reference_coordinates,
+    )
+    strain_uniform_load_expected = q / EA .* (L .- response_coordinates_uniform_load)
+    @test isapprox(
+        u_uniform_load,
+        [0.0, 3 * q * L^2 / (8 * EA), q * L^2 / (2 * EA)];
+        atol=atol,
+        rtol=rtol,
+    )
+    @test isapprox(strain_uniform_load, strain_uniform_load_expected; atol=atol, rtol=rtol)
+    @test isapprox(
+        stress_uniform_load, E .* strain_uniform_load_expected; atol=atol, rtol=rtol
+    )
+    @test isapprox(
+        axial_force_uniform_load,
+        A * E .* strain_uniform_load_expected;
+        atol=atol,
+        rtol=rtol,
+    )
+    @test isapprox(reactions_uniform_load[1], -q * L; atol=atol, rtol=rtol)
+    @test isapprox(reactions_uniform_load[1] + q * L, 0.0; atol=zero_atol, rtol=rtol)
+
+    P = 10000.0
+    node_coordinates_benchmark = [0.0, L / 4, L / 2, 3 * L / 4, L]
+    element_connectivity_benchmark = [
+        1 2 3;
+        3 4 5
+    ]
+    element_E_benchmark = [E, E]
+    element_A_benchmark = [A, A]
+    element_q_benchmark = [q, q]
+    u_benchmark, reactions_benchmark = solve_quadratic_axial_bar_gauss_legendre(
+        node_coordinates_benchmark,
+        element_connectivity_benchmark,
+        element_E_benchmark,
+        element_A_benchmark,
+        element_q_benchmark,
+        [(3, P)],
+        [1],
+        [0.0],
+        2,
+    )
+    (
+    response_coordinates_benchmark,
+    strain_benchmark,
+    stress_benchmark,
+    axial_force_benchmark
+) = recover_quadratic_axial_bar_response(
+        node_coordinates_benchmark,
+        element_connectivity_benchmark,
+        element_E_benchmark,
+        element_A_benchmark,
+        u_benchmark,
+        response_reference_coordinates,
+    )
+    response_coordinates_benchmark_expected = [
+        0.0 L / 4 L / 2;
+        L / 2 3 * L / 4 L
+    ]
+    strain_benchmark_expected = [
+        0.002 0.00175 0.0015;
+        0.0005 0.00025 0.0
+    ]
+    stress_benchmark_expected = E .* strain_benchmark_expected
+    axial_force_benchmark_expected = A .* stress_benchmark_expected
+    @test isapprox(
+        u_benchmark,
+        [0.0, 0.46875, 0.875, 0.96875, 1.0];
+        atol=atol,
+        rtol=rtol,
+    )
+    @test isapprox(reactions_benchmark[1], -20000.0; atol=atol, rtol=rtol)
+    @test isapprox(
+        reactions_benchmark[1] + q * L + P,
+        0.0;
+        atol=zero_atol,
+        rtol=rtol,
+    )
+    @test isapprox(
+        response_coordinates_benchmark,
+        response_coordinates_benchmark_expected;
+        atol=atol,
+        rtol=rtol,
+    )
+    @test isapprox(strain_benchmark, strain_benchmark_expected; atol=atol, rtol=rtol)
+    @test isapprox(stress_benchmark, stress_benchmark_expected; atol=atol, rtol=rtol)
+    @test isapprox(
+        axial_force_benchmark,
+        axial_force_benchmark_expected;
         atol=atol,
         rtol=rtol,
     )
@@ -301,4 +507,8 @@ end
         atol=atol,
         rtol=rtol,
     )
+end
+
+@testset "Three-node quadratic axial-bar Gauss--Legendre verification" begin
+    run_three_node_quadratic_axial_bar_gauss_legendre_tests()
 end
