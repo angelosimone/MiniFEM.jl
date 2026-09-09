@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>19&nbsp; Implementing the three-node quadratic axial-bar element – An Introduction to the Finite Element Method</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/isoparametric-three-node-bar_element.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-94cc1b8ca0a99db6a385995591d656fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  output: {
+    font: "mathjax-stix2",
+    mtextInheritFont: true
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/three-node-quadratic-bar-implementation.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Implementing the three-node quadratic axial-bar element</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">An Introduction to the Finite Element Method</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Discrete systems and the direct stiffness method</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">One-dimensional continuum finite elements</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/two-node-linear-bar-element.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The two-node linear bar element</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/four-element-axial-bar-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/numerical-integration-one-dimension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/gauss-quadrature-two-node-bar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Gauss–Legendre quadrature for the two-node bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/gauss-legendre-quadrature-implementation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Implementing Gauss–Legendre quadrature for the two-node bar</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/isoparametric-formulation-one-dimension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/isoparametric-three-node-bar_element.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/three-node-quadratic-bar-implementation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Implementing the three-node quadratic axial-bar element</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#start-from-a-verified-implementation" id="toc-start-from-a-verified-implementation" class="nav-link active" data-scroll-target="#start-from-a-verified-implementation"><span class="header-section-number">19.1</span> Start from a verified implementation</a></li>
+  <li><a href="#decide-what-the-new-interpolation-changes" id="toc-decide-what-the-new-interpolation-changes" class="nav-link" data-scroll-target="#decide-what-the-new-interpolation-changes"><span class="header-section-number">19.2</span> Decide what the new interpolation changes</a></li>
+  <li><a href="#replace-the-interpolation-before-changing-the-element-loop" id="toc-replace-the-interpolation-before-changing-the-element-loop" class="nav-link" data-scroll-target="#replace-the-interpolation-before-changing-the-element-loop"><span class="header-section-number">19.3</span> Replace the interpolation before changing the element loop</a></li>
+  <li><a href="#does-a-quadratic-element-imply-a-quadratic-geometry-map" id="toc-does-a-quadratic-element-imply-a-quadratic-geometry-map" class="nav-link" data-scroll-target="#does-a-quadratic-element-imply-a-quadratic-geometry-map"><span class="header-section-number">19.4</span> Does a quadratic element imply a quadratic geometry map?</a></li>
+  <li><a href="#adapt-the-local-element-integral" id="toc-adapt-the-local-element-integral" class="nav-link" data-scroll-target="#adapt-the-local-element-integral"><span class="header-section-number">19.5</span> Adapt the local element integral</a></li>
+  <li><a href="#reuse-the-s06-assembly-boundary" id="toc-reuse-the-s06-assembly-boundary" class="nav-link" data-scroll-target="#reuse-the-s06-assembly-boundary"><span class="header-section-number">19.6</span> Reuse the S06 assembly boundary</a></li>
+  <li><a href="#reuse-the-global-equilibrium-procedure" id="toc-reuse-the-global-equilibrium-procedure" class="nav-link" data-scroll-target="#reuse-the-global-equilibrium-procedure"><span class="header-section-number">19.7</span> Reuse the global equilibrium procedure</a></li>
+  <li><a href="#recover-a-response-that-can-vary-within-an-element" id="toc-recover-a-response-that-can-vary-within-an-element" class="nav-link" data-scroll-target="#recover-a-response-that-can-vary-within-an-element"><span class="header-section-number">19.8</span> Recover a response that can vary within an element</a></li>
+  <li><a href="#first-controlled-case-can-p2-reproduce-a-p1-solution" id="toc-first-controlled-case-can-p2-reproduce-a-p1-solution" class="nav-link" data-scroll-target="#first-controlled-case-can-p2-reproduce-a-p1-solution"><span class="header-section-number">19.9</span> First controlled case: can P2 reproduce a P1 solution?</a></li>
+  <li><a href="#second-controlled-case-when-is-the-quadratic-mode-needed" id="toc-second-controlled-case-when-is-the-quadratic-mode-needed" class="nav-link" data-scroll-target="#second-controlled-case-when-is-the-quadratic-mode-needed"><span class="header-section-number">19.10</span> Second controlled case: when is the quadratic mode needed?</a></li>
+  <li><a href="#the-five-node-reference-benchmark-same-nodes-richer-fields" id="toc-the-five-node-reference-benchmark-same-nodes-richer-fields" class="nav-link" data-scroll-target="#the-five-node-reference-benchmark-same-nodes-richer-fields"><span class="header-section-number">19.11</span> The five-node reference benchmark: same nodes, richer fields</a></li>
+  <li><a href="#study-the-supplied-regression-checks" id="toc-study-the-supplied-regression-checks" class="nav-link" data-scroll-target="#study-the-supplied-regression-checks"><span class="header-section-number">19.12</span> Study the supplied regression checks</a></li>
+  <li><a href="#what-changed-and-what-did-not" id="toc-what-changed-and-what-did-not" class="nav-link" data-scroll-target="#what-changed-and-what-did-not"><span class="header-section-number">19.13</span> What changed, and what did not?</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/three-node-quadratic-bar-implementation.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Implementing the three-node quadratic axial-bar element</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-three-node-quadratic-bar-implementation" class="quarto-section-identifier"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Implementing the three-node quadratic axial-bar element</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Repository snapshot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Course edition:</strong> 2026–27<br>
+<strong>Starting snapshot:</strong> <code>2026-27/S07-gauss-legendre-quadrature</code><br>
+<strong>Target snapshot:</strong> <code>2026-27/S08-three-node-quadratic-bar</code></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Task: Change the approximation space
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Starting from the two-node Gauss–Legendre axial-bar implementation, develop the corresponding regular three-node quadratic implementation. Change only the operations that depend on the interpolation, keep the two-node implementations active, and verify the richer approximation against independent reference cases.</p>
+</div>
+</div>
+<p>The preceding theory chapters established the one-dimensional isoparametric formulation and the regular three-node quadratic bar. We now turn to its implementation and ask:</p>
+<blockquote class="blockquote">
+<p>What actually changes when the approximation space is enriched from a two-node linear element to a three-node quadratic element, while the surrounding FEM workflow remains essentially unchanged?</p>
+</blockquote>
+<p>We will first identify which operations must change, then adapt a verified implementation, verify the element formulation and the complete analysis, and finally compare two discretizations of the same reference benchmark.</p>
+<section id="start-from-a-verified-implementation" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="start-from-a-verified-implementation"><span class="header-section-number">19.1</span> Start from a verified implementation</h2>
+<p>Before changing anything, run the existing regression suite:</p>
+<pre class="text"><code>julia --project=. test/runtests.jl</code></pre>
+<p>All tests must pass before you continue. A verified baseline means that a later failure can be traced to the quadratic adaptation rather than to an unresolved problem in the established two-node workflow.</p>
+<p>The closest verified starting point is the S07 Gauss–Legendre implementation. Make copies of its formulation file and executable driver:</p>
+<ul>
+<li>copy <code>examples/axial_bar_gauss_legendre_fem.jl</code> as <code>examples/quadratic_axial_bar_gauss_legendre_fem.jl</code>;</li>
+<li>copy <code>examples/four_element_axial_bar_gauss_legendre.jl</code> as <code>examples/three_node_quadratic_axial_bar_gauss_legendre.jl</code>.</li>
+</ul>
+<p>Do not overwrite the originals. Keeping both implementations available makes it possible to compare them directly and isolate the consequences of changing the approximation space from unrelated changes in code organization.</p>
+</section>
+<section id="decide-what-the-new-interpolation-changes" class="level2" data-number="19.2">
+<h2 data-number="19.2" class="anchored" data-anchor-id="decide-what-the-new-interpolation-changes"><span class="header-section-number">19.2</span> Decide what the new interpolation changes</h2>
+<p>Before editing the copied files, inspect the two-node implementation and decide which operations depend on its approximation space.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 51%">
+<col style="width: 48%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th>Does the change from P1 to P2 affect this operation? Why?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shape functions and their derivatives</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Number of local nodes and dimensions of <code>K_e</code> and <code>f_e</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Element connectivity and <code>dof_map</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Isoparametric Jacobian and <code>B</code> evaluation</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Gauss–Legendre loop and stiffness/load accumulation pattern</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>assemble_matrix!</code> and <code>assemble_vector!</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Partitioned global solution and reaction recovery</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Spatial response recovery</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The comparison separates two kinds of change. Interpolation, local dimensions, connectivity, and the spatial variation of recovered responses depend on the element. The sequence of isoparametric operations, the quadrature-loop structure, the local-to-global scatter operations, and the global equilibrium procedure remain structurally the same.</p>
+<p>In particular, the sequence of element-level operations remains the same. At each Gauss point, we</p>
+<ol type="1">
+<li>evaluate the shape functions and their derivatives with respect to <span class="math inline">\(\xi\)</span>;</li>
+<li>compute the Jacobian <span class="math inline">\(J\)</span>;</li>
+<li>obtain the strain–displacement vector <span class="math inline">\(\mathbf B\)</span>;</li>
+<li>use these quantities to accumulate the element stiffness matrix and consistent load vector.</li>
+</ol>
+<p>What changes from the two-node to the three-node element is the interpolation used in these steps, not their overall sequence.</p>
+<p>For the two-node bar, some of these quantities were especially simple. For the three-node bar, the interpolation changes and <code>B</code> generally varies with <code>xi</code>.</p>
+</section>
+<section id="replace-the-interpolation-before-changing-the-element-loop" class="level2" data-number="19.3">
+<h2 data-number="19.3" class="anchored" data-anchor-id="replace-the-interpolation-before-changing-the-element-loop"><span class="header-section-number">19.3</span> Replace the interpolation before changing the element loop</h2>
+<p>The first quadratic-specific target is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadratic_bar_shape_functions</span>(xi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Here, <code>xi</code> is the reference coordinate at which the quadratic shape functions and their derivatives are evaluated. The function returns two three-entry vectors, <code>N</code> and <code>dN_dxi</code>, ordered as left endpoint, midpoint, and right endpoint:</p>
+<p><span class="math display">\[
+  N_1 = \tfrac12\xi(\xi - 1),\qquad N_2
+      = 1 - \xi^2,\qquad N_3 = \tfrac12\xi(\xi + 1),
+\]</span></p>
+<p><span class="math display">\[
+  \frac{dN_1}{d\xi} = \xi - \tfrac12,\qquad \frac{dN_2}{d\xi}
+                    = -2\xi,\qquad \frac{dN_3}{d\xi} = \xi + \tfrac12.
+\]</span></p>
+<p>Before using these expressions in an element calculation, determine what they must satisfy at the three local reference nodes <span class="math inline">\(\xi = -1\)</span>, <span class="math inline">\(0\)</span>, and <span class="math inline">\(1\)</span>. Then verify the Kronecker property, the partition of unity <span class="math inline">\(\sum_i N_i = 1\)</span>, and the derivative identity <span class="math inline">\(\sum_i dN_i/d\xi = 0\)</span>.</p>
+<p>These checks confirm that the implementation preserves the interpolation properties established in the preceding theory chapter.</p>
+</section>
+<section id="does-a-quadratic-element-imply-a-quadratic-geometry-map" class="level2" data-number="19.4">
+<h2 data-number="19.4" class="anchored" data-anchor-id="does-a-quadratic-element-imply-a-quadratic-geometry-map"><span class="header-section-number">19.4</span> Does a quadratic element imply a quadratic geometry map?</h2>
+<p>The copied two-node code evaluates a simple affine map. The quadratic element instead evaluates the Jacobian from the isoparametric relation at every evaluation point. For the local coordinate vector <code>x_e</code>, calculate</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fu">sum</span>(dN_dxi[i] <span class="op">*</span> x_e[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> dN_dxi <span class="op">/</span> J</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>B</code> is a three-entry vector. Before evaluating the code, consider a regular element: its midpoint node satisfies <span class="math inline">\(x_2 = (x_1 + x_3)/2\)</span>. Must the resulting geometry map still be affine, or does quadratic interpolation force a varying Jacobian?</p>
+<p>Check the result at both Gauss points. For a regular three-node element,</p>
+<p><span class="math display">\[
+  J = \frac{L_e}{2}.
+\]</span></p>
+<p>The geometry map is therefore affine, even though the displacement interpolation is quadratic. We nevertheless compute <span class="math inline">\(J\)</span> from the isoparametric relation, rather than inserting <span class="math inline">\(L_e/2\)</span> directly, so that the implementation remains consistent with the general formulation.</p>
+</section>
+<section id="adapt-the-local-element-integral" class="level2" data-number="19.5">
+<h2 data-number="19.5" class="anchored" data-anchor-id="adapt-the-local-element-integral"><span class="header-section-number">19.5</span> Adapt the local element integral</h2>
+<p>The next target is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate_three_node_bar_gauss_legendre</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    x_e, E_e, A_e, q_e, num_gauss_legendre_points,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>x_e</code> contains the three local coordinates; <code>E_e</code>, <code>A_e</code>, and <code>q_e</code> are the constant element material, area, and distributed-load data; and the final argument specifies the number of Gauss–Legendre integration points. The function returns the local stiffness matrix <code>K_e</code> and consistent distributed-load vector <code>f_e</code>.</p>
+<p>Before modifying the copied two-node function, inspect the quantities that depend on the number of local nodes. How should the dimensions of <code>K_e</code>, <code>f_e</code>, <code>N</code>, <code>dN_dxi</code>, and <code>B</code> change for a three-node element? What should happen to the local accumulation loops?</p>
+<p>Once the necessary dimensional changes are clear, adapt the copied function while preserving the structure of the element integration. At each Gauss point, evaluate the quadratic interpolation, compute <span class="math inline">\(J\)</span> and <span class="math inline">\(\mathbf B\)</span>, and accumulate the stiffness and consistent-load contributions:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (xi_g, w_g) <span class="kw">in</span> <span class="fu">gauss_legendre_rule</span>(num_gauss_legendre_points)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># evaluate N_g and dN_dxi_g</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># compute J_g and B_g</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># accumulate stiffness entries</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># accumulate consistent-load entries</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The remaining question is how many Gauss points are required. As in the preceding quadrature chapters, examine the complete transformed integrands. For a regular three-node element, <span class="math inline">\(d\mathbf N/d\xi\)</span> is linear in <span class="math inline">\(\xi\)</span> and <span class="math inline">\(J\)</span> is constant, so <span class="math inline">\(\mathbf B\)</span> is linear. The stiffness integrand</p>
+<p><span class="math display">\[
+  B_i E A B_j J
+\]</span></p>
+<p>is therefore quadratic in <span class="math inline">\(\xi\)</span>. Likewise, each <span class="math inline">\(N_i\)</span> is quadratic, so for a uniform distributed load the integrand</p>
+<p><span class="math display">\[
+  N_i q J
+\]</span></p>
+<p>is also quadratic. One-point Gauss–Legendre quadrature is therefore insufficient, whereas the two-point rule is exact for both integrals.</p>
+<p>Use the existing two-point Gauss–Legendre rule by setting</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>num_gauss_legendre_points <span class="op">=</span> <span class="fl">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>No new quadrature function is required; only the number of integration points changes.</p>
+<p>Before assembling the global system, verify the resulting element quantities against the analytical expressions</p>
+<p><span class="math display">\[
+  \mathbf K_e = \frac{E_eA_e}{3L_e} \begin{bmatrix}
+                                      7  &amp; -8 &amp; 1  \\
+                                      -8 &amp; 16 &amp; -8 \\
+                                      1  &amp; -8 &amp; 7
+                                    \end{bmatrix},
+  \qquad \mathbf f_e^q = \frac{q_eL_e}{6} \begin{bmatrix}
+                                            1 \\
+                                            4 \\
+                                            1
+                                          \end{bmatrix}.
+\]</span></p>
+<p>Also verify that <span class="math inline">\(\mathbf K_e\)</span> is symmetric, that a rigid translation produces no internal force, and that the entries of <span class="math inline">\(\mathbf f_e^q\)</span> sum to the total distributed load <span class="math inline">\(q_eL_e\)</span>. The <span class="math inline">\(1:4:1\)</span> distribution follows directly from the integrals of the quadratic shape functions: the midpoint shape function contributes four times as much as either endpoint shape function.</p>
+</section>
+<section id="reuse-the-s06-assembly-boundary" class="level2" data-number="19.6">
+<h2 data-number="19.6" class="anchored" data-anchor-id="reuse-the-s06-assembly-boundary"><span class="header-section-number">19.6</span> Reuse the S06 assembly boundary</h2>
+<p>Once the <span class="math inline">\(3 \times 3\)</span> local stiffness matrix and the three-entry local load vector have been constructed, ask a second question:</p>
+<blockquote class="blockquote">
+<p>Does the three-node element require a new assembly algorithm?</p>
+</blockquote>
+<p>The quadratic element requires a new element loop:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_quadratic_axial_bar_gauss_legendre!</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    K, f, node_coordinates, element_connectivity,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    element_E, element_A, element_q, num_gauss_legendre_points,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This mutating function assembles the supplied global <code>K</code> and <code>f</code> in place. As before, the element loop extracts the connected nodes, forms the local data, evaluates the element stiffness matrix and load vector, and constructs the <code>dof_map</code>. The only difference is that the quadratic element has three connected nodes, ordered as left endpoint, midpoint, and right endpoint.</p>
+<p>The local quantities can then be passed directly to the S06 assembly functions:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_vector!</span>(f, f_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>No modification is required. These functions iterate over the supplied local arrays using <code>axes(...)</code>, so the same scatter-add operation works for both two-node and three-node elements.</p>
+<p>The local topology has changed, but the assembly operation has not. This is precisely the separation introduced in S06: the element formulation determines the local matrix, vector, and degree-of-freedom map, while the assembly functions place those local contributions into the global system.</p>
+</section>
+<section id="reuse-the-global-equilibrium-procedure" class="level2" data-number="19.7">
+<h2 data-number="19.7" class="anchored" data-anchor-id="reuse-the-global-equilibrium-procedure"><span class="header-section-number">19.7</span> Reuse the global equilibrium procedure</h2>
+<p>The same question now applies to the solution stage:</p>
+<blockquote class="blockquote">
+<p>Does the higher-order interpolation change the global equilibrium equation or the partitioned solution procedure?</p>
+</blockquote>
+<p>The global equilibrium problem is still</p>
+<p><span class="math display">\[
+  \mathbf K_{ff}\mathbf u_f = \mathbf f_f - \mathbf K_{fc}\mathbf u_c.
+\]</span></p>
+<p>The element formulation and connectivity have changed, but the global solution procedure has not. The quadratic solver can therefore be adapted directly from the existing two-node solver:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_quadratic_axial_bar_gauss_legendre</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    node_coordinates, element_connectivity, element_E, element_A, element_q,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    applied_forces, constrained_dofs, prescribed_displacements,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    num_gauss_legendre_points,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>It returns <code>u, reactions</code>. As before, the function creates the global arrays, assembles the element contributions, adds the applied nodal forces, partitions the system into free and constrained degrees of freedom, solves for the unknown displacements, reconstructs the complete displacement vector, and computes the reactions from the residual. Only the element assembly operation supplied to this procedure is now the quadratic one.</p>
+</section>
+<section id="recover-a-response-that-can-vary-within-an-element" class="level2" data-number="19.8">
+<h2 data-number="19.8" class="anchored" data-anchor-id="recover-a-response-that-can-vary-within-an-element"><span class="header-section-number">19.8</span> Recover a response that can vary within an element</h2>
+<p>We can now compute the quadratic nodal displacement vector. Unlike the two-node linear element, however, the quadratic displacement field generally produces a strain field that varies within the element. Before using the new element in the verification cases, we therefore need a way to evaluate its response at selected positions inside the element.</p>
+<p>Implement:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">recover_quadratic_axial_bar_response</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    node_coordinates, element_connectivity, element_E, element_A, u,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    response_reference_coordinates,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>As established in the preceding theory chapter, the quadratic-element response can be evaluated at any selected position within the element. The final argument, <code>response_reference_coordinates</code>, therefore specifies the reference coordinates <span class="math inline">\(\xi\)</span> at which the response is to be evaluated.</p>
+<p>The function should return four arrays, each with shape <code>(num_elements, num_response_points)</code>:</p>
+<pre class="text"><code>response_coordinates
+response_strain
+response_stress
+response_axial_force</code></pre>
+<p>For example, consider one element spanning <span class="math inline">\(x = 0\)</span> to <span class="math inline">\(x = 2\)</span>, with <span class="math inline">\(E = 100\)</span>, <span class="math inline">\(A = 2\)</span>, and nodal displacements</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">0.15</span>, <span class="fl">0.4</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sampling the response at <code>[-1.0, 0.0, 1.0]</code> gives</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>response_coordinates <span class="op">=</span> [<span class="fl">0.0</span>   <span class="fl">1.0</span>   <span class="fl">2.0</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>response_strain      <span class="op">=</span> [<span class="fl">0.1</span>   <span class="fl">0.2</span>   <span class="fl">0.3</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>response_stress      <span class="op">=</span> [<span class="fl">10.0</span>  <span class="fl">20.0</span>  <span class="fl">30.0</span>]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>response_axial_force <span class="op">=</span> [<span class="fl">20.0</span>  <span class="fl">40.0</span>  <span class="fl">60.0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each column refers to the same response location: the first to <span class="math inline">\(\xi = -1\)</span>, the second to <span class="math inline">\(\xi = 0\)</span>, and the third to <span class="math inline">\(\xi = 1\)</span>. The entries of <code>response_coordinates</code> contain the corresponding physical coordinates <span class="math inline">\(x\)</span>, while the other arrays contain the strain, stress, and axial force evaluated at those same locations.</p>
+<p>At each selected reference coordinate, evaluate the shape functions and their derivatives, compute <span class="math inline">\(J\)</span> and <span class="math inline">\(\mathbf B\)</span>, map the point to the physical coordinate <span class="math inline">\(x\)</span>, and then recover the strain, stress, and axial force.</p>
+<p>The locations supplied to this function are used to evaluate the already-computed finite element solution; they do not define a numerical integration rule, and no quadrature weights are required. Sampling at <code>[-1.0, 0.0, 1.0]</code>, for example, makes constant and linearly varying responses easy to inspect.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why are responses often sampled at Gauss points?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In finite element calculations, stresses, strains, and other element quantities are commonly evaluated at the Gauss points used for numerical integration. Besides being convenient locations already available in the element calculation, Gauss points often provide particularly accurate values of these derived fields. For many standard displacement-based elements, stresses and strains evaluated there can be more accurate than values evaluated at generic positions within the element; under suitable conditions, this enhanced accuracy is associated with <strong>superconvergence</strong>.</p>
+<p>This is one reason why Gauss-point values are widely used in finite element post-processing. The distinction remains important, however: Gauss points are defined by the numerical integration rule, whereas response locations specify where the computed finite element fields are evaluated. The two sets of locations may coincide, but they need not.</p>
+</div>
+</div>
+</section>
+<section id="first-controlled-case-can-p2-reproduce-a-p1-solution" class="level2" data-number="19.9">
+<h2 data-number="19.9" class="anchored" data-anchor-id="first-controlled-case-can-p2-reproduce-a-p1-solution"><span class="header-section-number">19.9</span> First controlled case: can P2 reproduce a P1 solution?</h2>
+<p>Use one regular quadratic element with its left end fixed, no distributed load, and an end force <span class="math inline">\(F\)</span>. The exact displacement field is</p>
+<p><span class="math display">\[
+  u(x) = \frac{Fx}{EA}.
+\]</span></p>
+<p>Before running the finite element analysis, use the relation <span class="math inline">\(P_1 \subset P_2\)</span> to predict whether the three-node quadratic element should be able to reproduce this field exactly.</p>
+<p>Determine the exact displacement at each of the three nodes and then compare these values with the finite element solution. In particular, check the displacement of the midpoint node.</p>
+<p>Next, use the recovery function to examine the strain, stress, and axial force at several positions within the element. What spatial variation should you expect for each quantity? Finally, verify the support reaction and global equilibrium.</p>
+<p>Explain the result in terms of the approximation space: does using a quadratic element imply that the computed displacement field must contain a nonzero quadratic term?</p>
+</section>
+<section id="second-controlled-case-when-is-the-quadratic-mode-needed" class="level2" data-number="19.10">
+<h2 data-number="19.10" class="anchored" data-anchor-id="second-controlled-case-when-is-the-quadratic-mode-needed"><span class="header-section-number">19.10</span> Second controlled case: when is the quadratic mode needed?</h2>
+<p>Next use one regular quadratic element with a uniform distributed load and a free right end. The exact displacement field is</p>
+<p><span class="math display">\[
+  u(x) = \frac{q}{EA}\left( Lx - \frac{x^2}{2} \right).
+\]</span></p>
+<p>Before solving, compare this field with the quadratic approximation space. How many regular quadratic elements should be needed to reproduce it exactly?</p>
+<p>Determine the exact displacement at the three nodes and compare these values with the finite element solution. Then use the recovery function to examine the strain, stress, and axial force within the element. What variation should each quantity have? Finally, verify the support reaction and global equilibrium.</p>
+<p>Compare this result with the preceding end-force case. There, the exact displacement field was linear and could be represented within the quadratic approximation space without using its quadratic part. What changes in the present problem?</p>
+</section>
+<section id="the-five-node-reference-benchmark-same-nodes-richer-fields" class="level2" data-number="19.11">
+<h2 data-number="19.11" class="anchored" data-anchor-id="the-five-node-reference-benchmark-same-nodes-richer-fields"><span class="header-section-number">19.11</span> The five-node reference benchmark: same nodes, richer fields</h2>
+<p>We now revisit the axial-bar problem considered earlier:</p>
+<p><span class="math display">\[
+  L = 1000\ \mathrm{mm},\qquad E
+    = 100000\ \mathrm{N/mm^2},\qquad A = 100\ \mathrm{mm^2},
+\]</span></p>
+<p><span class="math display">\[
+  q = 10\ \mathrm{N/mm},\qquad P
+    = 10000\ \mathrm{N}\text{ at }x = L/2,\qquad u(0) = 0.
+\]</span></p>
+<p>Previously, this problem was discretized using four two-node linear elements. We now solve it using two three-node quadratic elements.</p>
+<p>Using the same five physical node positions</p>
+<pre class="text"><code>0, 250, 500, 750, 1000 mm</code></pre>
+<p>define two regular quadratic elements:</p>
+<pre class="text"><code>element 1: 0, 250, 500 mm
+element 2: 500, 750, 1000 mm</code></pre>
+<p>The midpoint node of each quadratic element is already one of the existing physical nodes.</p>
+<p>Before running the quadratic driver, compare the two discretizations:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Four P1 elements</th>
+<th style="text-align: right;">Two P2 elements</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Physical nodes</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td>Global displacement DOFs</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td>Element interpolation</td>
+<td style="text-align: right;">piecewise linear</td>
+<td style="text-align: right;">piecewise quadratic</td>
+</tr>
+<tr class="even">
+<td>Strain within an element</td>
+<td style="text-align: right;">constant</td>
+<td style="text-align: right;">generally linear</td>
+</tr>
+</tbody>
+</table>
+<p>The mechanical problem, physical node positions, and number of global displacement degrees of freedom are therefore unchanged. What has changed is the approximation used between the nodes.</p>
+<p>Before solving, consider the following questions:</p>
+<ul>
+<li>Should the nodal displacement values obtained with the two discretizations be the same for this particular problem?</li>
+<li>What is the polynomial form of the exact displacement on each side of the concentrated force?</li>
+<li>Which of the two finite element spaces can reproduce that field exactly within each element?</li>
+<li>What differences should therefore appear in the recovered strain, stress, and axial force between the nodes?</li>
+</ul>
+<p>Run the quadratic analysis and compare the nodal displacements with the earlier four-element P1 result. Then sample the response within each quadratic element and compare it with the appropriate analytical solution on each side of <span class="math inline">\(x = L/2\)</span>.</p>
+<p>At <span class="math inline">\(x = L/2\)</span>, remember that the concentrated force produces a jump in the axial force. The value recovered from element 1 corresponds to the left-hand limit, while the value recovered from element 2 corresponds to the right-hand limit. There is no single axial-force value at the discontinuity.</p>
+<p>To adapt the existing driver, change only what is required by the new element formulation: use the quadratic implementation, define the two three-node elements, use two Gauss points for element integration, call the quadratic solver, and evaluate the quadratic response at the selected locations. The physical data, loading, constraints, reaction check, and overall solve–verify–interpret workflow remain unchanged.</p>
+</section>
+<section id="study-the-supplied-regression-checks" class="level2" data-number="19.12">
+<h2 data-number="19.12" class="anchored" data-anchor-id="study-the-supplied-regression-checks"><span class="header-section-number">19.12</span> Study the supplied regression checks</h2>
+<p>After completing the analytical verification, inspect the S08 regression tests. They check the interpolation properties, the Jacobian for a regular element, the element stiffness matrix and consistent load vector, the two one-element reference cases, and the two-element benchmark, including reactions, equilibrium, and recovered response quantities.</p>
+<p>The tests use <code>isapprox</code> to allow for floating-point roundoff. Their purpose is to ensure that subsequent changes do not alter the verified behavior of the implementation. They complement the preceding FEM verification; they do not replace it and should not be interpreted as validation.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Exercise: one-point underintegration">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exercise: one-point underintegration
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Evaluate the quadratic element stiffness matrix using a single Gauss point at <span class="math inline">\(\xi = 0\)</span>.</p>
+<p>A displacement mode <span class="math inline">\(\mathbf d\)</span> is a zero-energy mode if</p>
+<p><span class="math display">\[
+  \frac12\mathbf d^{\mathsf T}\mathbf K_e\mathbf d = 0.
+\]</span></p>
+<p>For the element stiffness matrix considered here, this is equivalent to</p>
+<p><span class="math display">\[
+  \mathbf K_e\mathbf d = \mathbf 0.
+\]</span></p>
+<p>Find the displacement vectors that satisfy this equation for the one-point stiffness matrix. One of them should correspond to the expected rigid translation,</p>
+<p><span class="math display">\[
+  \mathbf d = \begin{bmatrix}
+                1 \\
+                1 \\
+                1
+              \end{bmatrix}.
+\]</span></p>
+<p>Show that there is a second, linearly independent zero-energy mode. Plot or interpret the corresponding quadratic displacement field and examine its strain within the element. Why does one-point integration fail to detect this deformation?</p>
+<p>Repeat the argument for the two-point stiffness matrix. Which zero-energy mode remains?</p>
+</div>
+</div>
+</section>
+<section id="what-changed-and-what-did-not" class="level2" data-number="19.13">
+<h2 data-number="19.13" class="anchored" data-anchor-id="what-changed-and-what-did-not"><span class="header-section-number">19.13</span> What changed, and what did not?</h2>
+<p>Moving from P1 to P2 changed the interpolation, the number of local nodes, the dimensions of the local element arrays, the connectivity, and the variation of the response within each element. The overall FEM procedure, however, remained the same: numerical integration, assembly, global equilibrium, solution, reaction recovery, and response evaluation followed the same sequence.</p>
+<p>In the reference benchmark, four P1 elements and two P2 elements even use the same five physical nodes and the same five global displacement DOFs. What differs is the approximation constructed between those nodes: the P2 discretization can represent a richer displacement field and, consequently, a richer strain field.</p>
+<p>At this point, the two isoparametric implementations also reveal substantial duplication. Their interpolation differs, but most of the numerical integration, assembly, solution, and response-recovery operations are the same. This now provides a natural basis for a further refactoring: retain the choice between linear and quadratic interpolation explicitly, while sharing the FEM operations that do not depend on that choice.</p>
+<p>Once that common isoparametric formulation is established, we can turn to problems whose exact solution is not already contained in the finite element approximation space and study approximation error and convergence.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/isoparametric-three-node-bar_element.html" class="pagination-link" aria-label="The three-node quadratic axial-bar element">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

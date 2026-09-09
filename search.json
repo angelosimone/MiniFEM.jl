@@ -1990,13 +1990,167 @@
     ]
   },
   {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html",
+    "href": "chapters/three-node-quadratic-bar-implementation.html",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "",
+    "text": "19.1 Start from a verified implementation\nThe preceding theory chapters established the one-dimensional isoparametric formulation and the regular three-node quadratic bar. We now turn to its implementation and ask:\nWe will first identify which operations must change, then adapt a verified implementation, verify the element formulation and the complete analysis, and finally compare two discretizations of the same reference benchmark.\nBefore changing anything, run the existing regression suite:\nAll tests must pass before you continue. A verified baseline means that a later failure can be traced to the quadratic adaptation rather than to an unresolved problem in the established two-node workflow.\nThe closest verified starting point is the S07 Gauss–Legendre implementation. Make copies of its formulation file and executable driver:\nDo not overwrite the originals. Keeping both implementations available makes it possible to compare them directly and isolate the consequences of changing the approximation space from unrelated changes in code organization.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#start-from-a-verified-implementation",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#start-from-a-verified-implementation",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "",
+    "text": "julia --project=. test/runtests.jl\n\n\n\ncopy examples/axial_bar_gauss_legendre_fem.jl as examples/quadratic_axial_bar_gauss_legendre_fem.jl;\ncopy examples/four_element_axial_bar_gauss_legendre.jl as examples/three_node_quadratic_axial_bar_gauss_legendre.jl.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#decide-what-the-new-interpolation-changes",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#decide-what-the-new-interpolation-changes",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.2 Decide what the new interpolation changes",
+    "text": "19.2 Decide what the new interpolation changes\nBefore editing the copied files, inspect the two-node implementation and decide which operations depend on its approximation space.\n\n\n\n\n\n\n\nOperation\nDoes the change from P1 to P2 affect this operation? Why?\n\n\n\n\nShape functions and their derivatives\n\n\n\nNumber of local nodes and dimensions of K_e and f_e\n\n\n\nElement connectivity and dof_map\n\n\n\nIsoparametric Jacobian and B evaluation\n\n\n\nGauss–Legendre loop and stiffness/load accumulation pattern\n\n\n\nassemble_matrix! and assemble_vector!\n\n\n\nPartitioned global solution and reaction recovery\n\n\n\nSpatial response recovery\n\n\n\n\nThe comparison separates two kinds of change. Interpolation, local dimensions, connectivity, and the spatial variation of recovered responses depend on the element. The sequence of isoparametric operations, the quadrature-loop structure, the local-to-global scatter operations, and the global equilibrium procedure remain structurally the same.\nIn particular, the sequence of element-level operations remains the same. At each Gauss point, we\n\nevaluate the shape functions and their derivatives with respect to \\(\\xi\\);\ncompute the Jacobian \\(J\\);\nobtain the strain–displacement vector \\(\\mathbf B\\);\nuse these quantities to accumulate the element stiffness matrix and consistent load vector.\n\nWhat changes from the two-node to the three-node element is the interpolation used in these steps, not their overall sequence.\nFor the two-node bar, some of these quantities were especially simple. For the three-node bar, the interpolation changes and B generally varies with xi.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#replace-the-interpolation-before-changing-the-element-loop",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#replace-the-interpolation-before-changing-the-element-loop",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.3 Replace the interpolation before changing the element loop",
+    "text": "19.3 Replace the interpolation before changing the element loop\nThe first quadratic-specific target is:\nquadratic_bar_shape_functions(xi)\nHere, xi is the reference coordinate at which the quadratic shape functions and their derivatives are evaluated. The function returns two three-entry vectors, N and dN_dxi, ordered as left endpoint, midpoint, and right endpoint:\n\\[\n  N_1 = \\tfrac12\\xi(\\xi - 1),\\qquad N_2\n      = 1 - \\xi^2,\\qquad N_3 = \\tfrac12\\xi(\\xi + 1),\n\\]\n\\[\n  \\frac{dN_1}{d\\xi} = \\xi - \\tfrac12,\\qquad \\frac{dN_2}{d\\xi}\n                    = -2\\xi,\\qquad \\frac{dN_3}{d\\xi} = \\xi + \\tfrac12.\n\\]\nBefore using these expressions in an element calculation, determine what they must satisfy at the three local reference nodes \\(\\xi = -1\\), \\(0\\), and \\(1\\). Then verify the Kronecker property, the partition of unity \\(\\sum_i N_i = 1\\), and the derivative identity \\(\\sum_i dN_i/d\\xi = 0\\).\nThese checks confirm that the implementation preserves the interpolation properties established in the preceding theory chapter.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#does-a-quadratic-element-imply-a-quadratic-geometry-map",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#does-a-quadratic-element-imply-a-quadratic-geometry-map",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.4 Does a quadratic element imply a quadratic geometry map?",
+    "text": "19.4 Does a quadratic element imply a quadratic geometry map?\nThe copied two-node code evaluates a simple affine map. The quadratic element instead evaluates the Jacobian from the isoparametric relation at every evaluation point. For the local coordinate vector x_e, calculate\nJ = sum(dN_dxi[i] * x_e[i] for i in 1:3)\nB = dN_dxi / J\nB is a three-entry vector. Before evaluating the code, consider a regular element: its midpoint node satisfies \\(x_2 = (x_1 + x_3)/2\\). Must the resulting geometry map still be affine, or does quadratic interpolation force a varying Jacobian?\nCheck the result at both Gauss points. For a regular three-node element,\n\\[\n  J = \\frac{L_e}{2}.\n\\]\nThe geometry map is therefore affine, even though the displacement interpolation is quadratic. We nevertheless compute \\(J\\) from the isoparametric relation, rather than inserting \\(L_e/2\\) directly, so that the implementation remains consistent with the general formulation.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#adapt-the-local-element-integral",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#adapt-the-local-element-integral",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.5 Adapt the local element integral",
+    "text": "19.5 Adapt the local element integral\nThe next target is:\nintegrate_three_node_bar_gauss_legendre(\n    x_e, E_e, A_e, q_e, num_gauss_legendre_points,\n)\nx_e contains the three local coordinates; E_e, A_e, and q_e are the constant element material, area, and distributed-load data; and the final argument specifies the number of Gauss–Legendre integration points. The function returns the local stiffness matrix K_e and consistent distributed-load vector f_e.\nBefore modifying the copied two-node function, inspect the quantities that depend on the number of local nodes. How should the dimensions of K_e, f_e, N, dN_dxi, and B change for a three-node element? What should happen to the local accumulation loops?\nOnce the necessary dimensional changes are clear, adapt the copied function while preserving the structure of the element integration. At each Gauss point, evaluate the quadratic interpolation, compute \\(J\\) and \\(\\mathbf B\\), and accumulate the stiffness and consistent-load contributions:\nfor (xi_g, w_g) in gauss_legendre_rule(num_gauss_legendre_points)\n    # evaluate N_g and dN_dxi_g\n    # compute J_g and B_g\n    # accumulate stiffness entries\n    # accumulate consistent-load entries\nend\nThe remaining question is how many Gauss points are required. As in the preceding quadrature chapters, examine the complete transformed integrands. For a regular three-node element, \\(d\\mathbf N/d\\xi\\) is linear in \\(\\xi\\) and \\(J\\) is constant, so \\(\\mathbf B\\) is linear. The stiffness integrand\n\\[\n  B_i E A B_j J\n\\]\nis therefore quadratic in \\(\\xi\\). Likewise, each \\(N_i\\) is quadratic, so for a uniform distributed load the integrand\n\\[\n  N_i q J\n\\]\nis also quadratic. One-point Gauss–Legendre quadrature is therefore insufficient, whereas the two-point rule is exact for both integrals.\nUse the existing two-point Gauss–Legendre rule by setting\nnum_gauss_legendre_points = 2\nNo new quadrature function is required; only the number of integration points changes.\nBefore assembling the global system, verify the resulting element quantities against the analytical expressions\n\\[\n  \\mathbf K_e = \\frac{E_eA_e}{3L_e} \\begin{bmatrix}\n                                      7  & -8 & 1  \\\\\n                                      -8 & 16 & -8 \\\\\n                                      1  & -8 & 7\n                                    \\end{bmatrix},\n  \\qquad \\mathbf f_e^q = \\frac{q_eL_e}{6} \\begin{bmatrix}\n                                            1 \\\\\n                                            4 \\\\\n                                            1\n                                          \\end{bmatrix}.\n\\]\nAlso verify that \\(\\mathbf K_e\\) is symmetric, that a rigid translation produces no internal force, and that the entries of \\(\\mathbf f_e^q\\) sum to the total distributed load \\(q_eL_e\\). The \\(1:4:1\\) distribution follows directly from the integrals of the quadratic shape functions: the midpoint shape function contributes four times as much as either endpoint shape function.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#reuse-the-s06-assembly-boundary",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#reuse-the-s06-assembly-boundary",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.6 Reuse the S06 assembly boundary",
+    "text": "19.6 Reuse the S06 assembly boundary\nOnce the \\(3 \\times 3\\) local stiffness matrix and the three-entry local load vector have been constructed, ask a second question:\n\nDoes the three-node element require a new assembly algorithm?\n\nThe quadratic element requires a new element loop:\nassemble_quadratic_axial_bar_gauss_legendre!(\n    K, f, node_coordinates, element_connectivity,\n    element_E, element_A, element_q, num_gauss_legendre_points,\n)\nThis mutating function assembles the supplied global K and f in place. As before, the element loop extracts the connected nodes, forms the local data, evaluates the element stiffness matrix and load vector, and constructs the dof_map. The only difference is that the quadratic element has three connected nodes, ordered as left endpoint, midpoint, and right endpoint.\nThe local quantities can then be passed directly to the S06 assembly functions:\nassemble_matrix!(K, K_e, dof_map)\nassemble_vector!(f, f_e, dof_map)\nNo modification is required. These functions iterate over the supplied local arrays using axes(...), so the same scatter-add operation works for both two-node and three-node elements.\nThe local topology has changed, but the assembly operation has not. This is precisely the separation introduced in S06: the element formulation determines the local matrix, vector, and degree-of-freedom map, while the assembly functions place those local contributions into the global system.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#reuse-the-global-equilibrium-procedure",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#reuse-the-global-equilibrium-procedure",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.7 Reuse the global equilibrium procedure",
+    "text": "19.7 Reuse the global equilibrium procedure\nThe same question now applies to the solution stage:\n\nDoes the higher-order interpolation change the global equilibrium equation or the partitioned solution procedure?\n\nThe global equilibrium problem is still\n\\[\n  \\mathbf K_{ff}\\mathbf u_f = \\mathbf f_f - \\mathbf K_{fc}\\mathbf u_c.\n\\]\nThe element formulation and connectivity have changed, but the global solution procedure has not. The quadratic solver can therefore be adapted directly from the existing two-node solver:\nsolve_quadratic_axial_bar_gauss_legendre(\n    node_coordinates, element_connectivity, element_E, element_A, element_q,\n    applied_forces, constrained_dofs, prescribed_displacements,\n    num_gauss_legendre_points,\n)\nIt returns u, reactions. As before, the function creates the global arrays, assembles the element contributions, adds the applied nodal forces, partitions the system into free and constrained degrees of freedom, solves for the unknown displacements, reconstructs the complete displacement vector, and computes the reactions from the residual. Only the element assembly operation supplied to this procedure is now the quadratic one.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#recover-a-response-that-can-vary-within-an-element",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#recover-a-response-that-can-vary-within-an-element",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.8 Recover a response that can vary within an element",
+    "text": "19.8 Recover a response that can vary within an element\nWe can now compute the quadratic nodal displacement vector. Unlike the two-node linear element, however, the quadratic displacement field generally produces a strain field that varies within the element. Before using the new element in the verification cases, we therefore need a way to evaluate its response at selected positions inside the element.\nImplement:\nrecover_quadratic_axial_bar_response(\n    node_coordinates, element_connectivity, element_E, element_A, u,\n    response_reference_coordinates,\n)\nAs established in the preceding theory chapter, the quadratic-element response can be evaluated at any selected position within the element. The final argument, response_reference_coordinates, therefore specifies the reference coordinates \\(\\xi\\) at which the response is to be evaluated.\nThe function should return four arrays, each with shape (num_elements, num_response_points):\nresponse_coordinates\nresponse_strain\nresponse_stress\nresponse_axial_force\nFor example, consider one element spanning \\(x = 0\\) to \\(x = 2\\), with \\(E = 100\\), \\(A = 2\\), and nodal displacements\nu = [0.0, 0.15, 0.4]\nSampling the response at [-1.0, 0.0, 1.0] gives\nresponse_coordinates = [0.0   1.0   2.0]\nresponse_strain      = [0.1   0.2   0.3]\nresponse_stress      = [10.0  20.0  30.0]\nresponse_axial_force = [20.0  40.0  60.0]\nEach column refers to the same response location: the first to \\(\\xi = -1\\), the second to \\(\\xi = 0\\), and the third to \\(\\xi = 1\\). The entries of response_coordinates contain the corresponding physical coordinates \\(x\\), while the other arrays contain the strain, stress, and axial force evaluated at those same locations.\nAt each selected reference coordinate, evaluate the shape functions and their derivatives, compute \\(J\\) and \\(\\mathbf B\\), map the point to the physical coordinate \\(x\\), and then recover the strain, stress, and axial force.\nThe locations supplied to this function are used to evaluate the already-computed finite element solution; they do not define a numerical integration rule, and no quadrature weights are required. Sampling at [-1.0, 0.0, 1.0], for example, makes constant and linearly varying responses easy to inspect.\n\n\n\n\n\n\nNoteWhy are responses often sampled at Gauss points?\n\n\n\nIn finite element calculations, stresses, strains, and other element quantities are commonly evaluated at the Gauss points used for numerical integration. Besides being convenient locations already available in the element calculation, Gauss points often provide particularly accurate values of these derived fields. For many standard displacement-based elements, stresses and strains evaluated there can be more accurate than values evaluated at generic positions within the element; under suitable conditions, this enhanced accuracy is associated with superconvergence.\nThis is one reason why Gauss-point values are widely used in finite element post-processing. The distinction remains important, however: Gauss points are defined by the numerical integration rule, whereas response locations specify where the computed finite element fields are evaluated. The two sets of locations may coincide, but they need not.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#first-controlled-case-can-p2-reproduce-a-p1-solution",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#first-controlled-case-can-p2-reproduce-a-p1-solution",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.9 First controlled case: can P2 reproduce a P1 solution?",
+    "text": "19.9 First controlled case: can P2 reproduce a P1 solution?\nUse one regular quadratic element with its left end fixed, no distributed load, and an end force \\(F\\). The exact displacement field is\n\\[\n  u(x) = \\frac{Fx}{EA}.\n\\]\nBefore running the finite element analysis, use the relation \\(P_1 \\subset P_2\\) to predict whether the three-node quadratic element should be able to reproduce this field exactly.\nDetermine the exact displacement at each of the three nodes and then compare these values with the finite element solution. In particular, check the displacement of the midpoint node.\nNext, use the recovery function to examine the strain, stress, and axial force at several positions within the element. What spatial variation should you expect for each quantity? Finally, verify the support reaction and global equilibrium.\nExplain the result in terms of the approximation space: does using a quadratic element imply that the computed displacement field must contain a nonzero quadratic term?",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#second-controlled-case-when-is-the-quadratic-mode-needed",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#second-controlled-case-when-is-the-quadratic-mode-needed",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.10 Second controlled case: when is the quadratic mode needed?",
+    "text": "19.10 Second controlled case: when is the quadratic mode needed?\nNext use one regular quadratic element with a uniform distributed load and a free right end. The exact displacement field is\n\\[\n  u(x) = \\frac{q}{EA}\\left( Lx - \\frac{x^2}{2} \\right).\n\\]\nBefore solving, compare this field with the quadratic approximation space. How many regular quadratic elements should be needed to reproduce it exactly?\nDetermine the exact displacement at the three nodes and compare these values with the finite element solution. Then use the recovery function to examine the strain, stress, and axial force within the element. What variation should each quantity have? Finally, verify the support reaction and global equilibrium.\nCompare this result with the preceding end-force case. There, the exact displacement field was linear and could be represented within the quadratic approximation space without using its quadratic part. What changes in the present problem?",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#the-five-node-reference-benchmark-same-nodes-richer-fields",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#the-five-node-reference-benchmark-same-nodes-richer-fields",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.11 The five-node reference benchmark: same nodes, richer fields",
+    "text": "19.11 The five-node reference benchmark: same nodes, richer fields\nWe now revisit the axial-bar problem considered earlier:\n\\[\n  L = 1000\\ \\mathrm{mm},\\qquad E\n    = 100000\\ \\mathrm{N/mm^2},\\qquad A = 100\\ \\mathrm{mm^2},\n\\]\n\\[\n  q = 10\\ \\mathrm{N/mm},\\qquad P\n    = 10000\\ \\mathrm{N}\\text{ at }x = L/2,\\qquad u(0) = 0.\n\\]\nPreviously, this problem was discretized using four two-node linear elements. We now solve it using two three-node quadratic elements.\nUsing the same five physical node positions\n0, 250, 500, 750, 1000 mm\ndefine two regular quadratic elements:\nelement 1: 0, 250, 500 mm\nelement 2: 500, 750, 1000 mm\nThe midpoint node of each quadratic element is already one of the existing physical nodes.\nBefore running the quadratic driver, compare the two discretizations:\n\n\n\n\nFour P1 elements\nTwo P2 elements\n\n\n\n\nPhysical nodes\n5\n5\n\n\nGlobal displacement DOFs\n5\n5\n\n\nElement interpolation\npiecewise linear\npiecewise quadratic\n\n\nStrain within an element\nconstant\ngenerally linear\n\n\n\nThe mechanical problem, physical node positions, and number of global displacement degrees of freedom are therefore unchanged. What has changed is the approximation used between the nodes.\nBefore solving, consider the following questions:\n\nShould the nodal displacement values obtained with the two discretizations be the same for this particular problem?\nWhat is the polynomial form of the exact displacement on each side of the concentrated force?\nWhich of the two finite element spaces can reproduce that field exactly within each element?\nWhat differences should therefore appear in the recovered strain, stress, and axial force between the nodes?\n\nRun the quadratic analysis and compare the nodal displacements with the earlier four-element P1 result. Then sample the response within each quadratic element and compare it with the appropriate analytical solution on each side of \\(x = L/2\\).\nAt \\(x = L/2\\), remember that the concentrated force produces a jump in the axial force. The value recovered from element 1 corresponds to the left-hand limit, while the value recovered from element 2 corresponds to the right-hand limit. There is no single axial-force value at the discontinuity.\nTo adapt the existing driver, change only what is required by the new element formulation: use the quadratic implementation, define the two three-node elements, use two Gauss points for element integration, call the quadratic solver, and evaluate the quadratic response at the selected locations. The physical data, loading, constraints, reaction check, and overall solve–verify–interpret workflow remain unchanged.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#study-the-supplied-regression-checks",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#study-the-supplied-regression-checks",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.12 Study the supplied regression checks",
+    "text": "19.12 Study the supplied regression checks\nAfter completing the analytical verification, inspect the S08 regression tests. They check the interpolation properties, the Jacobian for a regular element, the element stiffness matrix and consistent load vector, the two one-element reference cases, and the two-element benchmark, including reactions, equilibrium, and recovered response quantities.\nThe tests use isapprox to allow for floating-point roundoff. Their purpose is to ensure that subsequent changes do not alter the verified behavior of the implementation. They complement the preceding FEM verification; they do not replace it and should not be interpreted as validation.\n\n\n\n\n\n\nTipExercise: one-point underintegration\n\n\n\nEvaluate the quadratic element stiffness matrix using a single Gauss point at \\(\\xi = 0\\).\nA displacement mode \\(\\mathbf d\\) is a zero-energy mode if\n\\[\n  \\frac12\\mathbf d^{\\mathsf T}\\mathbf K_e\\mathbf d = 0.\n\\]\nFor the element stiffness matrix considered here, this is equivalent to\n\\[\n  \\mathbf K_e\\mathbf d = \\mathbf 0.\n\\]\nFind the displacement vectors that satisfy this equation for the one-point stiffness matrix. One of them should correspond to the expected rigid translation,\n\\[\n  \\mathbf d = \\begin{bmatrix}\n                1 \\\\\n                1 \\\\\n                1\n              \\end{bmatrix}.\n\\]\nShow that there is a second, linearly independent zero-energy mode. Plot or interpret the corresponding quadratic displacement field and examine its strain within the element. Why does one-point integration fail to detect this deformation?\nRepeat the argument for the two-point stiffness matrix. Which zero-energy mode remains?",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/three-node-quadratic-bar-implementation.html#what-changed-and-what-did-not",
+    "href": "chapters/three-node-quadratic-bar-implementation.html#what-changed-and-what-did-not",
+    "title": "19  Implementing the three-node quadratic axial-bar element",
+    "section": "19.13 What changed, and what did not?",
+    "text": "19.13 What changed, and what did not?\nMoving from P1 to P2 changed the interpolation, the number of local nodes, the dimensions of the local element arrays, the connectivity, and the variation of the response within each element. The overall FEM procedure, however, remained the same: numerical integration, assembly, global equilibrium, solution, reaction recovery, and response evaluation followed the same sequence.\nIn the reference benchmark, four P1 elements and two P2 elements even use the same five physical nodes and the same five global displacement DOFs. What differs is the approximation constructed between those nodes: the P2 discretization can represent a richer displacement field and, consequently, a richer strain field.\nAt this point, the two isoparametric implementations also reveal substantial duplication. Their interpolation differs, but most of the numerical integration, assembly, solution, and response-recovery operations are the same. This now provides a natural basis for a further refactoring: retain the choice between linear and quadratic interpolation explicitly, while sharing the FEM operations that do not depend on that choice.\nOnce that common isoparametric formulation is established, we can turn to problems whose exact solution is not already contained in the finite element approximation space and study approximation error and convergence.",
+    "crumbs": [
+      "One-dimensional continuum finite elements",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Implementing the three-node quadratic axial-bar element</span>"
+    ]
+  },
+  {
     "objectID": "glossary.html",
     "href": "glossary.html",
     "title": "Glossary",
     "section": "",
     "text": "A",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2006,7 +2160,7 @@
     "section": "",
     "text": "Abstraction\nIn programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.\nSimilar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.\nFurther details: Wikipedia — Abstraction (computer science).\n\n\nAffine mapping\nA one-dimensional coordinate transformation of the form\n\\[\n  x(\\xi)=a_0+a_1\\xi,\n\\]\nwhich combines a constant scaling with a translation. For a two-node bar element extending from \\(x_1\\) to \\(x_2&gt;x_1\\), the affine mapping from the standard interval \\(\\xi\\in[-1,1]\\) to the physical element is\n\\[\n  x(\\xi)\n  =\n  \\frac{1-\\xi}{2}x_1\n  +\n  \\frac{1+\\xi}{2}x_2\n  =\n  \\frac{x_1+x_2}{2}\n  +\n  \\frac{L_e}{2}\\xi,\n\\]\nwhere \\(L_e=x_2-x_1&gt;0\\). This mapping sends \\(\\xi=-1\\) to \\(x_1\\) and \\(\\xi=1\\) to \\(x_2\\). Its Jacobian is constant and equal to\n\\[\n  J=\\frac{dx}{d\\xi}=\\frac{L_e}{2}.\n\\]\nThe mapping and its Jacobian belong to an exact change of coordinate, as developed in 14  Standard and physical coordinates. Numerical approximation begins only when a quadrature rule is subsequently applied to the transformed integral.\n\n\nAsymptotic behavior\nThe behavior of a quantity as a parameter approaches a limiting value. An asymptotic statement describes what happens near that limit; it does not generally claim that the stated relationship is an exact equality for every value of the parameter.\nIn numerical integration, for example,\n\\[\n  e_Q(h)=O(h^2)\n\\]\nas \\(h\\) approaches zero means that there are constants \\(C&gt;0\\) and \\(h_0&gt;0\\), independent of \\(h\\), such that\n\\[\n  e_Q(h)\\leq Ch^2\n\\]\nwhenever \\(0&lt;h\\leq h_0\\). Thus, once the subinterval width is sufficiently small, the error is bounded above by a constant times \\(h^2\\).\nThe big-\\(O\\) statement specifies this asymptotic bound; it does not by itself claim that\n\\[\n  e_Q(h)=Ch^2\n\\]\nor prescribe an exact error-reduction factor. If, more specifically, the error approaches a nonzero multiple of \\(h^2\\), halving \\(h\\) reduces the error by approximately a factor of four once the asymptotic behavior has been reached.\nOn a fixed integration interval divided into \\(n\\) equal subintervals,\n\\[\n  h=\\frac{b-a}{n},\n\\]\nso the same asymptotic bound may be written as\n\\[\n  e_Q=O(n^{-2})\n\\]\nas \\(n\\) increases.\nThe quadratic midpoint-rule example in 13  Numerical integration in one dimension is stronger than this general asymptotic statement. For that particular function and interval, its error satisfies the exact relationship\n\\[\n  e_Q=\\frac{h^2}{4}\n\\]\nfor every positive integer \\(n\\). Consequently, doubling \\(n\\) and therefore halving \\(h\\) reduces the error by exactly a factor of four in that example.",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2016,7 +2170,7 @@
     "section": "C",
     "text": "C\n\nCohesion\nThe degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Cohesion (computer science).\n\n\nCoupling\nThe degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.\nFurther details: Wikipedia — Coupling (computer programming).",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2026,7 +2180,7 @@
     "section": "D",
     "text": "D\n\nDeclarative programming\nA programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on what should be achieved, while the underlying implementation determines how to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.\nSee also: Imperative programming. Further details: Wikipedia — Declarative programming.\n\n\nDon’t Repeat Yourself (DRY)\nA design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Don’t repeat yourself.",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2036,7 +2190,7 @@
     "section": "I",
     "text": "I\n\nImmutable object\nAn object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.\nSee also: Mutable object; Modified in place.\n\n\nImperative programming\nA programming paradigm in which a computation is expressed as an explicit sequence of commands that describe how a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.\nSee also: Declarative programming. Further details: Wikipedia — Imperative programming.",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2046,7 +2200,7 @@
     "section": "M",
     "text": "M\n\nModified in place\nDescribes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.\nFor example, in Julia, integers are immutable:\nx = 4\nx = x + 1\nHere, x is not modified in place. Instead, x is rebound from the value 4 to the new value 5.\nBy contrast, an array is mutable:\nx = [4]\nx[1] += 1\nHere, the existing array is modified in place, changing its contents from [4] to [5].\nSee also: Mutable object; Immutable object.\n\n\nMutable object\nAn object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.\nSee also: Immutable object; Modified in place.",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2056,7 +2210,7 @@
     "section": "R",
     "text": "R\n\nRefactoring\nRestructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.\n\n\nRegression test\nAn automated test that checks whether previously accepted behavior remains unchanged after modifications to the code. A regression test compares current results with established reference values or properties so that unintended changes can be detected.\nIn MiniFEM, regression tests may protect previously verified displacements, reactions, element quantities, quadrature properties, or other numerical results while new functionality is introduced. They support verification of later code changes, but they do not replace independent analytical verification or physical validation.",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
@@ -2066,7 +2220,7 @@
     "section": "S",
     "text": "S\n\nSeparation of concerns\nA software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.\nFurther details: Wikipedia — Separation of concerns.\n\n\nSingle Responsibility Principle\nA design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in 12  From repeated assembly to shared FEM operations.\nFurther details: Wikipedia — Single-responsibility principle.",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Glossary</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Glossary</span>"
     ]
   },
   {
