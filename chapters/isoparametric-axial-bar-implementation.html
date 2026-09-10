@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Glossary – An Introduction to the Finite Element Method</title>
+<title>20&nbsp; From separate interpolations to a common isoparametric implementation – An Introduction to the Finite Element Method</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -64,25 +64,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
-<link href="./chapters/isoparametric-axial-bar-implementation.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-94cc1b8ca0a99db6a385995591d656fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../glossary.html" rel="next">
+<link href="../chapters/three-node-quadratic-bar-implementation.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-94cc1b8ca0a99db6a385995591d656fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -162,7 +162,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Glossary</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/isoparametric-axial-bar-implementation.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From separate interpolations to a common isoparametric implementation</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -177,7 +177,7 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">An Introduction to the Finite Element Method</a> 
+      <a href="../">An Introduction to the Finite Element Method</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -189,7 +189,7 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
@@ -204,13 +204,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/julia-installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installing Julia and setting up VS Code</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/julia-essentials.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The bare minimum: Julia essentials for MiniFEM</span></span></a>
   </div>
 </li>
@@ -227,37 +227,37 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/continuous-and-discrete-models.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">From continuous systems to discrete models</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-direct-stiffness.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Two springs in series: the direct stiffness method</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-julia.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Your first FEM code: two springs in series</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-functions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Organizing finite element operations with functions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-callable-analysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Making the two-spring analysis callable</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-springs-regression-tests.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">From analytical verification to regression testing</span></span></a>
   </div>
 </li>
@@ -274,73 +274,73 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/one-dimensional-axial-bar-weak-form.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The weak form of the one-dimensional axial bar</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/two-node-linear-bar-element.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/two-node-linear-bar-element.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The two-node linear bar element</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/four-element-axial-bar-analysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/four-element-axial-bar-analysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Implementing a finite element analysis of a one-dimensional axial bar</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/shared-fem-assembly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">From repeated assembly to shared FEM operations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/numerical-integration-one-dimension.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/numerical-integration-one-dimension.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Numerical integration in one dimension</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/standard-and-physical-coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Standard and physical coordinates</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/gauss-quadrature-two-node-bar.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/gauss-quadrature-two-node-bar.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Gauss–Legendre quadrature for the two-node bar</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/gauss-legendre-quadrature-implementation.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/gauss-legendre-quadrature-implementation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Implementing Gauss–Legendre quadrature for the two-node bar</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/isoparametric-formulation-one-dimension.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/isoparametric-formulation-one-dimension.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">The isoparametric formulation in one dimension</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/isoparametric-three-node-bar_element.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/isoparametric-three-node-bar_element.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">The three-node quadratic axial-bar element</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/three-node-quadratic-bar-implementation.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/three-node-quadratic-bar-implementation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Implementing the three-node quadratic axial-bar element</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/isoparametric-axial-bar-implementation.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/isoparametric-axial-bar-implementation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From separate interpolations to a common isoparametric implementation</span></span></a>
   </div>
 </li>
@@ -348,13 +348,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./glossary.html" class="sidebar-item-text sidebar-link active">
+  <a href="../glossary.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
 </li>
@@ -368,51 +368,25 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#a" id="toc-a" class="nav-link active" data-scroll-target="#a">A</a>
+  <li><a href="#start-from-the-verified-implementations" id="toc-start-from-the-verified-implementations" class="nav-link active" data-scroll-target="#start-from-the-verified-implementations"><span class="header-section-number">20.1</span> Start from the verified implementations</a></li>
+  <li><a href="#make-interpolation-the-explicit-variation" id="toc-make-interpolation-the-explicit-variation" class="nav-link" data-scroll-target="#make-interpolation-the-explicit-variation"><span class="header-section-number">20.2</span> Make interpolation the explicit variation</a></li>
+  <li><a href="#build-the-common-element-procedure" id="toc-build-the-common-element-procedure" class="nav-link" data-scroll-target="#build-the-common-element-procedure"><span class="header-section-number">20.3</span> Build the common element procedure</a>
   <ul class="collapse">
-  <li><a href="#gls-abstraction" id="toc-gls-abstraction" class="nav-link" data-scroll-target="#gls-abstraction">Abstraction</a></li>
-  <li><a href="#gls-affine-mapping" id="toc-gls-affine-mapping" class="nav-link" data-scroll-target="#gls-affine-mapping">Affine mapping</a></li>
-  <li><a href="#gls-asymptotic-behavior" id="toc-gls-asymptotic-behavior" class="nav-link" data-scroll-target="#gls-asymptotic-behavior">Asymptotic behavior</a></li>
+  <li><a href="#represent-the-distributed-load-at-the-element-nodes" id="toc-represent-the-distributed-load-at-the-element-nodes" class="nav-link" data-scroll-target="#represent-the-distributed-load-at-the-element-nodes"><span class="header-section-number">20.3.1</span> Represent the distributed load at the element nodes</a></li>
   </ul></li>
-  <li><a href="#c" id="toc-c" class="nav-link" data-scroll-target="#c">C</a>
-  <ul class="collapse">
-  <li><a href="#gls-cohesion" id="toc-gls-cohesion" class="nav-link" data-scroll-target="#gls-cohesion">Cohesion</a></li>
-  <li><a href="#gls-coupling" id="toc-gls-coupling" class="nav-link" data-scroll-target="#gls-coupling">Coupling</a></li>
-  </ul></li>
-  <li><a href="#d" id="toc-d" class="nav-link" data-scroll-target="#d">D</a>
-  <ul class="collapse">
-  <li><a href="#gls-declarative-programming" id="toc-gls-declarative-programming" class="nav-link" data-scroll-target="#gls-declarative-programming">Declarative programming</a></li>
-  <li><a href="#gls-dry" id="toc-gls-dry" class="nav-link" data-scroll-target="#gls-dry">Don’t Repeat Yourself (DRY)</a></li>
-  </ul></li>
-  <li><a href="#i" id="toc-i" class="nav-link" data-scroll-target="#i">I</a>
-  <ul class="collapse">
-  <li><a href="#gls-immutable-object" id="toc-gls-immutable-object" class="nav-link" data-scroll-target="#gls-immutable-object">Immutable object</a></li>
-  <li><a href="#gls-imperative-programming" id="toc-gls-imperative-programming" class="nav-link" data-scroll-target="#gls-imperative-programming">Imperative programming</a></li>
-  </ul></li>
-  <li><a href="#m" id="toc-m" class="nav-link" data-scroll-target="#m">M</a>
-  <ul class="collapse">
-  <li><a href="#gls-modified-in-place" id="toc-gls-modified-in-place" class="nav-link" data-scroll-target="#gls-modified-in-place">Modified in place</a></li>
-  <li><a href="#gls-mutable-object" id="toc-gls-mutable-object" class="nav-link" data-scroll-target="#gls-mutable-object">Mutable object</a></li>
-  </ul></li>
-  <li><a href="#r" id="toc-r" class="nav-link" data-scroll-target="#r">R</a>
-  <ul class="collapse">
-  <li><a href="#gls-refactoring" id="toc-gls-refactoring" class="nav-link" data-scroll-target="#gls-refactoring">Refactoring</a></li>
-  <li><a href="#gls-regression-test" id="toc-gls-regression-test" class="nav-link" data-scroll-target="#gls-regression-test">Regression test</a></li>
-  </ul></li>
-  <li><a href="#s" id="toc-s" class="nav-link" data-scroll-target="#s">S</a>
-  <ul class="collapse">
-  <li><a href="#gls-separation-of-concerns" id="toc-gls-separation-of-concerns" class="nav-link" data-scroll-target="#gls-separation-of-concerns">Separation of concerns</a></li>
-  <li><a href="#gls-single-responsibility-principle" id="toc-gls-single-responsibility-principle" class="nav-link" data-scroll-target="#gls-single-responsibility-principle">Single Responsibility Principle</a></li>
-  </ul></li>
+  <li><a href="#reuse-the-surrounding-fem-workflow" id="toc-reuse-the-surrounding-fem-workflow" class="nav-link" data-scroll-target="#reuse-the-surrounding-fem-workflow"><span class="header-section-number">20.4</span> Reuse the surrounding FEM workflow</a></li>
+  <li><a href="#resulting-source-organization" id="toc-resulting-source-organization" class="nav-link" data-scroll-target="#resulting-source-organization"><span class="header-section-number">20.5</span> Resulting source organization</a></li>
+  <li><a href="#verify-the-refactoring" id="toc-verify-the-refactoring" class="nav-link" data-scroll-target="#verify-the-refactoring"><span class="header-section-number">20.6</span> Verify the refactoring</a></li>
+  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">20.7</span> Reflection</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/one-dimensional-axial-bar-weak-form.html">One-dimensional continuum finite elements</a></li><li class="breadcrumb-item"><a href="../chapters/isoparametric-axial-bar-implementation.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From separate interpolations to a common isoparametric implementation</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">Glossary</span></h1>
+<h1 class="title"><span id="sec-common-isoparametric-axial-bar" class="quarto-section-identifier"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From separate interpolations to a common isoparametric implementation</span></span></h1>
 </div>
 
 
@@ -429,157 +403,253 @@ window.Quarto = {
 </header>
 
 
-<section id="a" class="level2">
-<h2 class="anchored" data-anchor-id="a">A</h2>
-<section id="gls-abstraction" class="level3">
-<h3 class="anchored" data-anchor-id="gls-abstraction">Abstraction</h3>
-<p>In programming, an abstraction represents a common idea or operation while leaving out details that are not essential to using it. A useful abstraction groups code that performs the same conceptual task and can therefore be used through a common interface.</p>
-<p>Similar-looking code does not necessarily belong to the same abstraction. The important question is whether the code has the same purpose and responsibility. In MiniFEM, for example, matrix assembly can be shared because the same local-to-global scatter-add operation is used for different element formulations, while the element stiffness calculations remain specific to each formulation.</p>
-<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Abstraction_(computer_science)">Wikipedia — Abstraction (computer science)</a>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Repository snapshot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Course edition:</strong> 2026–27<br>
+<strong>Starting snapshot:</strong> <code>2026-27/S08-three-node-quadratic-bar</code><br>
+<strong>Target snapshot:</strong> <code>2026-27/S09-common-isoparametric-axial-bar</code></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled" title="Task">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Task
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare the verified linear and quadratic isoparametric axial-bar implementations. Keep the interpolation choice explicit, but replace only the operations that have become demonstrably common with one shared implementation.</p>
+</div>
+</div>
+<p>In S07 and S08, the linear and quadratic numerical formulations were deliberately kept separate so that the effect of changing the interpolation remained visible in the implementation. With both formulations now understood and verified, we can compare them and ask:</p>
+<blockquote class="blockquote">
+<p>Which differences belong to the interpolation, and which operations are the same finite element algorithm acting on different data?</p>
+</blockquote>
+<p>No new finite element operations are introduced here. Instead, we will reuse the procedures developed in the preceding chapters and identify which parts of the implementation can now be shared.</p>
+<section id="start-from-the-verified-implementations" class="level2" data-number="20.1">
+<h2 data-number="20.1" class="anchored" data-anchor-id="start-from-the-verified-implementations"><span class="header-section-number">20.1</span> Start from the verified implementations</h2>
+<p>Run the regression suite before changing the source:</p>
+<pre class="text"><code>julia test/runtests.jl</code></pre>
+<p>Resolve any baseline failure before continuing. The mathematical models and reference results are already verified; S09 changes the organization of the numerical implementation.</p>
+<p>The separate numerical formulation files used in S07 and S08 were:</p>
+<pre class="text"><code>examples/axial_bar_gauss_legendre_fem.jl
+examples/quadratic_axial_bar_gauss_legendre_fem.jl</code></pre>
+<p>In S09, these are replaced by the common implementation</p>
+<pre class="text"><code>src/isoparametric_axial_bar.jl</code></pre>
+<p>which serves both the linear and quadratic isoparametric formulations. The two executable examples remain separate:</p>
+<pre class="text"><code>examples/linear_isoparametric_axial_bar.jl
+examples/quadratic_isoparametric_axial_bar.jl</code></pre>
+<p>The earlier implementations remain recoverable from the snapshots</p>
+<pre class="text"><code>2026-27/S07-gauss-legendre-quadrature
+2026-27/S08-three-node-quadratic-bar</code></pre>
+<p>Inspect the two snapshot implementations side by side. For each operation below, decide whether changing from linear to quadratic interpolation requires a different algorithm, or only different interpolation data or array dimensions.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th>What changes?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shape functions and <span class="math inline">\(d\mathbf N/d\xi\)</span></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Number of element DOFs</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(J = (d\mathbf N/d\xi)\mathbf x_e\)</span></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf B = (1/J)d\mathbf N/d\xi\)</span></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Gauss–Legendre integration</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Local-to-global assembly</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Global solution and reaction recovery</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Response recovery</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Do not assume that different array sizes or numerical values necessarily imply different algorithms. Use the comparison to identify which parts of the two implementations should remain interpolation-specific and which can be shared.</p>
 </section>
-<section id="gls-affine-mapping" class="level3">
-<h3 class="anchored" data-anchor-id="gls-affine-mapping">Affine mapping</h3>
-<p>A one-dimensional coordinate transformation of the form</p>
+<section id="make-interpolation-the-explicit-variation" class="level2" data-number="20.2">
+<h2 data-number="20.2" class="anchored" data-anchor-id="make-interpolation-the-explicit-variation"><span class="header-section-number">20.2</span> Make interpolation the explicit variation</h2>
+<p>The first difference to isolate is the interpolation itself. Rather than maintaining separate element procedures, we make the interpolation choice an explicit input:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar_shape_functions</span>(xi, interpolation)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Here, <code>xi</code> is the reference coordinate and <code>interpolation</code> is either <code>"linear"</code> or <code>"quadratic"</code>. The function returns the shape functions and their derivatives with respect to the reference coordinate:</p>
+<pre class="text"><code>N
+dN_dxi</code></pre>
+<p>For linear interpolation,</p>
 <p><span class="math display">\[
-  x(\xi)=a_0+a_1\xi,
+  \mathbf N(\xi) = \begin{bmatrix}
+                     (1 - \xi)/2 \\
+                     (1 + \xi)/2
+                   \end{bmatrix},
+  \qquad \frac{d\mathbf N}{d\xi} = \begin{bmatrix}
+                                     -1/2 \\
+                                     +1/2
+                                   \end{bmatrix}.
 \]</span></p>
-<p>which combines a constant scaling with a translation. For a two-node bar element extending from <span class="math inline">\(x_1\)</span> to <span class="math inline">\(x_2&gt;x_1\)</span>, the affine mapping from the standard interval <span class="math inline">\(\xi\in[-1,1]\)</span> to the physical element is</p>
+<p>For quadratic interpolation, with the local nodes ordered as left endpoint, midpoint, and right endpoint,</p>
 <p><span class="math display">\[
-  x(\xi)
-  =
-  \frac{1-\xi}{2}x_1
-  +
-  \frac{1+\xi}{2}x_2
-  =
-  \frac{x_1+x_2}{2}
-  +
-  \frac{L_e}{2}\xi,
+  \mathbf N(\xi) = \begin{bmatrix}
+                     \tfrac12\xi(\xi - 1) \\
+                     1 - \xi^2 \\
+                     \tfrac12\xi(\xi + 1)
+                   \end{bmatrix},
+  \qquad \frac{d\mathbf N}{d\xi} = \begin{bmatrix}
+                                     \xi - \tfrac12 \\
+                                     -2\xi \\
+                                     \xi + \tfrac12
+                                   \end{bmatrix}.
 \]</span></p>
-<p>where <span class="math inline">\(L_e=x_2-x_1&gt;0\)</span>. This mapping sends <span class="math inline">\(\xi=-1\)</span> to <span class="math inline">\(x_1\)</span> and <span class="math inline">\(\xi=1\)</span> to <span class="math inline">\(x_2\)</span>. Its Jacobian is constant and equal to</p>
-<p><span class="math display">\[
-  J=\frac{dx}{d\xi}=\frac{L_e}{2}.
-\]</span></p>
-<p>The mapping and its Jacobian belong to an exact change of coordinate, as developed in <a href="chapters/standard-and-physical-coordinates.html" class="quarto-xref"><span>14&nbsp; Standard and physical coordinates</span></a>. Numerical approximation begins only when a quadrature rule is subsequently applied to the transformed integral.</p>
+<p>These expressions were derived in the preceding chapters and do not need to be reconsidered here. They are simply the interpolation-specific information supplied to the common element procedure.</p>
+<p>Once <span class="math inline">\(\mathbf N\)</span> and <span class="math inline">\(d\mathbf N/d\xi\)</span> are available, we can ask whether any of the remaining isoparametric operations actually need to know whether the interpolation is linear or quadratic.</p>
 </section>
-<section id="gls-asymptotic-behavior" class="level3">
-<h3 class="anchored" data-anchor-id="gls-asymptotic-behavior">Asymptotic behavior</h3>
-<p>The behavior of a quantity as a parameter approaches a limiting value. An asymptotic statement describes what happens near that limit; it does not generally claim that the stated relationship is an exact equality for every value of the parameter.</p>
-<p>In numerical integration, for example,</p>
-<p><span class="math display">\[
-  e_Q(h)=O(h^2)
-\]</span></p>
-<p>as <span class="math inline">\(h\)</span> approaches zero means that there are constants <span class="math inline">\(C&gt;0\)</span> and <span class="math inline">\(h_0&gt;0\)</span>, independent of <span class="math inline">\(h\)</span>, such that</p>
-<p><span class="math display">\[
-  e_Q(h)\leq Ch^2
-\]</span></p>
-<p>whenever <span class="math inline">\(0&lt;h\leq h_0\)</span>. Thus, once the subinterval width is sufficiently small, the error is bounded above by a constant times <span class="math inline">\(h^2\)</span>.</p>
-<p>The big-<span class="math inline">\(O\)</span> statement specifies this asymptotic bound; it does not by itself claim that</p>
-<p><span class="math display">\[
-  e_Q(h)=Ch^2
-\]</span></p>
-<p>or prescribe an exact error-reduction factor. If, more specifically, the error approaches a nonzero multiple of <span class="math inline">\(h^2\)</span>, halving <span class="math inline">\(h\)</span> reduces the error by approximately a factor of four once the asymptotic behavior has been reached.</p>
-<p>On a fixed integration interval divided into <span class="math inline">\(n\)</span> equal subintervals,</p>
-<p><span class="math display">\[
-  h=\frac{b-a}{n},
-\]</span></p>
-<p>so the same asymptotic bound may be written as</p>
-<p><span class="math display">\[
-  e_Q=O(n^{-2})
-\]</span></p>
-<p>as <span class="math inline">\(n\)</span> increases.</p>
-<p>The quadratic midpoint-rule example in <a href="chapters/numerical-integration-one-dimension.html" class="quarto-xref"><span>13&nbsp; Numerical integration in one dimension</span></a> is stronger than this general asymptotic statement. For that particular function and interval, its error satisfies the exact relationship</p>
-<p><span class="math display">\[
-  e_Q=\frac{h^2}{4}
-\]</span></p>
-<p>for every positive integer <span class="math inline">\(n\)</span>. Consequently, doubling <span class="math inline">\(n\)</span> and therefore halving <span class="math inline">\(h\)</span> reduces the error by exactly a factor of four in that example.</p>
+<section id="build-the-common-element-procedure" class="level2" data-number="20.3">
+<h2 data-number="20.3" class="anchored" data-anchor-id="build-the-common-element-procedure"><span class="header-section-number">20.3</span> Build the common element procedure</h2>
+<p>The common element procedure is implemented by</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate_axial_bar_gauss_legendre</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    x_e,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    E_e,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    A_e,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    q_e,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    num_gauss_legendre_points,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    interpolation,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>which returns <code>K_e, f_e</code>.</p>
+<p>The important change is that the size of the element arrays is no longer hard-coded separately for each interpolation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>num_element_dofs <span class="op">=</span> <span class="fu">length</span>(x_e)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>K_e <span class="op">=</span> <span class="fu">zeros</span>(num_element_dofs, num_element_dofs)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>f_e <span class="op">=</span> <span class="fu">zeros</span>(num_element_dofs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For the present axial-bar elements, with one displacement DOF per node, <code>num_element_dofs</code> is therefore 2 for a linear element and 3 for a quadratic element. It is an element-level quantity and should not be confused with the already established <code>total_dofs</code>, which refers to the complete assembled model.</p>
+<p>The same implementation can therefore operate on either a two-node or a three-node element without separate local-array definitions or loop limits.</p>
+<section id="represent-the-distributed-load-at-the-element-nodes" class="level3" data-number="20.3.1">
+<h3 data-number="20.3.1" class="anchored" data-anchor-id="represent-the-distributed-load-at-the-element-nodes"><span class="header-section-number">20.3.1</span> Represent the distributed load at the element nodes</h3>
+<p>The common element procedure receives <code>q_e</code> as the distributed-load values at the element nodes and interpolates them using the selected shape functions.</p>
+<p>For the present benchmarks, <code>element_q[e]</code> stores the constant distributed load assigned to element <code>e</code>. The corresponding nodal values are constructed as</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>q_e <span class="op">=</span> <span class="fu">fill</span>(element_q[<span class="cn">e</span>], num_element_dofs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>so that a uniform load <span class="math inline">\(q\)</span> gives</p>
+<pre class="text"><code>linear:     q_e = [q, q]
+quadratic:  q_e = [q, q, q]</code></pre>
+<p>More generally, <code>q_e</code> may contain different nodal values. The previously verified linearly varying load for the two-node element is therefore handled by the same element procedure, without an interpolation-specific branch.</p>
+<p>Using the displacement shape functions to interpolate the prescribed load is convenient for the present examples, but it is not a general requirement that all physical fields use the same interpolation.</p>
 </section>
 </section>
-<section id="c" class="level2">
-<h2 class="anchored" data-anchor-id="c">C</h2>
-<section id="gls-cohesion" class="level3">
-<h3 class="anchored" data-anchor-id="gls-cohesion">Cohesion</h3>
-<p>The degree to which the responsibilities within a function, module, or file belong together. High cohesion means that the contained operations serve a clear, closely related purpose. For example, the local-to-global matrix and vector assembly operations in MiniFEM form a small, cohesive family because they both add element contributions to global finite element arrays, as illustrated by the S06 refactoring in <a href="chapters/shared-fem-assembly.html" class="quarto-xref"><span>12&nbsp; From repeated assembly to shared FEM operations</span></a>.</p>
-<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Cohesion_%28computer_science%29">Wikipedia — Cohesion (computer science)</a>.</p>
+<section id="reuse-the-surrounding-fem-workflow" class="level2" data-number="20.4">
+<h2 data-number="20.4" class="anchored" data-anchor-id="reuse-the-surrounding-fem-workflow"><span class="header-section-number">20.4</span> Reuse the surrounding FEM workflow</h2>
+<p>Once the element procedure has been made independent of the interpolation order, the surrounding finite element workflow can also be shared.</p>
+<p>The common assembly procedure is implemented by</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_axial_bar_gauss_legendre!</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    K,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    f,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    node_coordinates,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    element_connectivity,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    element_E,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    element_A,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    element_q,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    num_gauss_legendre_points,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    interpolation,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>It constructs the element quantities and uses the established assembly operations</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_matrix!</span>(K, K_e, dof_map)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">assemble_vector!</span>(f, f_e, dof_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>for both linear and quadratic elements. The number of entries in <code>dof_map</code> changes with the element interpolation, but the assembly procedure does not.</p>
+<p>Similarly,</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve_axial_bar_gauss_legendre</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    node_coordinates,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    element_connectivity,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    element_E,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    element_A,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    element_q,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    applied_forces,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    constrained_dofs,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    prescribed_displacements,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    num_gauss_legendre_points,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    interpolation,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>returns <code>u, reactions</code> using the same established global solution procedure for both interpolation choices.</p>
+<p>Response recovery is handled by</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">recover_axial_bar_response</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    node_coordinates,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    element_connectivity,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    element_E,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    element_A,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    u,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    response_reference_coordinates,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    interpolation,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>which returns <code>response_coordinates, strain, stress, axial_force</code>.</p>
+<p>The response coordinates are specified independently of the Gauss–Legendre quadrature rule. Quadrature points are chosen to integrate the element contributions, whereas response points are chosen to inspect the computed solution. They may coincide, but one choice does not determine the other.</p>
 </section>
-<section id="gls-coupling" class="level3">
-<h3 class="anchored" data-anchor-id="gls-coupling">Coupling</h3>
-<p>The degree to which one part of a program depends on details of another part. Lower coupling is often useful because a function can then change independently of details that are outside its responsibility. For example, a local-to-global assembly operation needs a local contribution and a DOF map, but does not need to know how a spring or bar formulation produced that contribution.</p>
-<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29">Wikipedia — Coupling (computer programming)</a>.</p>
+<section id="resulting-source-organization" class="level2" data-number="20.5">
+<h2 data-number="20.5" class="anchored" data-anchor-id="resulting-source-organization"><span class="header-section-number">20.5</span> Resulting source organization</h2>
+<p>The distinction between reusable finite element operations and executable examples is now reflected in the repository structure:</p>
+<pre class="text"><code>src/
+    MiniFEM.jl
+    two_springs_fem.jl
+    axial_bar_closed_form.jl
+    fem_assembly.jl
+    gauss_legendre_quadrature.jl
+    isoparametric_axial_bar.jl
+
+examples/
+    two_springs.jl
+    four_element_axial_bar.jl
+    gauss_legendre_scalar_integration.jl
+    linear_isoparametric_axial_bar.jl
+    quadratic_isoparametric_axial_bar.jl</code></pre>
+<p>The files in <code>src/</code> contain reusable FEM and numerical operations, whereas the files in <code>examples/</code> define and run particular problems.</p>
+<p>For the axial bar, the closed-form implementation</p>
+<pre class="text"><code>src/axial_bar_closed_form.jl</code></pre>
+<p>is used by</p>
+<pre class="text"><code>examples/four_element_axial_bar.jl</code></pre>
+<p>while the common isoparametric implementation</p>
+<pre class="text"><code>src/isoparametric_axial_bar.jl</code></pre>
+<p>is used by both</p>
+<pre class="text"><code>examples/linear_isoparametric_axial_bar.jl
+examples/quadratic_isoparametric_axial_bar.jl</code></pre>
+<p>The examples still include the required source files explicitly with <code>include(...)</code>. <code>src/MiniFEM.jl</code> remains inactive at this stage.</p>
 </section>
+<section id="verify-the-refactoring" class="level2" data-number="20.6">
+<h2 data-number="20.6" class="anchored" data-anchor-id="verify-the-refactoring"><span class="header-section-number">20.6</span> Verify the refactoring</h2>
+<p>The tests must follow the new source organization as well. The regression suite now loads the reusable FEM and numerical operations from <code>src/</code>, including the common isoparametric axial-bar implementation, while retaining the separate verification cases developed in the preceding snapshots.</p>
+<p>Run the regression suite:</p>
+<pre class="text"><code>julia test/runtests.jl</code></pre>
+<p>All previously verified linear and quadratic results should remain unchanged.</p>
 </section>
-<section id="d" class="level2">
-<h2 class="anchored" data-anchor-id="d">D</h2>
-<section id="gls-declarative-programming" class="level3">
-<h3 class="anchored" data-anchor-id="gls-declarative-programming">Declarative programming</h3>
-<p>A programming paradigm in which the desired result is specified without explicitly prescribing the sequence of operations required to obtain it. In other words, declarative programming focuses on <strong>what</strong> should be achieved, while the underlying implementation determines <strong>how</strong> to achieve it. For example, selecting all even values from an array using a filtering operation expresses the desired result without explicitly defining the iteration and state changes required to construct it.</p>
-<p><strong>See also:</strong> <a href="#gls-imperative-programming">Imperative programming</a>. <strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Declarative_programming">Wikipedia — Declarative programming</a>.</p>
-</section>
-<section id="gls-dry" class="level3">
-<h3 class="anchored" data-anchor-id="gls-dry">Don’t Repeat Yourself (DRY)</h3>
-<p>A design principle that encourages a stable piece of knowledge or responsibility to have one well-defined implementation. It is not an absolute prohibition on duplicated syntax: repeated code should be abstracted when it represents the same stable responsibility and the resulting abstraction improves the design. MiniFEM, for example, retains element-specific formulation code while sharing the local-to-global assembly operation, as illustrated by the S06 refactoring in <a href="chapters/shared-fem-assembly.html" class="quarto-xref"><span>12&nbsp; From repeated assembly to shared FEM operations</span></a>.</p>
-<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">Wikipedia — Don’t repeat yourself</a>.</p>
-</section>
-</section>
-<section id="i" class="level2">
-<h2 class="anchored" data-anchor-id="i">I</h2>
-<section id="gls-immutable-object" class="level3">
-<h3 class="anchored" data-anchor-id="gls-immutable-object">Immutable object</h3>
-<p>An object whose contents or internal state cannot be changed after it has been created. An operation that appears to modify an immutable object instead creates a new object representing the modified value, leaving the original object unchanged. Strings and numbers are common examples of immutable objects in many programming languages.</p>
-<p><strong>See also:</strong> <a href="#gls-mutable-object">Mutable object</a>; <a href="#gls-modified-in-place">Modified in place</a>.</p>
-</section>
-<section id="gls-imperative-programming" class="level3">
-<h3 class="anchored" data-anchor-id="gls-imperative-programming">Imperative programming</h3>
-<p>A programming paradigm in which a computation is expressed as an explicit sequence of commands that describe <strong>how</strong> a result should be obtained. Imperative programs typically modify variables or other aspects of the program state as execution proceeds. For example, selecting all even values from an array by iterating through its elements, testing each value, and adding the matching values to a new array follows an imperative approach.</p>
-<p><strong>See also:</strong> <a href="#gls-declarative-programming">Declarative programming</a>. <strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Imperative_programming">Wikipedia — Imperative programming</a>.</p>
-</section>
-</section>
-<section id="m" class="level2">
-<h2 class="anchored" data-anchor-id="m">M</h2>
-<section id="gls-modified-in-place" class="level3">
-<h3 class="anchored" data-anchor-id="gls-modified-in-place">Modified in place</h3>
-<p>Describes an operation that changes an existing object or data structure directly, rather than creating and returning a separate modified copy.</p>
-<p>For example, in Julia, integers are immutable:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">4</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">+</span> <span class="fl">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Here, <code>x</code> is not modified in place. Instead, <code>x</code> is rebound from the value <code>4</code> to the new value <code>5</code>.</p>
-<p>By contrast, an array is mutable:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">4</span>]</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x[<span class="fl">1</span>] <span class="op">+=</span> <span class="fl">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Here, the existing array is modified in place, changing its contents from <code>[4]</code> to <code>[5]</code>.</p>
-<p><strong>See also:</strong> <a href="#gls-mutable-object">Mutable object</a>; <a href="#gls-immutable-object">Immutable object</a>.</p>
-</section>
-<section id="gls-mutable-object" class="level3">
-<h3 class="anchored" data-anchor-id="gls-mutable-object">Mutable object</h3>
-<p>An object whose contents or internal state can be changed after it has been created. Operations on a mutable object may therefore modify the existing object directly rather than creating a new one. Lists and dictionaries are common examples of mutable objects in many programming languages.</p>
-<p><strong>See also:</strong> <a href="#gls-immutable-object">Immutable object</a>; <a href="#gls-modified-in-place">Modified in place</a>.</p>
-</section>
-</section>
-<section id="r" class="level2">
-<h2 class="anchored" data-anchor-id="r">R</h2>
-<section id="gls-refactoring" class="level3">
-<h3 class="anchored" data-anchor-id="gls-refactoring">Refactoring</h3>
-<p>Restructuring existing code to improve its organization, readability, or reuse while preserving its intended computational behavior.</p>
-</section>
-<section id="gls-regression-test" class="level3">
-<h3 class="anchored" data-anchor-id="gls-regression-test">Regression test</h3>
-<p>An automated test that checks whether previously accepted behavior remains unchanged after modifications to the code. A regression test compares current results with established reference values or properties so that unintended changes can be detected.</p>
-<p>In MiniFEM, regression tests may protect previously verified displacements, reactions, element quantities, quadrature properties, or other numerical results while new functionality is introduced. They support verification of later code changes, but they do not replace independent analytical verification or physical validation.</p>
-</section>
-</section>
-<section id="s" class="level2">
-<h2 class="anchored" data-anchor-id="s">S</h2>
-<section id="gls-separation-of-concerns" class="level3">
-<h3 class="anchored" data-anchor-id="gls-separation-of-concerns">Separation of concerns</h3>
-<p>A software-design principle in which different aspects of a program are kept in distinct parts of the code so that each part addresses a specific concern. For example, a numerical function can perform a finite element operation while diagnostic output is handled separately.</p>
-<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Separation_of_concerns">Wikipedia — Separation of concerns</a>.</p>
-</section>
-<section id="gls-single-responsibility-principle" class="level3">
-<h3 class="anchored" data-anchor-id="gls-single-responsibility-principle">Single Responsibility Principle</h3>
-<p>A design principle stating that a function, module, or other program component should have a coherent responsibility and a principal reason to change. It does not mean that every component must perform only one small action. For example, element-response recovery may coherently compute several related physical quantities, while element formulation and local-to-global assembly have different reasons to change and can be separated, as illustrated by the S06 refactoring in <a href="chapters/shared-fem-assembly.html" class="quarto-xref"><span>12&nbsp; From repeated assembly to shared FEM operations</span></a>.</p>
-<p><strong>Further details:</strong> <a href="https://en.wikipedia.org/wiki/Single-responsibility_principle">Wikipedia — Single-responsibility principle</a>.</p>
+<section id="reflection" class="level2" data-number="20.7">
+<h2 data-number="20.7" class="anchored" data-anchor-id="reflection"><span class="header-section-number">20.7</span> Reflection</h2>
+<p>Comparing the S07 and S08 implementations has allowed us to separate interpolation-specific information from the finite element operations that can be shared.</p>
+<p>The common implementation now supports both linear and quadratic elements within the same program structure, preparing the way for the study of approximation error and convergence.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -985,13 +1055,13 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./chapters/isoparametric-axial-bar-implementation.html" class="pagination-link" aria-label="From separate interpolations to a common isoparametric implementation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From separate interpolations to a common isoparametric implementation</span></span>
+      <a href="../chapters/three-node-quadratic-bar-implementation.html" class="pagination-link" aria-label="Implementing the three-node quadratic axial-bar element">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Implementing the three-node quadratic axial-bar element</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../glossary.html" class="pagination-link" aria-label="Glossary">
+        <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
