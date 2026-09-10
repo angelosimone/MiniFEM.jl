@@ -8,7 +8,8 @@
 **Target snapshot:** `2026-27/S09-common-isoparametric-axial-bar`
 :::
 
-::: {.callout-important title="Task"}
+
+::: {.callout-important title="Task: Refactor the linear and quadratic isoparametric implementations"}
 Compare the verified linear and quadratic isoparametric axial-bar
 implementations. Keep the interpolation choice explicit, but replace only the
 operations that have become demonstrably common with one shared implementation.
