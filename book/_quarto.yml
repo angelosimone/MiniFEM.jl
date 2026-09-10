@@ -48,6 +48,9 @@ format:
       method: mathjax
       url: https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml-nofont.js
     include-in-header: fonts-mathjax.html
+    css: styles.css
+    filters:
+      - tools/git-lastmod.lua
 
   pdf:
     pdf-engine: lualatex
