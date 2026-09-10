@@ -116,6 +116,7 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-sidebar floating quarto-light">
@@ -367,6 +368,9 @@ window.Quarto = {
 </header>
 
 
+<div class="lastmod">
+<p><em>Last updated: 10 September 2026</em></p>
+</div>
 <p>Part II introduced the finite element assembly process through discrete spring systems. For those systems, the element force–displacement relations followed directly from spring kinematics, the constitutive law, and equilibrium. Part III moves to continuum problems, where the unknown is a field governed by a differential equation. Before the familiar finite element assembly process can be used, the continuum problem must therefore be reformulated in a form suitable for numerical approximation.</p>
 <p>The familiar algebraic system <span class="math inline">\(\mathbf{K}\mathbf{u}=\mathbf{f}\)</span> will eventually reappear, but the path to it is now different: the governing differential equation is first reformulated in weak form and only then restricted to a finite-dimensional approximation. This formulation provides a systematic basis for handling spatially varying properties, distributed loads, natural boundary conditions, and finite element approximations of different orders. It therefore provides the bridge between the continuum model and the finite element equations that will ultimately be assembled.</p>
 <section id="from-three-dimensional-equilibrium-to-a-one-dimensional-model" class="level2" data-number="9.1">

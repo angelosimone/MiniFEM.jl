@@ -1,0 +1,26 @@
+/* Mark coding/development chapters in the HTML book sidebar. */
+
+#quarto-sidebar a.sidebar-link[href$="two-springs-julia.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="two-springs-functions.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="two-springs-callable-analysis.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="two-springs-regression-tests.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="four-element-axial-bar-analysis.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="shared-fem-assembly.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="gauss-legendre-quadrature-implementation.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="three-node-quadratic-bar-implementation.html"]::before,
+#quarto-sidebar a.sidebar-link[href$="isoparametric-axial-bar-implementation.html"]::before {
+    content: "{ }";
+    color: #6F42C1;
+    font-family: monospace;
+    font-weight: 600;
+    font-size: 0.8em;
+    margin-right: 0.35em;
+}
+
+
+.lastmod {
+    margin-top: -0.6rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.9em;
+    color: #777;
+}
