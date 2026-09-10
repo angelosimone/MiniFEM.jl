@@ -1,0 +1,355 @@
+# From separate interpolations to a common isoparametric implementation {#sec-common-isoparametric-axial-bar}
+
+::: {.callout-note}
+## Repository snapshot
+
+**Course edition:** 2026--27\
+**Starting snapshot:** `2026-27/S08-three-node-quadratic-bar`\
+**Target snapshot:** `2026-27/S09-common-isoparametric-axial-bar`
+:::
+
+::: {.callout-important title="Task"}
+Compare the verified linear and quadratic isoparametric axial-bar
+implementations. Keep the interpolation choice explicit, but replace only the
+operations that have become demonstrably common with one shared implementation.
+:::
+
+In S07 and S08, the linear and quadratic numerical formulations were
+deliberately kept separate so that the effect of changing the interpolation
+remained visible in the implementation. With both formulations now understood
+and verified, we can compare them and ask:
+
+> Which differences belong to the interpolation, and which operations are the
+> same finite element algorithm acting on different data?
+
+No new finite element operations are introduced here. Instead, we will reuse the
+procedures developed in the preceding chapters and identify which parts of the
+implementation can now be shared.
+
+## Start from the verified implementations
+
+Run the regression suite before changing the source:
+
+```text
+julia test/runtests.jl
+```
+
+Resolve any baseline failure before continuing. The mathematical models and
+reference results are already verified; S09 changes the organization of the
+numerical implementation.
+
+The separate numerical formulation files used in S07 and S08 were:
+
+```text
+examples/axial_bar_gauss_legendre_fem.jl
+examples/quadratic_axial_bar_gauss_legendre_fem.jl
+```
+
+In S09, these are replaced by the common implementation
+
+```text
+src/isoparametric_axial_bar.jl
+```
+
+which serves both the linear and quadratic isoparametric formulations. The two
+executable examples remain separate:
+
+```text
+examples/linear_isoparametric_axial_bar.jl
+examples/quadratic_isoparametric_axial_bar.jl
+```
+
+The earlier implementations remain recoverable from the snapshots
+
+```text
+2026-27/S07-gauss-legendre-quadrature
+2026-27/S08-three-node-quadratic-bar
+```
+
+Inspect the two snapshot implementations side by side. For each operation below,
+decide whether changing from linear to quadratic interpolation requires a
+different algorithm, or only different interpolation data or array dimensions.
+
+  | Operation                             | What changes? |
+  | ------------------------------------- | ------------- |
+  | Shape functions and $d\mathbf N/d\xi$ |               |
+  | Number of element DOFs                |               |
+  | $J = (d\mathbf N/d\xi)\mathbf x_e$    |               |
+  | $\mathbf B = (1/J)d\mathbf N/d\xi$    |               |
+  | Gauss--Legendre integration           |               |
+  | Local-to-global assembly              |               |
+  | Global solution and reaction recovery |               |
+  | Response recovery                     |               |
+
+Do not assume that different array sizes or numerical values necessarily imply
+different algorithms. Use the comparison to identify which parts of the two
+implementations should remain interpolation-specific and which can be shared.
+
+## Make interpolation the explicit variation
+
+The first difference to isolate is the interpolation itself. Rather than
+maintaining separate element procedures, we make the interpolation choice an
+explicit input:
+
+```julia
+bar_shape_functions(xi, interpolation)
+```
+
+Here, `xi` is the reference coordinate and `interpolation` is either `"linear"`
+or `"quadratic"`. The function returns the shape functions and their derivatives
+with respect to the reference coordinate:
+
+```text
+N
+dN_dxi
+```
+
+For linear interpolation,
+
+$$
+  \mathbf N(\xi) = \begin{bmatrix}
+                     (1 - \xi)/2 \\
+                     (1 + \xi)/2
+                   \end{bmatrix},
+  \qquad \frac{d\mathbf N}{d\xi} = \begin{bmatrix}
+                                     -1/2 \\
+                                     +1/2
+                                   \end{bmatrix}.
+$$
+
+For quadratic interpolation, with the local nodes ordered as left endpoint,
+midpoint, and right endpoint,
+
+$$
+  \mathbf N(\xi) = \begin{bmatrix}
+                     \tfrac12\xi(\xi - 1) \\
+                     1 - \xi^2 \\
+                     \tfrac12\xi(\xi + 1)
+                   \end{bmatrix},
+  \qquad \frac{d\mathbf N}{d\xi} = \begin{bmatrix}
+                                     \xi - \tfrac12 \\
+                                     -2\xi \\
+                                     \xi + \tfrac12
+                                   \end{bmatrix}.
+$$
+
+These expressions were derived in the preceding chapters and do not need to be
+reconsidered here. They are simply the interpolation-specific information
+supplied to the common element procedure.
+
+Once $\mathbf N$ and $d\mathbf N/d\xi$ are available, we can ask whether any of
+the remaining isoparametric operations actually need to know whether the
+interpolation is linear or quadratic.
+
+## Build the common element procedure
+
+The common element procedure is implemented by
+
+```julia
+integrate_axial_bar_gauss_legendre(
+    x_e,
+    E_e,
+    A_e,
+    q_e,
+    num_gauss_legendre_points,
+    interpolation,
+)
+```
+
+which returns `K_e, f_e`.
+
+The important change is that the size of the element arrays is no longer
+hard-coded separately for each interpolation:
+
+```julia
+num_element_dofs = length(x_e)
+
+K_e = zeros(num_element_dofs, num_element_dofs)
+f_e = zeros(num_element_dofs)
+```
+
+For the present axial-bar elements, with one displacement DOF per node,
+`num_element_dofs` is therefore 2 for a linear element and 3 for a quadratic
+element. It is an element-level quantity and should not be confused with the
+already established `total_dofs`, which refers to the complete assembled model.
+
+The same implementation can therefore operate on either a two-node or a
+three-node element without separate local-array definitions or loop limits.
+
+### Represent the distributed load at the element nodes
+
+The common element procedure receives `q_e` as the distributed-load values at
+the element nodes and interpolates them using the selected shape functions.
+
+For the present benchmarks, `element_q[e]` stores the constant distributed load
+assigned to element `e`. The corresponding nodal values are constructed as
+
+```julia
+q_e = fill(element_q[e], num_element_dofs)
+```
+
+so that a uniform load $q$ gives
+
+```text
+linear:     q_e = [q, q]
+quadratic:  q_e = [q, q, q]
+```
+
+More generally, `q_e` may contain different nodal values. The previously
+verified linearly varying load for the two-node element is therefore handled by
+the same element procedure, without an interpolation-specific branch.
+
+Using the displacement shape functions to interpolate the prescribed load is
+convenient for the present examples, but it is not a general requirement that
+all physical fields use the same interpolation.
+
+## Reuse the surrounding FEM workflow
+
+Once the element procedure has been made independent of the interpolation order,
+the surrounding finite element workflow can also be shared.
+
+The common assembly procedure is implemented by
+
+```julia
+assemble_axial_bar_gauss_legendre!(
+    K,
+    f,
+    node_coordinates,
+    element_connectivity,
+    element_E,
+    element_A,
+    element_q,
+    num_gauss_legendre_points,
+    interpolation,
+)
+```
+
+It constructs the element quantities and uses the established assembly
+operations
+
+```julia
+assemble_matrix!(K, K_e, dof_map)
+assemble_vector!(f, f_e, dof_map)
+```
+
+for both linear and quadratic elements. The number of entries in `dof_map`
+changes with the element interpolation, but the assembly procedure does not.
+
+Similarly,
+
+```julia
+solve_axial_bar_gauss_legendre(
+    node_coordinates,
+    element_connectivity,
+    element_E,
+    element_A,
+    element_q,
+    applied_forces,
+    constrained_dofs,
+    prescribed_displacements,
+    num_gauss_legendre_points,
+    interpolation,
+)
+```
+
+returns `u, reactions` using the same established global solution procedure for
+both interpolation choices.
+
+Response recovery is handled by
+
+```julia
+recover_axial_bar_response(
+    node_coordinates,
+    element_connectivity,
+    element_E,
+    element_A,
+    u,
+    response_reference_coordinates,
+    interpolation,
+)
+```
+
+which returns `response_coordinates, strain, stress, axial_force`.
+
+The response coordinates are specified independently of the Gauss--Legendre
+quadrature rule. Quadrature points are chosen to integrate the element
+contributions, whereas response points are chosen to inspect the computed
+solution. They may coincide, but one choice does not determine the other.
+
+## Resulting source organization
+
+The distinction between reusable finite element operations and executable
+examples is now reflected in the repository structure:
+
+```text
+src/
+    MiniFEM.jl
+    two_springs_fem.jl
+    axial_bar_closed_form.jl
+    fem_assembly.jl
+    gauss_legendre_quadrature.jl
+    isoparametric_axial_bar.jl
+
+examples/
+    two_springs.jl
+    four_element_axial_bar.jl
+    gauss_legendre_scalar_integration.jl
+    linear_isoparametric_axial_bar.jl
+    quadratic_isoparametric_axial_bar.jl
+```
+
+The files in `src/` contain reusable FEM and numerical operations, whereas the
+files in `examples/` define and run particular problems.
+
+For the axial bar, the closed-form implementation
+
+```text
+src/axial_bar_closed_form.jl
+```
+
+is used by
+
+```text
+examples/four_element_axial_bar.jl
+```
+
+while the common isoparametric implementation
+
+```text
+src/isoparametric_axial_bar.jl
+```
+
+is used by both
+
+```text
+examples/linear_isoparametric_axial_bar.jl
+examples/quadratic_isoparametric_axial_bar.jl
+```
+
+The examples still include the required source files explicitly with
+`include(...)`. `src/MiniFEM.jl` remains inactive at this stage.
+
+## Verify the refactoring
+
+The tests must follow the new source organization as well. The regression suite
+now loads the reusable FEM and numerical operations from `src/`, including the
+common isoparametric axial-bar implementation, while retaining the separate
+verification cases developed in the preceding snapshots.
+
+Run the regression suite:
+
+```text
+julia test/runtests.jl
+```
+
+All previously verified linear and quadratic results should remain unchanged.
+
+## Reflection
+
+Comparing the S07 and S08 implementations has allowed us to separate
+interpolation-specific information from the finite element operations that can
+be shared.
+
+The common implementation now supports both linear and quadratic elements within
+the same program structure, preparing the way for the study of approximation
+error and convergence.

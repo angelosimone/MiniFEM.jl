@@ -6,8 +6,8 @@
 #     |---- element 1 ----|---- element 2 ----|---- element 3 ----|---- element 4 ----|
 #   node 1              node 2              node 3              node 4              node 5
 
-include("fem_assembly.jl")
-include("axial_bar_fem.jl")
+include("../src/fem_assembly.jl")
+include("../src/axial_bar_closed_form.jl")
 
 # -------------------------------
 # 1. Model data

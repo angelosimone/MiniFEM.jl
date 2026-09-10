@@ -299,6 +299,14 @@ x = zeros(3)
 
 Here `x` contains three `Float64` zeros.
 
+To create a vector whose entries all have the same value, use `fill`:
+
+```julia
+a = fill(3.0, 4)
+```
+
+This creates the vector `[3.0, 3.0, 3.0, 3.0]`.
+
 Useful inspection functions include:
 
 ```julia

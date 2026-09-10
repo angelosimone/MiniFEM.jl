@@ -12,8 +12,8 @@
 #
 # Left-to-right node order: [2, 3, 1].
 
-include("fem_assembly.jl")
-include("two_springs_fem.jl")
+include("../src/fem_assembly.jl")
+include("../src/two_springs_fem.jl")
 
 # -------------------------------
 # Reference two-spring benchmark

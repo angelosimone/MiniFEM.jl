@@ -1,8 +1,8 @@
-# Executable Gauss--Legendre reference cases for the regular three-node quadratic axial bar.
+# Executable reference cases using quadratic isoparametric axial-bar elements.
 
-include("fem_assembly.jl")
-include("gauss_legendre_quadrature.jl")
-include("quadratic_axial_bar_gauss_legendre_fem.jl")
+include("../src/fem_assembly.jl")
+include("../src/gauss_legendre_quadrature.jl")
+include("../src/isoparametric_axial_bar.jl")
 
 # -------------------------------
 # 1. Common model data
@@ -17,6 +17,7 @@ EA = E * A
 
 # Two points are exact for the regular quadratic-element stiffness and uniform load.
 num_gauss_legendre_points = 2
+interpolation = "quadratic"
 response_reference_coordinates = [-1.0, 0.0, 1.0]
 
 # -------------------------------
@@ -33,7 +34,7 @@ applied_forces_end_force = [(3, F)]
 constrained_dofs_end_force = [1]
 prescribed_displacements_end_force = [0.0]
 
-u_end_force, reactions_end_force = solve_quadratic_axial_bar_gauss_legendre(
+u_end_force, reactions_end_force = solve_axial_bar_gauss_legendre(
     node_coordinates_end_force,
     element_connectivity_end_force,
     element_E_end_force,
@@ -43,6 +44,7 @@ u_end_force, reactions_end_force = solve_quadratic_axial_bar_gauss_legendre(
     constrained_dofs_end_force,
     prescribed_displacements_end_force,
     num_gauss_legendre_points,
+    interpolation,
 )
 
 (
@@ -50,13 +52,14 @@ response_coordinates_end_force,
 response_strain_end_force,
 response_stress_end_force,
 response_axial_force_end_force
-) = recover_quadratic_axial_bar_response(
+) = recover_axial_bar_response(
     node_coordinates_end_force,
     element_connectivity_end_force,
     element_E_end_force,
     element_A_end_force,
     u_end_force,
     response_reference_coordinates,
+    interpolation,
 )
 
 u_end_force_exact = [0.0, F * L / (2 * EA), F * L / EA]
@@ -78,7 +81,7 @@ applied_forces_uniform_load = Tuple{Int, Float64}[]
 constrained_dofs_uniform_load = [1]
 prescribed_displacements_uniform_load = [0.0]
 
-u_uniform_load, reactions_uniform_load = solve_quadratic_axial_bar_gauss_legendre(
+u_uniform_load, reactions_uniform_load = solve_axial_bar_gauss_legendre(
     node_coordinates_uniform_load,
     element_connectivity_uniform_load,
     element_E_uniform_load,
@@ -88,6 +91,7 @@ u_uniform_load, reactions_uniform_load = solve_quadratic_axial_bar_gauss_legendr
     constrained_dofs_uniform_load,
     prescribed_displacements_uniform_load,
     num_gauss_legendre_points,
+    interpolation,
 )
 
 (
@@ -95,13 +99,14 @@ response_coordinates_uniform_load,
 response_strain_uniform_load,
 response_stress_uniform_load,
 response_axial_force_uniform_load
-) = recover_quadratic_axial_bar_response(
+) = recover_axial_bar_response(
     node_coordinates_uniform_load,
     element_connectivity_uniform_load,
     element_E_uniform_load,
     element_A_uniform_load,
     u_uniform_load,
     response_reference_coordinates,
+    interpolation,
 )
 
 u_uniform_load_exact = [0.0, 3 * q * L^2 / (8 * EA), q * L^2 / (2 * EA)]
@@ -130,7 +135,7 @@ applied_forces = [(3, P)]
 constrained_dofs = [1]
 prescribed_displacements = [0.0]
 
-u, reactions = solve_quadratic_axial_bar_gauss_legendre(
+u, reactions = solve_axial_bar_gauss_legendre(
     node_coordinates,
     element_connectivity,
     element_E,
@@ -140,6 +145,7 @@ u, reactions = solve_quadratic_axial_bar_gauss_legendre(
     constrained_dofs,
     prescribed_displacements,
     num_gauss_legendre_points,
+    interpolation,
 )
 
 (
@@ -147,13 +153,14 @@ response_coordinates,
 response_strain,
 response_stress,
 response_axial_force
-) = recover_quadratic_axial_bar_response(
+) = recover_axial_bar_response(
     node_coordinates,
     element_connectivity,
     element_E,
     element_A,
     u,
     response_reference_coordinates,
+    interpolation,
 )
 
 # -------------------------------

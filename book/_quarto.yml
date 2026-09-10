@@ -35,6 +35,7 @@ book:
         - chapters/isoparametric-formulation-one-dimension.qmd
         - chapters/isoparametric-three-node-bar_element.qmd
         - chapters/three-node-quadratic-bar-implementation.qmd
+        - chapters/isoparametric-axial-bar-implementation.qmd
     - glossary.qmd
     - references.qmd
 

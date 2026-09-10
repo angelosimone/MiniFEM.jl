@@ -1,6 +1,6 @@
 # Explicit scalar examples of Gauss--Legendre quadrature.
 
-include("gauss_legendre_quadrature.jl")
+include("../src/gauss_legendre_quadrature.jl")
 
 function evaluate_scalar_gauss_legendre_examples()
     # A one-point rule integrates a general linear polynomial exactly.

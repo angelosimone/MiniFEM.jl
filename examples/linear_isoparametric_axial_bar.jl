@@ -1,4 +1,4 @@
-# Executable Gauss--Legendre benchmark for a uniform one-dimensional axial bar.
+# Executable reference benchmark using linear isoparametric axial-bar elements.
 
 # Physical layout: four equal bar elements with geometric node numbering.
 #
@@ -6,9 +6,9 @@
 #     |---- element 1 ----|---- element 2 ----|---- element 3 ----|---- element 4 ----|
 #   node 1              node 2              node 3              node 4              node 5
 
-include("fem_assembly.jl")
-include("gauss_legendre_quadrature.jl")
-include("axial_bar_gauss_legendre_fem.jl")
+include("../src/fem_assembly.jl")
+include("../src/gauss_legendre_quadrature.jl")
+include("../src/isoparametric_axial_bar.jl")
 
 # -------------------------------
 # 1. Model data
@@ -44,6 +44,10 @@ prescribed_displacements = [0.0]
 
 # One point is exact here for constant E, A, and the uniform element load.
 num_gauss_legendre_points = 1
+interpolation = "linear"
+
+# Response locations are selected independently of the quadrature rule.
+response_reference_coordinates = [0.0]
 
 # -------------------------------
 # 2. Finite element solution
@@ -59,6 +63,7 @@ u, reactions = solve_axial_bar_gauss_legendre(
     constrained_dofs,
     prescribed_displacements,
     num_gauss_legendre_points,
+    interpolation,
 )
 
 # -------------------------------
@@ -66,18 +71,18 @@ u, reactions = solve_axial_bar_gauss_legendre(
 # -------------------------------
 
 (
-gauss_point_reference_coordinates,
-gauss_point_coordinates,
-gauss_point_strain,
-gauss_point_stress,
-gauss_point_axial_force
-) = recover_axial_bar_response_gauss_legendre(
+response_coordinates,
+response_strain,
+response_stress,
+response_axial_force
+) = recover_axial_bar_response(
     node_coordinates,
     element_connectivity,
     element_E,
     element_A,
     u,
-    num_gauss_legendre_points,
+    response_reference_coordinates,
+    interpolation,
 )
 
 # -------------------------------
@@ -89,8 +94,8 @@ EA = E * A
 num_nodes = length(node_coordinates)
 num_elements = size(element_connectivity, 1)
 u_exact = zeros(num_nodes)
-num_response_points = size(gauss_point_coordinates, 2)
-axial_force_exact_at_gauss_points = zeros(num_elements, num_response_points)
+num_response_points = length(response_reference_coordinates)
+axial_force_exact_at_response_points = zeros(num_elements, num_response_points)
 
 for node in 1:num_nodes
     x = node_coordinates[node]
@@ -103,13 +108,13 @@ for node in 1:num_nodes
 end
 
 for e in 1:num_elements
-    for g in 1:num_response_points
-        x_g = gauss_point_coordinates[e, g]
+    for r in 1:num_response_points
+        x_r = response_coordinates[e, r]
 
-        if x_g < a
-            axial_force_exact_at_gauss_points[e, g] = q * (L - x_g) + P
+        if x_r < a
+            axial_force_exact_at_response_points[e, r] = q * (L - x_r) + P
         else
-            axial_force_exact_at_gauss_points[e, g] = q * (L - x_g)
+            axial_force_exact_at_response_points[e, r] = q * (L - x_r)
         end
     end
 end
@@ -139,25 +144,25 @@ display(reactions)
 println("\n- Expected reaction at x = 0 [N]: ", reaction_expected)
 println("- Global equilibrium residual R + qL + P [N]: ", global_equilibrium_residual)
 
-println("\n- Gauss-point reference coordinates xi:")
-display(gauss_point_reference_coordinates)
+println("\n- Response reference coordinates xi:")
+display(response_reference_coordinates)
 
-println("\n- Gauss-point physical coordinates x [mm]:")
-display(gauss_point_coordinates)
+println("\n- Response physical coordinates x [mm]:")
+display(response_coordinates)
 
-println("\n- Gauss-point strains:")
-display(gauss_point_strain)
+println("\n- Response strains:")
+display(response_strain)
 
-println("\n- Gauss-point stresses [N/mm^2]:")
-display(gauss_point_stress)
+println("\n- Response stresses [N/mm^2]:")
+display(response_stress)
 
-println("\n- Recovered Gauss-point axial forces [N]:")
-display(gauss_point_axial_force)
+println("\n- Recovered response axial forces [N]:")
+display(response_axial_force)
 
-println("\n- Exact axial forces at Gauss points [N]:")
-display(axial_force_exact_at_gauss_points)
+println("\n- Exact axial forces at response points [N]:")
+display(axial_force_exact_at_response_points)
 
-println("\n- Gauss-point axial-force error [N]:")
-display(gauss_point_axial_force - axial_force_exact_at_gauss_points)
+println("\n- Response axial-force error [N]:")
+display(response_axial_force - axial_force_exact_at_response_points)
 
 println("\n- Exact axial-force jump at x = L / 2 [N]: ", exact_force_jump)
